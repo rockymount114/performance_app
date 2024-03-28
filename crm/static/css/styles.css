@@ -1,0 +1,35 @@
+
+.form-layout{
+
+    border-radius: 15px;
+    width: 1200px;
+
+}
+
+.message-text{
+
+    color: rgb(255, 253, 253);
+
+}
+
+.page-item{
+    color: red;
+    background-color: rgb(93, 94, 93);
+}
+
+
+.content{
+    width: 1920px;
+    padding: 3px;
+    /* background-color: rgb(240, 9, 21); */
+}
+
+
+body{
+	background-color: hsl(0, 5%, 98%);
+}
+
+/* for measure actual and target col*/
+#centered-header {
+    text-align: center;
+}

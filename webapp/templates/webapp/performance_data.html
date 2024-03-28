@@ -1,0 +1,17 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Performance Data Details{% endblock title %}
+{% load static %}
+
+{% block content %}
+
+<h1>Performance data </h1>
+
+Initiative 1 
+
+<div class="progress">
+    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+  </div>
+
+{{form.as_p}}
+
+{% endblock content %}

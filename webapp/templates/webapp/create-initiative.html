@@ -1,0 +1,49 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Strategic Initiative{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <body>
+
+        <div class="container bg-light shadow-md p-5 form-layout">
+
+            <h3> Create a strategic initiative </h3>
+            <h6> Start adding in the required details for your strategic initiative. </h6>
+            <hr>
+
+            <form method="POST" autocomplete="off" >
+
+                {% csrf_token %}  
+
+                {{ form.as_p }}
+
+                {% comment %} {{form.site|as_crispy_field}}
+                {{form.location|as_crispy_field }}
+                {{form.owner|as_crispy_field}}
+                {{form.retention|as_crispy_field}}
+                {{form.content|as_crispy_field}}  {% endcomment %}
+
+                <br>
+                <button type="submit" class="btn btn-primary">                     
+                    Create a initiative &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                &nbsp;
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
+                    Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </form>
+        </div>
+        <br>
+
+       
+
+    </body>
+
+
+
+
+{% endblock %}
+
+
+
+

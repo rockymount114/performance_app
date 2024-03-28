@@ -1,0 +1,105 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Quarterly Data{% endblock title %}
+{% load crispy_forms_tags %}
+{% load static %} 
+{% block content %}
+
+
+<h3>Quarterly data</h1>
+
+<hr>
+
+<!--Quarterly data table-->
+
+<div class="card">
+  <div class="card-body">
+
+      <table class="table table-hover table-bordered">
+          <thead class="table-light">
+              <tr>
+                  <th scope="col"> Objective No. </th>
+                  <th scope="col"> Q1 </th>
+                  <th scope="col"> Q2 </th>
+                  <th scope="col"> Q3 </th>
+                  <th scope="col"> Q4 </th>  
+
+              </tr>
+          </thead>
+
+          <tr>
+              <td> {{objective}} </td>
+
+              <td> 1/4
+                  <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                  </div>
+              </td>
+              <td> 2/3 
+                  <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                  </div>
+              </td>
+              <td> 4/5 
+                  <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                  </div>
+              </td>
+              <td> 6/6 
+                  <div class="progress">
+                      <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                  </div>
+              </td>
+
+          </tr>
+      <tbody>
+
+
+      </tbody>
+
+          </table>
+
+     
+
+          {% comment %}                   
+          {% for quarter_data in quarterly_data%}
+          <li class="list-group-item">{{quarter_data}}</li>     
+      
+          {% endfor %} {% endcomment %}
+
+      <hr> 
+      
+
+  </div>
+
+</div>
+
+
+<!--Quarterly data form-->
+
+<form method="POST">
+    {% csrf_token %}
+    
+    {{form.as_p}}
+
+
+    <button type="submit" class="btn btn-primary">                     
+        Submit Quarterly Data &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+    </button>
+    &nbsp;
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
+        Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+    </a>
+
+    <a href="{% url 'view-quarterly-data' %}" class="btn btn-secondary"> 
+      View quarterly data &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+  </a>
+
+  </form>
+
+
+
+
+
+
+
+{% endblock content %}

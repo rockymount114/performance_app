@@ -1,0 +1,29 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Home{% endblock title %}
+{% block content %}    
+    <body>
+        <br>
+        <br>
+        <div class="text-center">
+            <h3> Performance Measure Application of City Rocky Mount </h3>
+            <br>
+            <h5> Keep track of your performance effectively! </h5>
+            <hr>
+            <br>
+            <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
+        </div>
+
+
+    </body>      
+
+    <canvas id="myChart"></canvas>
+    
+<script>
+    var data = {{ chartJSON | safe }}
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, data);
+</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+
+{% endblock %}
