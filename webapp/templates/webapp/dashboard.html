@@ -12,6 +12,8 @@
     <hr>
 </div>
 
+
+
 <!--Mission statement & Department overview start-->
 
 <div class="container-fluid ">
@@ -104,89 +106,57 @@
     <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
         Create a new measure &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
     </a>
-    {% comment %} <a class="btn btn-outline-primary btn-sm" href="{% url 'create-mission' %}">
-        Create a mission &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-    </a> {% endcomment %}
+<br><br>
 
-    <table class="table table-hover table-bordered">
-        <thead class="table-light">
-            <tr>
-                <th scope="col"> Id </th>
-                <th scope="col"> Objective </th>
-                <th scope="col"> Measure </th>
-                <th scope="col"> Direction </th>
-                <th scope="col" id="centered-header"> FY {{current_year}} (Actual) </th>
-                <th scope="col" id="centered-header"> FY {{target_year}} Target </th>
-                <th scope="col"> Frequency </th>
-                <th scope="col" id="centered-header"> {{target_year}} Q1 </th>
-                <th scope="col" id="centered-header"> {{target_year}} Q2 </th>
-                <th scope="col" id="centered-header"> {{target_year}} Q3 </th>
-                <th scope="col" id="centered-header"> {{target_year}} Q4 </th>
+    <div class="container-fluid">
+      {% if grouped_measures %}
+          {% for objective_id, measures in grouped_measures.items %}
+              <h5 style="background-color: #FAEBD7; padding: 10px;">Objective: {{ objective_id }}</h5>
+              <table class="table table-hover table-bordered">
+                  <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th class="title_column">Title</th>
+                          <th>Direction</th>
+                          <th id="centered-header">Frequency</th>
+                          <th id="centered-header">Current Year Rate</th>
+                          <th id="centered-header">Target Rate</th>
+                          <th id="centered-header">Q1</th>
+                          <th id="centered-header">Q2</th>
+                          <th id="centered-header">Q3</th>
+                          <th id="centered-header">Q4</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for measure in measures %}
+                          <tr>
+                              <td>{{ measure.id}}</td>
+                              <td class="title_column">{{ measure.title }}</td>
+                              <td>{{ measure.direction }}</td>
+                              <td align="center">{{ measure.frequency }}</td>
+                              <td align="center">{{ measure.current_year_rate }}</td>
+                              <td align="center">{{ measure.target_rate }}</td>
 
-            </tr>
-        </thead>
-        <tbody>
+                             
+                              <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>                  
+                              <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                              <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+                              <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          {% endfor %}
+      {% else %}
+          <p>No measures found.</p>
+      {% endif %}
+  </div>
 
-            {% for measure in measures %}
-            <tr>
-                <td> {{measure.id}} </td>
-                <td> Obj# {{measure.objective_id}} </td>
-                <td> {{measure.title}} </td>
-                <td> {{measure.direction}} </td>
-                <td align="center"> {{measure.current_year_rate}} </td>
-                <td align="center"> {{measure.target_rate}} </td>
-                <td> {{measure.frequency}} </td>
-
-                <!--pencil icoin <i class="fa fa-pencil-square-o" aria-hidden="true"></i> -->
-                <!--line_id, quarter_number, dept_id, obj_id-->
-                <td align="center"> 
-                  <a href="{% url 'create-quarterly-data'  %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> 
-                  {% comment %} <a href="" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{quarterly_data}}</a>  {% endcomment %}
-                </td>
-
-                {% comment %} {% for object in quarterly_data%}
-                <td> <a href="#" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{object}}</a> </td>
-                {% endfor %} {% endcomment %}
-
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
-      
-            </tr>
-
-            {% endfor %} 
-
-        {% comment %} {% if records %}
-            {% for record in records %}
-            <tr>
-
-                <td> {{record.id}} </td>
-                <td> {{record.site}}  </td>
-                <td> {{record.location}} </td>
-                <td> {{record.owner}} </td>
-                <td> {{record.retention}} </td>
-                <td> {{record.content}} </td>
-                <td> {{record.create_by}} </td>
-                
-                <td> {{record.creation_date|date:"m/d/Y"}} </td>
-                <td> {{record.review_date|date:"m/d/Y"}}  </td>
-
-                <td> 
-                    <div class="d-flex justify-content-center">
-                    <a class="btn btn-success btn-sm" href="{% url 'record' record.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> 
-                    </div>
-                </td>
-
-            </tr>
-            {% endfor %}        
-        {% endif %} {% endcomment %}
-
-        </tbody>
-
-    </table>
+<!--Test Measure group by objective_id end-->
 
 
-<!-- Pagination for Measures-->
+
+<!-- Pagination for Measures
 
 <div class="container-fluid">
     <div class="row my-1">        
@@ -222,7 +192,7 @@
     </div>
 </div> 
 
-
+-->
 
 
 <!--Table 2 is for Strategic initatives-->

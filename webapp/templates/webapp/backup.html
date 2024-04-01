@@ -1,0 +1,82 @@
+<!--Measure table old -->
+<table class="table table-hover table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th scope="col"> Id </th>
+            <th scope="col"> Objective </th>
+            <th scope="col"> Measure </th>
+            <th scope="col"> Direction </th>
+            <th scope="col" id="centered-header"> FY {{current_year}} (Actual) </th>
+            <th scope="col" id="centered-header"> FY {{target_year}} Target </th>
+            <th scope="col"> Frequency </th>
+            <th scope="col" id="centered-header"> {{target_year}} Q1 </th>
+            <th scope="col" id="centered-header"> {{target_year}} Q2 </th>
+            <th scope="col" id="centered-header"> {{target_year}} Q3 </th>
+            <th scope="col" id="centered-header"> {{target_year}} Q4 </th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for measure in measures %}
+        <tr>
+            <td> {{measure.id}} </td>
+            <td> Obj# {{measure.objective_id}} </td>
+            <td> {{measure.title}} </td>
+            <td> {{measure.direction}} </td>
+            <td align="center"> {{measure.current_year_rate}} </td>
+            <td align="center"> {{measure.target_rate}} </td>
+            <td> {{measure.frequency}} </td>
+
+            <!--pencil icoin <i class="fa fa-pencil-square-o" aria-hidden="true"></i> -->
+            <!--line_id, quarter_number, dept_id, obj_id-->
+            <td align="center"> 
+              <a href="{% url 'create-quarterly-data'  %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> 
+              {% comment %} <a href="" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{quarterly_data}}</a>  {% endcomment %}
+            </td>
+
+            {% comment %} {% for object in quarterly_data%}
+            <td> <a href="#" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{object}}</a> </td>
+            {% endfor %} {% endcomment %}
+
+            <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+            <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+  
+        </tr>
+
+        {% endfor %} 
+
+    {% comment %} {% if records %}
+        {% for record in records %}
+        <tr>
+
+            <td> {{record.id}} </td>
+            <td> {{record.site}}  </td>
+            <td> {{record.location}} </td>
+            <td> {{record.owner}} </td>
+            <td> {{record.retention}} </td>
+            <td> {{record.content}} </td>
+            <td> {{record.create_by}} </td>
+            
+            <td> {{record.creation_date|date:"m/d/Y"}} </td>
+            <td> {{record.review_date|date:"m/d/Y"}}  </td>
+
+            <td> 
+                <div class="d-flex justify-content-center">
+                <a class="btn btn-success btn-sm" href="{% url 'record' record.id %}"> <i class="fa fa-eye" aria-hidden="true"></i> </a> 
+                </div>
+            </td>
+
+        </tr>
+        {% endfor %}        
+    {% endif %} {% endcomment %}
+
+    </tbody>
+
+</table> 
+
+<!--Measure table old end-->
+
+<!--Test Measure group by objective_id-->
+

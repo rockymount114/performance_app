@@ -1,3 +1,4 @@
+from itertools import groupby
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import *
 
@@ -12,6 +13,9 @@ from datetime import datetime, date
 import pandas as pd
 from dateutil.relativedelta import relativedelta 
 from django.contrib.auth import get_user_model
+from django.db.models.query import QuerySet
+from django.db.models import Count
+from operator import attrgetter
 
 User = get_user_model()
 
@@ -112,8 +116,7 @@ def dashboard(request):
     #     raise handler404
     
     
-    department_id = request.user.department_id
-    
+    department_id = request.user.department_id   
     
     
     # my_mission = Mission.objects.all() 
@@ -124,30 +127,38 @@ def dashboard(request):
    
     
     my_measures = Measure.objects.filter(department_id=department_id) 
+    
+    # grouped_measures = my_measures.values('objective_id').annotate(count=Count('id'))
+    
+    grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+    grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
 
-    # total_measures = Measure.objects.count()
+    
+    
     
     # Pagination
-    page = Paginator(my_measures, PAGES)
-    page_list = request.GET.get('page')    
-    page = page.get_page(page_list)
+    # page = Paginator(my_measures, PAGES)
+    # page_list = request.GET.get('page')    
+    # page = page.get_page(page_list)
     
     
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
     
-    page_initiatives = Paginator(my_initiatives, PAGES)
-    page_list_initiatives = request.GET.get('page')    
-    page_initiatives = page_initiatives.get_page(page_list_initiatives)
+    # Pagination for initiatives
+    
+    # page_initiatives = Paginator(my_initiatives, PAGES)
+    # page_list_initiatives = request.GET.get('page')    
+    # page_initiatives = page_initiatives.get_page(page_list_initiatives)
     
     # Quarterly data
     objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
-    print(objective_id)
+
     my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
-    print(my_quarterly_data)
+
     
     context = {
         'mission': my_mission,
-        'measures': page, #
+        # 'measures': my_measures, #
         'initiatives': my_initiatives,
         'overview': my_overview, 
         'objectives': my_objectives, 
@@ -155,6 +166,7 @@ def dashboard(request):
         'quarterly_data': my_quarterly_data,
         'current_year': CURRENT_YEAR,
         'target_year': TARGET_YEAR,
+        'grouped_measures': grouped_measures
                
                }
     

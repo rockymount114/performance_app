@@ -1,4 +1,8 @@
 
+
+/*
+Original code 
+*/
 .form-layout{
 
     border-radius: 15px;
@@ -32,4 +36,14 @@ body{
 /* for measure actual and target col*/
 #centered-header {
     text-align: center;
+}
+
+.title-column {
+    max-width: 150px; /* Adjust the width as needed */
+    word-wrap: break-word;
+}
+
+.mytb-header {
+    background-color: #008B8B;
+    padding: 10px;
 }
