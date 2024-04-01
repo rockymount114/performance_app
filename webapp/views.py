@@ -227,18 +227,42 @@ def create_initiative(request):
 
 @login_required(login_url='my-login')
 def create_mission(request):    
-    department_id = request.user.department_id  
-    department = Department.objects.get(id=department_id)
-    form = CreateMissionForm(initial={'department': department})
+    department = Department.objects.get(id=request.user.department_id)
+    # form = CreateMissionForm(initial={'department': department})
     
 
     if request.method=="POST":
         form=CreateMissionForm(request.POST)
         if form.is_valid():
+            mission = form.save(commit=False)
+            mission.department = department
+            mission.save()
             messages.success(request, "Your mission was created sucessfully")
+            return redirect("dashboard")
+    else:
+        form = CreateMissionForm()
+        
     context = {'form': form}    
     return render(request, 'webapp/create-mission.html', context=context)
 
+# Create Mission statement
+
+@login_required(login_url='my-login')
+def create_overview(request):    
+    department = Department.objects.get(id=request.user.department_id)
+    if request.method=="POST":
+        form=CreateOverviewForm(request.POST)
+        if form.is_valid():
+            overview = form.save(commit=False)
+            overview.department = department
+            overview.save()
+            messages.success(request, "Your overview was created sucessfully")
+            return redirect("dashboard")
+    else:
+        form = CreateOverviewForm()
+        
+    context = {'form': form}    
+    return render(request, 'webapp/create-overview.html', context=context)
 
 # Create quaterly data for depterment and objectives
 

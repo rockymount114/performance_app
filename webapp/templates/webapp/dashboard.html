@@ -18,6 +18,8 @@
 
 <div class="container-fluid ">
         <div class="row">
+
+          <!--Create mission start-->
           {% if mission %}  
           <div class="col">
             <div class="card text-black  mb-1" style="max-width: 100%;">
@@ -45,15 +47,48 @@
 
           {% endif%}
 
+          <!--Create mission end-->
+
+
+          <!--Create Overview start-->
+          {% if overview %}  
           <div class="col">
-            <div class="card text-black bs-tertiary-bg mb-1" style="max-width: 100%;">
-                <div class="card-header bg-info-subtle"><b>Department Overview of {{user.department}}</b></div>
+            <div class="card text-black  mb-1" style="max-width: 100%;">
+                <div class="card-header bg-info-subtle"><b>Overview of {{user.department}}</b>  </div>
                 <div class="card-body">
-                  {% comment %} <h5 class="card-title">Department Overview</h5> {% endcomment %}
-                  <p class="card-text">{{overview}}</p>
+
+                  <p class="card-text">
+                    {{overview}}   
+                  </p>
                 </div>
               </div>
           </div>
+          {% else %}
+
+          <div class="col">
+            <div class="card text-black  mb-1" style="max-width: 100%;">
+                <div class="card-header bg-info-subtle"><b>Overview of {{user.department}}</b></div>
+                <div class="card-body">
+                  <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="create-overview"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview</a> 
+                  </p>
+                </div>
+              </div>
+          </div>
+
+          {% endif%}
+
+          <!--Create mission end-->
+
+          {% comment %} <div class="col">
+            <div class="card text-black bs-tertiary-bg mb-1" style="max-width: 100%;">
+                <div class="card-header bg-info-subtle"><b>Department Overview of {{user.department}}</b></div>
+                <div class="card-body">
+                
+                  <p class="card-text">{{overview}}</p>
+                </div>
+              </div>
+          </div> {% endcomment %}
 
         </div>
 <!--Mission statement & Department overview end-->

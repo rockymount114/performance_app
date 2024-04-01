@@ -20,6 +20,7 @@ urlpatterns = [
     path('dashboard', views.dashboard, name="dashboard"),
     path('create-measure', views.create_measure, name="create-measure"),
     path('create-mission', views.create_mission, name="create-mission"),
+    path('create-overview', views.create_overview, name="create-overview"),
     
     path('create-initiative', views.create_initiative, name="create-initiative"),
     

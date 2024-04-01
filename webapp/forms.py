@@ -73,19 +73,27 @@ class CreateInitiativeForm(forms.ModelForm):
 
 
 class CreateMissionForm(forms.ModelForm):
-
+    name = forms.CharField(
+        widget=forms.Textarea,
+        label="Please input Overview text here",
+        max_length=255,
+        required=False,
+    )
     class Meta:
         model = Mission    
-        fields = '__all__' 
-        name = forms.CharField(label="Wiki title", required=False,
-                           widget= forms.TextInput
-                           (attrs={
-                               'class': 'wiki-title',
-                               'name': 'WikiTitle',
-                               'placeholder':'Enter Wiki title',
-                               'required': 'True'
-                            }))
+        # fields = "__all__"
+        fields = ['name']  
+        exclude = ['department']  
+       
+        # readonly_fields = ['department']
 
+class CreateOverviewForm(forms.ModelForm):
+
+    class Meta:
+        model = Overview    
+        fields = ['name']  
+        exclude = ['department']
+        
 class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
     class Meta:

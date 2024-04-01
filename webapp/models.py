@@ -118,7 +118,7 @@ class Overview(TimeStampMixin):
 class Mission(TimeStampMixin):
     name = models.TextField(max_length=255, null=True)   
     
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    department = models.ForeignKey("Department", on_delete=models.CASCADE, related_name='missions')
       
     class Meta:
         ordering = ["name"]

@@ -1,5 +1,5 @@
 {% extends 'webapp/base.html' %}
-{% block title %}Create Mission{% endblock title %}
+{% block title %}Create Overview{% endblock title %}
 {% load crispy_forms_tags %}
 {% load static %} 
 {% block content %}
@@ -7,18 +7,14 @@
 <body>
 
     <div class="container bg-light shadow-md p-5 form-layout">
-
-        <h4> Create your Dept Mission Statement for  </h4>
-
+        <h4> Create your Dept Overview for  </h4>
         <h6> Department of {{user.department}} </h6>
-
         <hr>
 
-        <form method="POST" id="missionForm"  autocomplete="off" action="{% url 'create-mission' %}">
+        <form method="POST" id="overviewForm"  autocomplete="off" action="{% url 'create-overview' %}">
 
             {% csrf_token %}
            {{ form.name | as_crispy_field }}        
-           {% comment %} {{ form.department|as_crispy_field }}     {% endcomment %}
 
 
             <br>              
