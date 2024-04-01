@@ -18,9 +18,10 @@
 
 <div class="container-fluid ">
         <div class="row">
+          {% if mission %}  
           <div class="col">
             <div class="card text-black  mb-1" style="max-width: 100%;">
-                <div class="card-header bg-info-subtle"><b>Mission Statement of {{user.department}}</b></div>
+                <div class="card-header bg-info-subtle"><b>Mission Statement of {{user.department}}</b>  </div>
                 <div class="card-body">
                   {% comment %} <h5 class="card-title">Mission Statement</h5> {% endcomment %}
                   <p class="card-text">
@@ -28,8 +29,21 @@
                   </p>
                 </div>
               </div>
-
           </div>
+          {% else %}
+
+          <div class="col">
+            <div class="card text-black  mb-1" style="max-width: 100%;">
+                <div class="card-header bg-info-subtle"><b>Mission Statement of {{user.department}}</b></div>
+                <div class="card-body">
+                  <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="create-mission"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
+                  </p>
+                </div>
+              </div>
+          </div>
+
+          {% endif%}
 
           <div class="col">
             <div class="card text-black bs-tertiary-bg mb-1" style="max-width: 100%;">
@@ -50,10 +64,6 @@
         <div class="row">
           <div class="col ">
             <div class="list-group mb-1">
-              {% comment %} <button type="button" class="list-group-item list-group-item-action active bg-info" aria-current="true">
-                STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas)
-              </button> {% endcomment %}
-
               <li class="list-group-item bg-info-subtle">
                 <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas) 
                 </b>
@@ -83,17 +93,6 @@
               {% endfor %}
             </div>
             
-            
-       
-          {% comment %} <div class="col">
-            <div class="card text-white bg-info mb-1" style="max-width: 18rem;">
-                <div class="card-header">Focus Areas Impacted</div>
-                <div class="card-body">
-                  <h5 class="card-title">Focus Areas Impacted</h5>
-                  <p class="card-text">A mission statement summarizes why a business exists and helps a company respond to change and make decisions...</p>
-                </div>
-              </div>
-          </div> {% endcomment %}
 
         </div>
 
@@ -111,7 +110,7 @@
     <div class="container-fluid">
       {% if grouped_measures %}
           {% for objective_id, measures in grouped_measures.items %}
-              <h5 style="background-color: #FAEBD7; padding: 10px;">Objective: {{ objective_id }}</h5>
+              <h5 class="objective-header">Objective: {{ objective_id }}</h5>
               <table class="table table-hover table-bordered">
                   <thead>
                       <tr>
@@ -148,7 +147,7 @@
               </table>
           {% endfor %}
       {% else %}
-          <p>No measures found.</p>
+          <p class="text-bg-danger">You haven't created any measures.</p>
       {% endif %}
   </div>
 

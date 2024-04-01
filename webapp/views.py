@@ -226,9 +226,12 @@ def create_initiative(request):
 # Create Mission statement
 
 @login_required(login_url='my-login')
-def create_mission(request):
+def create_mission(request):    
+    department_id = request.user.department_id  
+    department = Department.objects.get(id=department_id)
+    form = CreateMissionForm(initial={'department': department})
     
-    form = CreateMissionForm()
+
     if request.method=="POST":
         form=CreateMissionForm(request.POST)
         if form.is_valid():

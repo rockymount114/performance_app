@@ -10,17 +10,17 @@
 
     <div class="container bg-light shadow-md p-5 form-layout">
 
-        <h3> Create your mission statement </h3>
+        <h4> Create your Dept Mission Statement for  </h4>
 
-        <h6> ... </h6>
+        <h6> Department of {{user.department}} </h6>
 
         <hr>
 
         <form method="POST" id="missionForm"  autocomplete="off" action="{% url 'create-mission' %}">
 
             {% csrf_token %}
-           {{form.as_p}} 
-        
+           {{ form.name | as_crispy_field }}        
+           {{ form.department | as_crispy_field }}        
 
 
             <br>   
