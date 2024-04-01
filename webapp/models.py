@@ -14,6 +14,7 @@ class TimeStampMixin(models.Model):
     class Meta:
         abstract = True
 
+# manage User model
 class CustomUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:
