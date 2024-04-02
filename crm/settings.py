@@ -103,6 +103,8 @@ WSGI_APPLICATION = 'crm.wsgi.application'
 
 ## SSQL Database connection
 
+# add comment
+
 DATABASES = {
     "default": {
         "ENGINE": "mssql",
