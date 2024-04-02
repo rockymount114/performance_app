@@ -88,19 +88,35 @@ WSGI_APPLICATION = 'crm.wsgi.application'
 # DROP database db_performance
 # CREATE DATABASE db_performance CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME" : "db_performance",
+#         "USER" : "root",
+#         "PASSWORD" : "",
+#         "HOST" : "127.0.0.1",
+#         "PORT" : "3306",  
+#         'OPTIONS': {
+#         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#     }, 
+#     }
+# }
+
+## SSQL Database connection
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME" : "db_performance",
-        "USER" : "root",
-        "PASSWORD" : "",
-        "HOST" : "127.0.0.1",
-        "PORT" : "3306",  
-        'OPTIONS': {
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-    }, 
-    }
+        "ENGINE": "mssql",
+        "NAME": "db_performance",
+        "USER": "SSRS",
+        "PASSWORD": "Ts4test@",
+        "HOST": "172.20.21.115",
+        "PORT": "1433",
+        "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server",
+                    },
+    },
 }
+
 
 
 AUTH_USER_MODEL = 'webapp.CustomerUser'
