@@ -14,6 +14,9 @@ from django.utils import timezone
 
 from django.contrib.auth import get_user_model
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field
+
 User = get_user_model()
 
 # - Register/Create a user
@@ -55,17 +58,21 @@ class CustomUserChangeForm(UserChangeForm):
 class CreateMeasureForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure title here, max 200 characters'}),
-        # label="Please input Overview text here",
         max_length=255,
         required=False,
     )
-    class Meta:
-        model = Measure    
-        fields = '__all__'    
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['department'].disabled = True
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    class Meta:
+        model = Measure
+        fields = '__all__'
+
+
 
 class CreateQuarterlyMeasureForm(forms.ModelForm):
     class Meta:
