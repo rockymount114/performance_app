@@ -62,7 +62,10 @@ class CreateMeasureForm(forms.ModelForm):
     class Meta:
         model = Measure    
         fields = '__all__'    
-#         # fields = ['site', 'location', 'owner', 'retention', 'content']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['department'].disabled = True
 
 class CreateQuarterlyMeasureForm(forms.ModelForm):
     class Meta:
@@ -73,8 +76,11 @@ class CreateInitiativeForm(forms.ModelForm):
 
     class Meta:
         model =  StrategicInitiative  
-        fields = '__all__'    
-#         # fields = ['site', 'location', 'owner', 'retention', 'content']
+        fields = '__all__'  
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['department'].disabled = True
 
 
 class CreateMissionForm(forms.ModelForm):

@@ -7,7 +7,7 @@
 
         <div class="container bg-light shadow-md p-5 form-layout">
 
-            <h3> Create a strategic initiative </h3>
+            <h3> Create a Strategic Initiative </h3>
             <h6> Start adding in the required details for your strategic initiative. </h6>
             <hr>
 
@@ -15,13 +15,13 @@
 
                 {% csrf_token %}  
 
-                {{ form.as_p }}
+                {% comment %} {{ form.as_p }} {% endcomment %}
 
-                {% comment %} {{form.site|as_crispy_field}}
-                {{form.location|as_crispy_field }}
-                {{form.owner|as_crispy_field}}
-                {{form.retention|as_crispy_field}}
-                {{form.content|as_crispy_field}}  {% endcomment %}
+                {{form.department | as_crispy_field }}
+                {{form.title | as_crispy_field }}
+                {{form.description | as_crispy_field }}
+
+                
 
                 <br>
                 <button type="submit" class="btn btn-primary">                     

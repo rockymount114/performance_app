@@ -180,7 +180,7 @@ def create_measure(request):
     
     department = Department.objects.get(id=request.user.department_id)
     objective = Objective.objects.get(id=request.user.department_id)
-    print(objective)
+
     form = CreateMeasureForm(initial={
                                     'department': department,
                                     # 'objective': objective,
@@ -210,12 +210,18 @@ def create_measure(request):
 @login_required(login_url='my-login')
 def create_initiative(request):
     
-    form = CreateInitiativeForm
+    department = Department.objects.get(id=request.user.department_id)
+
+    form = CreateInitiativeForm(initial={
+                                    'department': department,
+                                        })  
+    
+
     if request.method == "POST":
         form = CreateInitiativeForm(request.POST)
         if form.is_valid():            
             instance = form.save(commit=False)
-
+            instance.department = department
             instance.save() 
             messages.success(request, "Your Strategic Initiative was created!")
             return redirect("dashboard")
