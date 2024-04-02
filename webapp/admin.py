@@ -69,7 +69,7 @@ admin.site.register(Measure, MeasureAdmin)
 
 
 class StrategicInitiativeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'title', 'status', 'proposed_completion_date', 'expected_impact', 'created_at',)
+    list_display = ('id', 'department', 'title',  'proposed_completion_date',  'created_at',)
     fields = (
         # 'id',
         'title',

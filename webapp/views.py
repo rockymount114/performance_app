@@ -272,19 +272,20 @@ def create_overview(request):
 # Create quaterly data for depterment and objectives
 
 @login_required(login_url='my-login')
-def create_quarterly_data(request):
+def create_quarterly_data(request,pk,quarter):
+
+    initial_data = {
+        'objective':Measure.objects.get(id=pk).objective,
+        'department':request.user.department_id,
+        'quarter':quarter,
+    }
     
     department_id = request.user.department_id
-    objective_id = 2
-    q1 = 1
-    measure_id = 1
+    objective_id = Measure.objects.get(id=pk).objective
+    measure = Measure.objects.get(id=pk)
 
-    objective = Objective.objects.filter(department_id=department_id, id=2).last()
-    print(objective)
-    txt = get_object_or_404(Measure, department_id=department_id, objective_id=2)
-    print(txt)
     
-    form = CreateQuarterlyPerformanceDataForm()
+    form = CreateQuarterlyPerformanceDataForm(initial=initial_data)
     if request.method=="POST":
         form=CreateQuarterlyPerformanceDataForm()
         if form.is_valid():
@@ -295,31 +296,11 @@ def create_quarterly_data(request):
             return redirect("view-quarterly-data")    
     
     context = {'form': form,
-               'objective':objective,
-            #    'quarter_number':quarter_number,
+               'measure': measure,
                } 
     return render(request, 'webapp/create-quarterly-data.html', context=context)
 
-# Update quarterly data 
 
-# @login_required(login_url='my-login')
-# def update_quarterly_data(request, pk):
-    
-#     department_id = request.user.department_id
-    
-#     objective = Objective.objects.filter(department_id=department_id, id=2).last()
-    
-#     get_object_or_404(Task, pk=pk)
-    
-#     form = {}
-    
-#     context = {'form': form,
-#                'objective':objective,
-#             #    'quarter_number':quarter_number,
-#                } 
-#     return render(request, 'webapp/create-quarterly-data.html', context=context)
-
-# View quarterly data
 
 @login_required(login_url='my-login')
 def view_quarterly_data(request):   
