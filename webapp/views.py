@@ -179,10 +179,11 @@ def dashboard(request):
 def create_measure(request):
     
     department = Department.objects.get(id=request.user.department_id)
-    objective = Objective.objects.get(id=request.user.department_id)
+    # objective = Objective.objects.get(id=request.user.department_id)
 
     form = CreateMeasureForm(initial={
-                                    'department': department,
+                                        'department': department,
+                                    
                                     # 'objective': objective,
                                         })  
 
@@ -192,7 +193,7 @@ def create_measure(request):
         if form.is_valid():            
             measure = form.save(commit=False)
             measure.department = department
-            measure.objective = objective
+            # measure.objective = objective
             measure.save() 
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
