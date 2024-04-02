@@ -62,7 +62,28 @@ class CreateMeasureForm(forms.ModelForm):
 class CreateQuarterlyMeasureForm(forms.ModelForm):
     class Meta:
         model = QuarterlyPerformanceData    
-        fields = '__all__' 
+        fields = ['objective', 
+                  'department', 
+                  'quarter', 
+                  'numerator', 
+                  'denominator', 
+                  'impact', 
+                  'descriptive_impact' 
+                    
+                 ]
+        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Disable the 'objective' field
+        self.fields['objective'].disabled = True
+
+        # Disable the 'department' field
+        self.fields['department'].disabled = True
+
+        # Disable the 'quarter' field
+        self.fields['quarter'].disabled = True
 
 class CreateInitiativeForm(forms.ModelForm):
 
@@ -90,4 +111,25 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
     class Meta:
         model =  QuarterlyPerformanceData  
-        fields = '__all__' 
+        fields = ['objective', 
+                  'department', 
+                  'quarter', 
+                  'numerator', 
+                  'denominator', 
+                  'impact', 
+                  'descriptive_impact' 
+                    
+                 ]
+        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Disable the 'objective' field
+        self.fields['objective'].disabled = True
+
+        # Disable the 'department' field
+        self.fields['department'].disabled = True
+
+        # Disable the 'quarter' field
+        self.fields['quarter'].disabled = True 

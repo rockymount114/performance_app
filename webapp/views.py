@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import *
-
+from itertools import groupby
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -123,14 +123,15 @@ def dashboard(request):
     my_focus_area = FocusArea.objects.filter(department_id=department_id)
    
     
-    my_measures = Measure.objects.filter(department_id=department_id) 
+    my_measures = Measure.objects.filter(department_id=department_id).order_by('objective')
 
-    # total_measures = Measure.objects.count()
     
+    
+
     # Pagination
-    page = Paginator(my_measures, PAGES)
-    page_list = request.GET.get('page')    
-    page = page.get_page(page_list)
+    # page = Paginator(my_measures, PAGES)
+    # page_list = request.GET.get('page')    
+    # page = page.get_page(page_list)
     
     
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
@@ -147,7 +148,7 @@ def dashboard(request):
     
     context = {
         'mission': my_mission,
-        'measures': page, #
+        'measures': my_measures, #
         'initiatives': my_initiatives,
         'overview': my_overview, 
         'objectives': my_objectives, 
@@ -228,19 +229,26 @@ def create_mission(request):
 # Create quaterly data for depterment and objectives
 
 @login_required(login_url='my-login')
-def create_quarterly_data(request):
+def create_quarterly_data(request,pk,quarter):
+
+    initial_data = {
+        'objective':Measure.objects.get(id=pk).objective,
+        'department':request.user.department_id,
+        'quarter':quarter,
+    }
     
     department_id = request.user.department_id
-    objective_id = 2
-    q1 = 1
-    measure_id = 1
+    objective_id = Measure.objects.get(id=pk).objective
+    measure = Measure.objects.get(id=pk)
+    # q1 = 1 
+    # measure_id = 1
 
-    objective = Objective.objects.filter(department_id=department_id, id=2).last()
-    print(objective)
-    txt = get_object_or_404(Measure, department_id=department_id, objective_id=2)
-    print(txt)
+    # objective = Objective.objects.filter(department_id=department_id, id=objective_id).last()
+    # print(objective)
+    # txt = get_object_or_404(Measure, department_id=department_id, objective_id=1)
+    # print(txt)
     
-    form = CreateQuarterlyPerformanceDataForm()
+    form = CreateQuarterlyPerformanceDataForm(initial=initial_data)
     if request.method=="POST":
         form=CreateQuarterlyPerformanceDataForm()
         if form.is_valid():
@@ -251,10 +259,14 @@ def create_quarterly_data(request):
             return redirect("view-quarterly-data")    
     
     context = {'form': form,
-               'objective':objective,
+            #    'objective':objective,
+               'measure': measure,
             #    'quarter_number':quarter_number,
                } 
     return render(request, 'webapp/create-quarterly-data.html', context=context)
+
+
+
 
 # Update quarterly data 
 

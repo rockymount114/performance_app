@@ -12,6 +12,7 @@
     <hr>
 </div>
 
+
 <!--Mission statement & Department overview start-->
 
 <div class="container-fluid ">
@@ -66,9 +67,7 @@
             </div>
 
             <div class="list-group ">
-              {% comment %} <button type="button" class="list-group-item list-group-item-action active bg-warning" aria-current="true">
-                FOCUS AREAS IMPACTED (Must align with at least 3)		
-              </button> {% endcomment %}
+             
               <li class="list-group-item bg-info-subtle"><b>
                 FOCUS AREAS IMPACTED (Must align with at least 3)
               </b>
@@ -82,17 +81,7 @@
             </div>
             
             
-       
-          {% comment %} <div class="col">
-            <div class="card text-white bg-info mb-1" style="max-width: 18rem;">
-                <div class="card-header">Focus Areas Impacted</div>
-                <div class="card-body">
-                  <h5 class="card-title">Focus Areas Impacted</h5>
-                  <p class="card-text">A mission statement summarizes why a business exists and helps a company respond to change and make decisions...</p>
-                </div>
-              </div>
-          </div> {% endcomment %}
-
+ 
         </div>
 
       </div>
@@ -104,15 +93,12 @@
     <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
         Create a new measure &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
     </a>
-    {% comment %} <a class="btn btn-outline-primary btn-sm" href="{% url 'create-mission' %}">
-        Create a mission &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-    </a> {% endcomment %}
-
+   
     <table class="table table-hover table-bordered">
         <thead class="table-light">
             <tr>
+                <!-- <th scope="col"> Objective </th> -->
                 <th scope="col"> Id </th>
-                <th scope="col"> Objective </th>
                 <th scope="col"> Measure </th>
                 <th scope="col"> Direction </th>
                 <th scope="col" id="centered-header"> FY {{current_year}} (Actual) </th>
@@ -127,34 +113,26 @@
         </thead>
         <tbody>
 
-            {% for measure in measures %}
+          {% regroup measures by objective as objective_list %}
+          {% for objective in objective_list %}
+          {% for measure in objective.list %}
             <tr>
-                <td> {{measure.id}} </td>
-                <td> Obj# {{measure.objective_id}} </td>
-                <td> {{measure.title}} </td>
-                <td> {{measure.direction}} </td>
-                <td align="center"> {{measure.current_year_rate}} </td>
-                <td align="center"> {{measure.target_rate}} </td>
-                <td> {{measure.frequency}} </td>
-
-                <!--pencil icoin <i class="fa fa-pencil-square-o" aria-hidden="true"></i> -->
-                <!--line_id, quarter_number, dept_id, obj_id-->
-                <td align="center"> 
-                  <a href="{% url 'create-quarterly-data'  %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> 
-                  {% comment %} <a href="" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{quarterly_data}}</a>  {% endcomment %}
-                </td>
-
-                {% comment %} {% for object in quarterly_data%}
-                <td> <a href="#" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">{{object}}</a> </td>
-                {% endfor %} {% endcomment %}
-
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
-                <td align="center"> <a href="{% url 'create-quarterly-data' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
-      
+            {% ifchanged %}<td colspan="11" class="table-light">Obj# {{ measure.objective_id }}</td>{% endifchanged %}
             </tr>
+            <td> {{measure.id}} </td>
+            <td> {{measure.title}} </td>
+            <td> {{measure.direction}} </td>
+            <td align="center"> {{measure.current_year_rate}} </td>
+            <td align="center"> {{measure.target_rate}} </td>
+            <td> {{measure.frequency}} </td>
 
-            {% endfor %} 
+            <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1'%}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+            <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2'%}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3'%}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+            <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4'%}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+  
+          {% endfor %}
+          {% endfor %}
 
         {% comment %} {% if records %}
             {% for record in records %}
@@ -257,10 +235,10 @@
             <td> {{initiative.title}} </td>
             <td> {{initiative.description}} </td>
             <td> {{initiative.proposed_completion_date}} </td>
-            <td> {{initiative.status}} </td>
-            <td> {{initiative.description_project_status}} </td>
+            <!-- <td> {{initiative.status}} </td> -->
+            <!-- <td> {{initiative.description_project_status}} </td>
             <td> {{initiative.expected_impact}} </td>
-            <td> {{initiative.notes}} </td>
+            <td> {{initiative.notes}} </td> -->
         </tr>
 
         {% endfor %} 

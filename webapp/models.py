@@ -199,6 +199,14 @@ class StrategicInitiative(TimeStampMixin):
     title = models.TextField(max_length=255)
     description = models.TextField(max_length=255, null=True, blank=True)
     proposed_completion_date = models.DateField(auto_now=True)
+
+    def __str__(self) -> str:
+        return self.title 
+    
+class StrategicInitiativeDetail(TimeStampMixin):
+    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    strategic_initiative = models.ForeignKey("StrategicInitiative", on_delete=models.CASCADE)
+    
     STATUS_CHOICES = (
         ("0-25%", "0-25%"),
         ("25-50%", "25-50%"),
@@ -218,12 +226,4 @@ class StrategicInitiative(TimeStampMixin):
     description_project_status = models.CharField(max_length=255) # Describe milestones achieved during the quarter. 
     
     notes = models.TextField(max_length=255, null=True, blank=True)
-    def __str__(self) -> str:
-        return self.title 
-    
-class StrategicInitiativeDetail(TimeStampMixin):
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    strategic_initiative = models.ForeignKey("StrategicInitiative", on_delete=models.CASCADE)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    
     

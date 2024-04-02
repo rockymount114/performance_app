@@ -24,8 +24,8 @@ urlpatterns = [
     path('create-initiative', views.create_initiative, name="create-initiative"),
     
     
-    path('create-quarterly-data', views.create_quarterly_data, name="create-quarterly-data"),
-    path('view-quarterly-data', views.view_quarterly_data, name="view-quarterly-data"),
+    path('create-quarterly-data/<int:pk>/<str:quarter>', views.create_quarterly_data, name="create-quarterly-data"),
+    path('view-quarterly-data/<int:pk>', views.view_quarterly_data, name="view-quarterly-data"),
     
     
     # path('update-record/<int:pk>', views.update_record, name='update-record'),
