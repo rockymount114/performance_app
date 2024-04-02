@@ -7,15 +7,22 @@
 
         <div class="container bg-light shadow-md p-5 form-layout">
 
-            <h3> Create a measure </h3>
+            <h3> Create a Measure </h3>
             <h6> Start adding in the required details for your measure. </h6>
             <hr>
 
             <form method="POST" autocomplete="off" >
 
                 {% csrf_token %}  
+                {% comment %} {{form.as_p}} {% endcomment %}
 
-                {{ form.as_p }}
+                {{ form.department|as_crispy_field }}
+                {{ form.objective|as_crispy_field }}
+                {{ form.title|as_crispy_field }}
+                {{ form.direction|as_crispy_field }}
+                {{ form.frequency|as_crispy_field }}
+                {{ form.current_year_rate|as_crispy_field }}
+                {{ form.target_rate|as_crispy_field }}
 
                 {% comment %} {{form.site|as_crispy_field}}
                 {{form.location|as_crispy_field }}

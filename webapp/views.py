@@ -40,8 +40,6 @@ def register(request):
 # - Login a user
 def my_login(request):
     form = LoginForm()
-    # current_user = request.user
-    # print(current_user.department)
     
     if request.method == "POST":
         form = LoginForm(request.POST or None)
@@ -180,20 +178,27 @@ def dashboard(request):
 @login_required(login_url='my-login')
 def create_measure(request):
     
-    # initial_data = {
-    #     'site': Site.objects.first()
-    # }   
+    department = Department.objects.get(id=request.user.department_id)
+    objective = Objective.objects.get(id=request.user.department_id)
+    print(objective)
+    form = CreateMeasureForm(initial={
+                                    'department': department,
+                                    # 'objective': objective,
+                                        })  
 
-    form = CreateMeasureForm
+    
     if request.method == "POST":
         form = CreateMeasureForm(request.POST)
         if form.is_valid():            
-            instance = form.save(commit=False)
-
-            instance.save() 
+            measure = form.save(commit=False)
+            measure.department = department
+            measure.objective = objective
+            measure.save() 
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
-        
+    # else:
+    #     form = CreateMeasureForm()
+            
     context = {'form': form}
     print(context)
     

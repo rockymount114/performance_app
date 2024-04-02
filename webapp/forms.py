@@ -29,7 +29,7 @@ class CreateUserForm(UserCreationForm):
 
 class LoginForm(forms.Form):
     # username = forms.CharField(widget=TextInput())
-    email = forms.EmailField(label="email", max_length=100)
+    email = forms.EmailField(label="Email", max_length=100)
     password = forms.CharField(widget=PasswordInput())
 
 # for superuser
@@ -53,7 +53,12 @@ class CustomUserChangeForm(UserChangeForm):
 # - Create a measure
 
 class CreateMeasureForm(forms.ModelForm):
-
+    title = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure title here, max 200 characters'}),
+        # label="Please input Overview text here",
+        max_length=255,
+        required=False,
+    )
     class Meta:
         model = Measure    
         fields = '__all__'    
@@ -74,9 +79,9 @@ class CreateInitiativeForm(forms.ModelForm):
 
 class CreateMissionForm(forms.ModelForm):
     name = forms.CharField(
-        widget=forms.Textarea,
-        label="Please input Overview text here",
-        max_length=255,
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Mission text here, max 800 characters'}),
+        # label="Please input Overview text here",
+        max_length=800,
         required=False,
     )
     class Meta:
@@ -88,6 +93,12 @@ class CreateMissionForm(forms.ModelForm):
         # readonly_fields = ['department']
 
 class CreateOverviewForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Overview text here, max 800 characters'}),
+        # label="Please input Overview text here",
+        max_length=800,
+        required=False,
+    )
 
     class Meta:
         model = Overview    

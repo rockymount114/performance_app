@@ -13,10 +13,10 @@
             <form method="POST" autocomplete="off">
                 {% csrf_token %}
 
-                {{ form.as_p}}
-                {% comment %} {{form.username|as_crispy_field}}
+                {% comment %} {{ form.as_p}} {% endcomment %}
+                {{form.email|as_crispy_field}}
                 <br>
-                {{form.password|as_crispy_field}} {% endcomment %}
+                {{form.password|as_crispy_field}} 
 
 
 

@@ -19,7 +19,9 @@
 
                 {% csrf_token %}
 
-                {{ form.as_p}}
+                {{ form.email|as_crispy_field}}
+                {{ form.password1|as_crispy_field}}
+                {{ form.password2|as_crispy_field}}
                   </div>
                 <br>
                 <br>
