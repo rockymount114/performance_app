@@ -8,8 +8,8 @@
 
 <div class="container-fluid ">
     <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}}, Director Name & Email Address: {{user.first_name}} {{user.last_name}}, {{user.email}}</h6>
+  
     <hr>
-
 </div>
 
 
@@ -78,9 +78,19 @@
 
           {% endif%}
 
+          <!--Create mission end-->
+
+          {% comment %} <div class="col">
+            <div class="card text-black bs-tertiary-bg mb-1" style="max-width: 100%;">
+                <div class="card-header bg-info-subtle"><b>Department Overview of {{user.department}}</b></div>
+                <div class="card-body">
+                
+                  <p class="card-text">{{overview}}</p>
+                </div>
+              </div>
+          </div> {% endcomment %}
+
         </div>
-        <!--Create mission end-->
-        
 <!--Mission statement & Department overview end-->
 
 
@@ -160,12 +170,38 @@
                               <td align="center">{{ measure.frequency }}</td>
                               <td align="center">{{ measure.current_year_rate }}</td>
                               <td align="center">{{ measure.target_rate }}</td>
+ 
+                              {% for quarter_data in quarterly_data %} 
 
-                             
-                              <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>                  
+                              {% if quarter_data.measure_id == measure.id %} 
+                                {% if quarter_data.quarter == "Q1" %}
+                                  <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q1'%}">{{ quarter_data.get_percentage }}</a></td>
+                                {% elif quarter_data.quarter == "Q2" %}
+                                  <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q1'%}">{{ quarter_data.get_percentage }}</a></td>
+                                {% elif quarter_data.quarter == "Q3" %}
+                                  <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q1'%}">{{ quarter_data.get_percentage }}</a></td>
+                                {% elif quarter_data.quarter == "Q4" %}
+                                  <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q1'%}">{{ quarter_data.get_percentage }}</a></td>
+                                {% endif %}
+
+                                {% else %}
+                                <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>                  
+
+                              {% endif %}
+
+                              <!-- {% if quarterly_data%}
+                                <td> - </td>
+                              {% endif %} -->
+
+
+
+
+
+                              {% endfor %}
+                              <!-- <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>                  
                               <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                               <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
-                              <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+                              <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td> -->
                           </tr>
                       {% endfor %}
                   </tbody>

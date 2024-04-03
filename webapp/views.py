@@ -16,8 +16,8 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from operator import attrgetter
-from django.views.generic import View
-from .urls import render_to_pdf
+# from django.views.generic import View
+# from .urls import render_to_pdf
 
 User = get_user_model()
 
@@ -286,11 +286,13 @@ def create_quarterly_data(request,pk,quarter):
     initial_data = {
         'objective':Measure.objects.get(id=pk).objective,
         'department':request.user.department_id,
+        'measure':Measure.objects.get(id=pk),
         'quarter':quarter,
     }
     
     department_id = Department.objects.get(id = request.user.department_id)
     objective_id = Measure.objects.get(id=pk).objective
+    measure = Measure.objects.get(id=pk)
     quarter = quarter
 
     
@@ -302,6 +304,7 @@ def create_quarterly_data(request,pk,quarter):
             instance = form.save(commit=False)
             instance.department = department_id
             instance.objective = objective_id
+            instance.measure = measure
             instance.quarter = quarter
             instance.save() 
             messages.success(request, "Your Quaterly data was created!")
@@ -332,9 +335,9 @@ def handler404(request, exception):
 
 
 
-class GeneratorPdf(View):
-    def get(self, request, *args, **kwargs):
-        pdf = render_to_pdf('report.html')
+# class GeneratorPdf(View):
+#     def get(self, request, *args, **kwargs):
+#         pdf = render_to_pdf('report.html')
         
 
 
