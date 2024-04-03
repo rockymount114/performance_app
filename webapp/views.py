@@ -289,24 +289,27 @@ def create_quarterly_data(request,pk,quarter):
         'quarter':quarter,
     }
     
-    department_id = request.user.department_id
+    department_id = Department.objects.get(id = request.user.department_id)
     objective_id = Measure.objects.get(id=pk).objective
-    measure = Measure.objects.get(id=pk)
+    quarter = quarter
 
     
     form = CreateQuarterlyPerformanceDataForm(initial=initial_data)
+
     if request.method=="POST":
-        form=CreateQuarterlyPerformanceDataForm()
+        form=CreateQuarterlyPerformanceDataForm(request.POST)
         if form.is_valid():
-            
             instance = form.save(commit=False)
+            instance.department = department_id
+            instance.objective = objective_id
+            instance.quarter = quarter
             instance.save() 
             messages.success(request, "Your Quaterly data was created!")
-            return redirect("view-quarterly-data")    
+            return redirect("dashboard")    
     
     context = {'form': form,
-               'measure': measure,
                } 
+    
     return render(request, 'webapp/create-quarterly-data.html', context=context)
 
 

@@ -120,27 +120,29 @@ class CreateOverviewForm(forms.ModelForm):
         
 class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
+    objective = forms.ModelChoiceField(
+        queryset=Objective.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    quarter = forms.ChoiceField(
+        choices=QuarterlyPerformanceData.QUARTER_CHOICES,
+        disabled=True,
+        required=False,
+    )
+    
+
+
     class Meta:
         model =  QuarterlyPerformanceData  
-        fields = ['objective', 
-                  'department', 
-                  'quarter', 
-                  'numerator', 
-                  'denominator', 
-                  'impact', 
-                  'descriptive_impact' 
-                    
-                 ]
+        fields = '__all__' 
+
         
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Disable the 'objective' field
-        self.fields['objective'].disabled = True
-
-        # Disable the 'department' field
-        self.fields['department'].disabled = True
-
-        # Disable the 'quarter' field
-        self.fields['quarter'].disabled = True 
