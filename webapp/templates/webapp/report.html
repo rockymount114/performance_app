@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{report_id}}</title>
+    <style>
+        body {
+            color: blue;
+            font-family: verdana;
+            font-size: 100%;
+            text-align: center;
+          }
+    </style>
+</head>
+<body>
+
+
+
+    <div class="container-fluid ">
+        <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}}, Director Name & Email Address: {{user.first_name}} {{user.last_name}}, {{user.email}}</h6>
+        <hr>
+    
+    </div>
+    
+    
+    
+    <!--Mission statement & Department overview start-->
+    
+    <div class="container-fluid ">
+            <div class="row">
+    
+              <!--Create mission start-->
+              {% if mission %}  
+              <div class="col">
+                <div class="card text-black  mb-1" style="max-width: 100%;">
+                    <div class="card-header bg-info-subtle"><b>Mission Statement of {{user.department}}</b>  </div>
+                    <div class="card-body">
+                      {% comment %} <h5 class="card-title">Mission Statement</h5> {% endcomment %}
+                      <p class="card-text">
+                        {{mission}}   
+                      </p>
+                    </div>
+                  </div>
+              </div>
+              {% else %}
+    
+              <div class="col">
+                <div class="card text-black  mb-1" style="max-width: 100%;">
+                    <div class="card-header bg-info-subtle"><b>Mission Statement of {{user.department}}</b></div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        <a class="list-group-item text-bg-danger" href="create-mission"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
+                      </p>
+                    </div>
+                  </div>
+              </div>
+    
+              {% endif%}
+    
+              <!--Create mission end-->
+    
+    
+              <!--Create Overview start-->
+              {% if overview %}  
+              <div class="col">
+                <div class="card text-black  mb-1" style="max-width: 100%;">
+                    <div class="card-header bg-info-subtle"><b>Overview of {{user.department}}</b>  </div>
+                    <div class="card-body">
+    
+                      <p class="card-text">
+                        {{overview}}   
+                      </p>
+                    </div>
+                  </div>
+              </div>
+              {% else %}
+    
+              <div class="col">
+                <div class="card text-black  mb-1" style="max-width: 100%;">
+                    <div class="card-header bg-info-subtle"><b>Overview of {{user.department}}</b></div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        <a class="list-group-item text-bg-danger" href="create-overview"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview</a> 
+                      </p>
+                    </div>
+                  </div>
+              </div>
+    
+              {% endif%}
+    
+            </div>
+            <!--Create mission end-->
+            
+    <!--Mission statement & Department overview end-->
+    
+    
+    <!--Strategic Objectives & Focus area start-->
+    
+            <div class="row">
+              <div class="col ">
+                <div class="list-group mb-1">
+                  <li class="list-group-item bg-info-subtle">
+                    <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas) 
+                    </b>
+                    </li> 
+    
+                  {% for objective in objectives%}
+                  <ul style="list-style-type:square">
+                    <li>{{objective}} </li> 
+                  </ul>
+                  {% endfor %}
+    
+                </div>
+    
+                <div class="list-group ">
+                  {% comment %} <button type="button" class="list-group-item list-group-item-action active bg-warning" aria-current="true">
+                    FOCUS AREAS IMPACTED (Must align with at least 3)		
+                  </button> {% endcomment %}
+                  <li class="list-group-item bg-info-subtle"><b>
+                    FOCUS AREAS IMPACTED (Must align with at least 3)
+                  </b>
+                 </li> 
+    
+                  {% for focus_area in focus_areas%}
+                  <ul style="list-style-type:square">
+                    <li>{{focus_area}}</li>
+                  </ul>
+                  {% endfor %}
+                </div>
+                
+    
+            </div>
+    
+          </div>
+    
+    <hr>
+    
+    <!--Strategic Objectives & Focus area start-->
+
+    <br><br>
+    
+        <div class="container-fluid">
+          {% if grouped_measures %}
+              {% for objective_id, measures in grouped_measures.items %}
+                  <h5 class="objective-header">Objective: {{ objective_id }}</h5>
+                  <table class="table table-hover table-bordered">
+                      <thead>
+                          <tr>
+                              <th>ID</th>
+                              <th class="title_column">Title</th>
+                              <th>Direction</th>
+                              <th id="centered-header">Frequency</th>
+                              <th id="centered-header">Current Year Rate</th>
+                              <th id="centered-header">Target Rate</th>
+                              <th id="centered-header">Q1</th>
+                              <th id="centered-header">Q2</th>
+                              <th id="centered-header">Q3</th>
+                              <th id="centered-header">Q4</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for measure in measures %}
+                              <tr>
+                                  <td>{{ measure.id}}</td>
+                                  <td class="title_column">{{ measure.title }}</td>
+                                  <td>{{ measure.direction }}</td>
+                                  <td align="center">{{ measure.frequency }}</td>
+                                  <td align="center">{{ measure.current_year_rate }}</td>
+                                  <td align="center">{{ measure.target_rate }}</td>
+    
+                                 
+                                  <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>                  
+                                  <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                  <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+                                  <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </a> </td>
+                              </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              {% endfor %}
+          {% else %}
+              <p class="text-bg-danger">You haven't created any measures.</p>
+          {% endif %}
+      </div>
+    
+    <!--Test Measure group by objective_id end-->
+    
+    
+    
+
+    
+    
+    <!--Table 2 is for Strategic initatives-->
+    
+    <br><br>
+    <table class="table table-hover table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th scope="col"> Id </th>
+                <th scope="col"> Strategic Initiative Title </th>
+                <th scope="col"> Description </th>
+                <th scope="col"> Proposed Completion Date </th>
+                <th scope="col"> Status </th>
+                <th scope="col"> Description of Project Status</th>
+                <th scope="col"> Expected Impacts </th>
+                <th scope="col"> Notes </th>
+    
+            </tr>
+        </thead>
+    
+        <tbody>
+    
+    <!-- Initiatives -->
+            
+            {% for initiative in initiatives %}
+            <tr>
+                <td> {{initiative.id}} </td>
+                <td> {{initiative.title}} </td>
+                <td> {{initiative.description}} </td>
+                <td> {{initiative.proposed_completion_date}} </td>
+                <td> {{initiative.status}} </td>
+                <td> {{initiative.description_project_status}} </td>
+                <td> {{initiative.expected_impact}} </td>
+                <td> {{initiative.notes}} </td>
+            </tr>
+    
+            {% endfor %} 
+    
+    
+        </tbody>
+    
+    </table>
+    
+</div>
+
+</body>
+</html>

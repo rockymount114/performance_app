@@ -7,7 +7,17 @@
 
 
 <div class="container-fluid ">
-    <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}}, Director Name & Email Address: {{user.first_name}} {{user.last_name}}, {{user.email}}</h6>
+    <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}}, <b>Department Head Name & Email:</b> {% if dept_head %}
+
+      {% for user in dept_head %}           
+              {{ user.first_name }} {{ user.last_name }},
+              {{ user.email }}  
+        
+      {% endfor %}
+  
+  {% else %}
+  
+  {% endif %} </h6>
     <hr>
 
 </div>
