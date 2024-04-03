@@ -16,6 +16,8 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from operator import attrgetter
+from django.views.generic import View
+from .urls import render_to_pdf
 
 User = get_user_model()
 
@@ -327,6 +329,16 @@ def handler404(request, exception):
     response = render(request, "webapp/404.html", context=context)
     response.status_code = 404
     return response
+
+
+
+class GeneratorPdf(View):
+    def get(self, request, *args, **kwargs):
+        pdf = render_to_pdf('report.html')
+        
+
+
+
 
 # - User logout
 

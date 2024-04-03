@@ -19,6 +19,7 @@ Original code
 .page-item{
     color: red;
     background-color: rgb(93, 94, 93);
+    
 }
 
 
@@ -31,6 +32,7 @@ Original code
 
 body{
 	background-color: hsl(0, 5%, 98%);
+    font-family: lato;
 }
 
 /* for measure actual and target col*/
@@ -46,4 +48,16 @@ body{
 .objective-header {
     background-color: #F1E9D2;
     padding: 10px;
+}
+
+/*for card*/
+.card {
+    margin: 3px;
+    background-color: hsl(0, 5%, 98%);
+    padding: 10px 10px;
+}
+
+.card .card-header{
+    font-size: 16px;
+    text-transform: uppercase;
 }
