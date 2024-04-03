@@ -33,6 +33,9 @@ urlpatterns = [
     path('user-logout', views.user_logout, name="user-logout"),
     
     
+    path('pdf/', GeneratorPdf.as_view(), name="pdf"),
+    
+    
 ]
 
 

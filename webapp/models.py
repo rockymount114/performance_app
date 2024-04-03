@@ -160,6 +160,8 @@ class QuarterlyPerformanceData(TimeStampMixin):
     
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)       
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
+    measure = models.ForeignKey("Measure", on_delete=models.CASCADE) 
+    
     QUARTER_CHOICES = (
         ("Q1", "Q1"),
         ("Q2", "Q2"),
