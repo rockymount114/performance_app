@@ -72,34 +72,47 @@
   </div>
 
 </div>
+<br>
 
 
 <!--Quarterly data form-->
 
-<form method="POST">
-    {% csrf_token %}
-    
-    {{form.as_p}}
+<div class="container bg-light shadow-md p-5 form-layout">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ form.objective|as_crispy_field }}
+        {{ form.department|as_crispy_field }}
+        {{ form.quarter|as_crispy_field }}
+        {{ form.numerator|as_crispy_field }}
+        {{ form.denominator|as_crispy_field }}
+        {{ form.impact|as_crispy_field }}
+        {{ form.descriptive_impact|as_crispy_field }}
 
 
-    <button type="submit" class="btn btn-primary">                     
-        Submit Quarterly Data &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
-    </button>
-    &nbsp;
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
-        Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
-    </a>
+        <br>
 
-    <a href="{% url 'view-quarterly-data' measure.id %}" class="btn btn-secondary"> 
-      View quarterly data &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
-  </a>
 
-  </form>
+        <button type="submit" class="btn btn-primary">                     
+            Submit Quarterly Data &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+        </button>
+        &nbsp;
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
+            Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        </a>
 
 
 
+    </form>
 
+</div>
 
 
 
 {% endblock content %}
+
+
+    <!-- <a href="{% url 'view-quarterly-data' measure.id %}" class="btn btn-secondary"> 
+      View quarterly data &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+  </a> -->
