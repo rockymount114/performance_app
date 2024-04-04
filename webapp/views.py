@@ -290,11 +290,13 @@ def create_quarterly_data(request,pk,quarter):
     initial_data = {
         'objective':Measure.objects.get(id=pk).objective,
         'department':request.user.department_id,
+        'measure':Measure.objects.get(id=pk),
         'quarter':quarter,
     }
     
     department_id = Department.objects.get(id = request.user.department_id)
     objective_id = Measure.objects.get(id=pk).objective
+    measure = Measure.objects.get(id=pk)
     quarter = quarter
 
     
@@ -306,6 +308,7 @@ def create_quarterly_data(request,pk,quarter):
             instance = form.save(commit=False)
             instance.department = department_id
             instance.objective = objective_id
+            instance.measure = measure
             instance.quarter = quarter
             instance.save() 
             messages.success(request, "Your Quaterly data was created!")

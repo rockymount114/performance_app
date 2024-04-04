@@ -135,16 +135,14 @@
 
 <hr>
 
+<!--Strategic Objectives & Focus area start-->
 <div class="container-fluid">
 
-  <!--Strategic Objectives & Focus area start-->
-
-  <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
+<a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
     Create a new measure &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
 </a>
 <br><br>
 
-<div class="container-fluid">
   {% if grouped_measures %}
       {% for objective_id, measures in grouped_measures.items %}
           <h5 class="objective-header">Objective: {{ objective_id }}</h5>
@@ -212,12 +210,12 @@
   {% else %}
       <p class="text-bg-danger">You haven't created any measures.</p>
   {% endif %}
-</div>
 
+
+
+
+</div>
 <!--Test Measure group by objective_id end-->
-
-</div>
-
 
 
 <!-- Pagination for Measures
