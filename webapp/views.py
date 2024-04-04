@@ -121,9 +121,7 @@ def dashboard(request):
      
     department_id = request.user.department_id 
     dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
-    print(dept_head)
-        
-    # my_mission = Mission.objects.all() 
+   
     my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
     my_overview = Overview.objects.filter(department_id=department_id).last()
     my_objectives = Objective.objects.filter(department_id=department_id)
@@ -131,27 +129,13 @@ def dashboard(request):
    
     
     my_measures = Measure.objects.filter(department_id=department_id) 
-    
-    # grouped_measures = my_measures.values('objective_id').annotate(count=Count('id'))
-    
+   
     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
   
 
     
-    # Pagination
-    # page = Paginator(my_measures, PAGES)
-    # page_list = request.GET.get('page')    
-    # page = page.get_page(page_list)
-    
-    
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
-    
-    # Pagination for initiatives
-    
-    # page_initiatives = Paginator(my_initiatives, PAGES)
-    # page_list_initiatives = request.GET.get('page')    
-    # page_initiatives = page_initiatives.get_page(page_list_initiatives)
     
     # Quarterly data
     objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
@@ -165,33 +149,23 @@ def dashboard(request):
     quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
 
     d1 = {}
-
     for i in quarterly_data_q1:
         d1.update({i.measure_id:i.get_percentage})
 
-
-
     d2 = {}
-
     for i in quarterly_data_q2:
         d2.update({i.measure_id:i.get_percentage})
-
-
+        
     d3 = {}
-
     for i in quarterly_data_q3:
         d3.update({i.measure_id:i.get_percentage})
-
-
-
+        
     d4 = {}
-
     for i in quarterly_data_q4:
         d4.update({i.measure_id:i.get_percentage})
     
     context = {
         'mission': my_mission,
-        # 'measures': my_measures, #
         'initiatives': my_initiatives,
         'overview': my_overview, 
         'objectives': my_objectives, 
@@ -213,13 +187,10 @@ def dashboard(request):
        
 
         'dept_head':dept_head,
-
                
                }
     
     return render(request, 'webapp/dashboard.html', context=context)
-
-
 
 
 # - Create a measure record 
@@ -228,12 +199,9 @@ def dashboard(request):
 def create_measure(request):
     
     department = Department.objects.get(id=request.user.department_id)
-    # objective = Objective.objects.get(id=request.user.department_id)
 
     form = CreateMeasureForm(initial={
                                         'department': department,
-                                    
-                                    # 'objective': objective,
                                         })  
 
     
@@ -242,7 +210,6 @@ def create_measure(request):
         if form.is_valid():            
             measure = form.save(commit=False)
             measure.department = department
-            # measure.objective = objective
             measure.save() 
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
@@ -288,9 +255,7 @@ def create_initiative(request):
 
 @login_required(login_url='my-login')
 def create_mission(request):    
-    department = Department.objects.get(id=request.user.department_id)
-    # form = CreateMissionForm(initial={'department': department})
-    
+    department = Department.objects.get(id=request.user.department_id)    
 
     if request.method=="POST":
         form=CreateMissionForm(request.POST)
