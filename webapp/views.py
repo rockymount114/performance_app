@@ -132,9 +132,8 @@ def dashboard(request):
     
     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+  
 
-    
-    
     
     # Pagination
     # page = Paginator(my_measures, PAGES)
@@ -155,6 +154,35 @@ def dashboard(request):
 
     my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
 
+    quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+    quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+    quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+    quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+
+    d1 = {}
+
+    for i in quarterly_data_q1:
+        d1.update({i.measure_id:i.get_percentage})
+
+
+
+    d2 = {}
+
+    for i in quarterly_data_q2:
+        d2.update({i.measure_id:i.get_percentage})
+
+
+    d3 = {}
+
+    for i in quarterly_data_q3:
+        d3.update({i.measure_id:i.get_percentage})
+
+
+
+    d4 = {}
+
+    for i in quarterly_data_q4:
+        d4.update({i.measure_id:i.get_percentage})
     
     context = {
         'mission': my_mission,
@@ -166,7 +194,17 @@ def dashboard(request):
         'quarterly_data': my_quarterly_data,
         'current_year': CURRENT_YEAR,
         'target_year': TARGET_YEAR,
-        'grouped_measures': grouped_measures
+        'grouped_measures': grouped_measures,
+       
+        'quarterly_data_q1':quarterly_data_q1,
+        'quarterly_data_q2':quarterly_data_q2,
+        'quarterly_data_q3':quarterly_data_q3,
+        'quarterly_data_q4':quarterly_data_q4,
+        'd1':d1,
+        'd2':d2,
+        'd3':d3,
+        'd4':d4,
+       
                
                }
     

@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'webapp',
     'crispy_forms',
     'easyaudit',
+   
+    
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -62,6 +64,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+            'custom_tags':'webapp.template_tags.custom_tags'
+            }
         },
     },
 ]
