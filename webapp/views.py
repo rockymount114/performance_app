@@ -346,13 +346,18 @@ class GeneratePdf(View):
         my_overviews = Overview.objects.filter(department_id=department_id).last()
         my_objectives = Objective.objects.filter(department_id=department_id)
         my_focus_area = FocusArea.objects.filter(department_id=department_id)
-        
+        user_email = User.objects.get(id=department_id)
+        dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))
         
         data = {
         "report_name":"Performance Report",
         "name": "City of Rocky Mount", 
         "department_name": "Technology Services",
-        "username": request.user.department_id,
+        "username": request.user.first_name + " " + request.user.last_name,
+        "user_email": user_email,
+        "dept_head":User.get_head_name,
+        
+        
         "missions": my_missions,
         "overviews": my_overviews,
         "objectives": my_objectives,
@@ -368,6 +373,7 @@ class GeneratePdf(View):
             return response
         return HttpResponse("Page Not Found")
         
+
 
 
 
