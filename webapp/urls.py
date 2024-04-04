@@ -2,6 +2,7 @@
 from django.urls import path
 from django.conf.urls import (handler404)
 from . import views
+from .views import GeneratePdf
 
 handler404 = 'webapp.views.handler404'
 
@@ -32,8 +33,9 @@ urlpatterns = [
 
     path('user-logout', views.user_logout, name="user-logout"),
     
-    
-    # path('pdf/', GeneratorPdf.as_view(), name="pdf"),
+
+    path('pdf/', GeneratePdf.as_view(), name="pdf"),
+
     
     
 ]

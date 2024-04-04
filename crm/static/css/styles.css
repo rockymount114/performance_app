@@ -46,8 +46,7 @@ body{
 }
 
 .objective-header {
-    background-color: #F1E9D2;
-    padding: 10px;
+    background-color: hsl(43, 85%, 90%);
 }
 
 /*for card*/

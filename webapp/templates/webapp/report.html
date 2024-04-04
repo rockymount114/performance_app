@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ report_name }}</h1>
+    <h2>{{ name }}</h2>
+    <p><b>Name:</b> {{ username }} <b>Email:</b> {{user_email}}</p>
+
+    <p><b>Department:</b> {{ department_name }} <b>Dept Head Name:</b>{{user.get_user_info}} <b>Dept Head Email:</b>{{dept_head}}</p>
+    
+
+    <h3>Mission</h3>
+    <p>{{ missions.mission_text }}</p>
+
+    <h3>Overview</h3>
+    <p>{{ overviews.overview_text }}</p>
+
+    <h3>Objectives</h3>
+    <ul>
+        {% for objective in objectives %}
+        <li>{{ objective.objective_text }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Focus Areas</h3>
+    <ul>
+        {% for area in focusareas %}
+        <li>{{ area.focus_area_text }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

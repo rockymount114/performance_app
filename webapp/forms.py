@@ -149,6 +149,5 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
     class Meta:
         model =  QuarterlyPerformanceData  
         fields = '__all__' 
-
         
 

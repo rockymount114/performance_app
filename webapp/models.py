@@ -92,7 +92,11 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
         elif self.is_citymanager_office:
             role = "City Manager Officer"
 
-
+    @property
+    def get_head_name(self):
+        if self.is_dept_head:
+            return self.get_full_name()
+        
  
  
     

@@ -1,7 +1,8 @@
 from itertools import groupby
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import *
-
+from django.db.models import Q
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -16,8 +17,10 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from operator import attrgetter
-# from django.views.generic import View
-# from .urls import render_to_pdf
+
+from django.views.generic import View
+from .utils import render_to_pdf
+
 
 User = get_user_model()
 
@@ -115,10 +118,11 @@ def dashboard(request):
     # except Department.DoesNotExist:
     #     raise handler404
     
-    
-    department_id = request.user.department_id   
-    
-    
+     
+    department_id = request.user.department_id 
+    dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
+    print(dept_head)
+        
     # my_mission = Mission.objects.all() 
     my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
     my_overview = Overview.objects.filter(department_id=department_id).last()
@@ -153,6 +157,7 @@ def dashboard(request):
     objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
 
     my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
+    
 
     quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
     quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
@@ -195,6 +200,7 @@ def dashboard(request):
         'current_year': CURRENT_YEAR,
         'target_year': TARGET_YEAR,
         'grouped_measures': grouped_measures,
+
        
         'quarterly_data_q1':quarterly_data_q1,
         'quarterly_data_q2':quarterly_data_q2,
@@ -205,6 +211,9 @@ def dashboard(request):
         'd3':d3,
         'd4':d4,
        
+
+        'dept_head':dept_head,
+
                
                }
     
@@ -373,10 +382,43 @@ def handler404(request, exception):
 
 
 
-# class GeneratorPdf(View):
-#     def get(self, request, *args, **kwargs):
-#         pdf = render_to_pdf('report.html')
+
+class GeneratePdf(View):
+    def get(self, request, *args, **kwargs):
+        department_id = request.user.department_id
+        my_missions = Mission.objects.filter(department_id=department_id).last()              
+        my_overviews = Overview.objects.filter(department_id=department_id).last()
+        my_objectives = Objective.objects.filter(department_id=department_id)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id)
+        user_email = User.objects.get(id=department_id)
+        dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))
+
         
+        data = {
+        "report_name":"Performance Report",
+        "name": "City of Rocky Mount", 
+        "department_name": "Technology Services",
+        "username": request.user.first_name + " " + request.user.last_name,
+        "user_email": user_email,
+        "dept_head":User.get_head_name,
+        
+        
+        "missions": my_missions,
+        "overviews": my_overviews,
+        "objectives": my_objectives,
+        "focusareas": my_focus_area,
+        
+        }
+        pdf = render_to_pdf('webapp/report.html',data)
+        if pdf:
+            response=HttpResponse(pdf,content_type='application/pdf')
+            filename = "Report_for_%s.pdf" %(data['report_name'])
+            content = "inline; filename= %s" %(filename)
+            response['Content-Disposition']=content
+            return response
+        return HttpResponse("Page Not Found")
+        
+
 
 
 
