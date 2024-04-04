@@ -132,6 +132,12 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
         required=False,
     )
 
+    measure = forms.ModelChoiceField(
+        queryset=Measure.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
     quarter = forms.ChoiceField(
         choices=QuarterlyPerformanceData.QUARTER_CHOICES,
         disabled=True,
@@ -143,6 +149,5 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
     class Meta:
         model =  QuarterlyPerformanceData  
         fields = '__all__' 
-
         
 
