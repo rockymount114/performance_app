@@ -93,7 +93,6 @@ class CreateInitiativeForm(forms.ModelForm):
 class CreateMissionForm(forms.ModelForm):
     name = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Mission text here, max 800 characters'}),
-        # label="Please input Overview text here",
         max_length=800,
         required=False,
     )
@@ -102,8 +101,6 @@ class CreateMissionForm(forms.ModelForm):
         # fields = "__all__"
         fields = ['name']  
         exclude = ['department']  
-       
-        # readonly_fields = ['department']
 
 class CreateOverviewForm(forms.ModelForm):
     name = forms.CharField(
