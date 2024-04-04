@@ -33,8 +33,9 @@ urlpatterns = [
 
     path('user-logout', views.user_logout, name="user-logout"),
     
-    
+
     path('pdf/', GeneratePdf.as_view(), name="pdf"),
+
     
     
 ]

@@ -17,8 +17,10 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from operator import attrgetter
+
 from django.views.generic import View
 from .utils import render_to_pdf
+
 
 User = get_user_model()
 
@@ -134,9 +136,8 @@ def dashboard(request):
     
     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+  
 
-    
-    
     
     # Pagination
     # page = Paginator(my_measures, PAGES)
@@ -158,6 +159,35 @@ def dashboard(request):
     my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
     
 
+    quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+    quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+    quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+    quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+
+    d1 = {}
+
+    for i in quarterly_data_q1:
+        d1.update({i.measure_id:i.get_percentage})
+
+
+
+    d2 = {}
+
+    for i in quarterly_data_q2:
+        d2.update({i.measure_id:i.get_percentage})
+
+
+    d3 = {}
+
+    for i in quarterly_data_q3:
+        d3.update({i.measure_id:i.get_percentage})
+
+
+
+    d4 = {}
+
+    for i in quarterly_data_q4:
+        d4.update({i.measure_id:i.get_percentage})
     
     context = {
         'mission': my_mission,
@@ -170,7 +200,20 @@ def dashboard(request):
         'current_year': CURRENT_YEAR,
         'target_year': TARGET_YEAR,
         'grouped_measures': grouped_measures,
+
+       
+        'quarterly_data_q1':quarterly_data_q1,
+        'quarterly_data_q2':quarterly_data_q2,
+        'quarterly_data_q3':quarterly_data_q3,
+        'quarterly_data_q4':quarterly_data_q4,
+        'd1':d1,
+        'd2':d2,
+        'd3':d3,
+        'd4':d4,
+       
+
         'dept_head':dept_head,
+
                
                }
     
@@ -339,6 +382,7 @@ def handler404(request, exception):
 
 
 
+
 class GeneratePdf(View):
     def get(self, request, *args, **kwargs):
         department_id = request.user.department_id
@@ -348,6 +392,7 @@ class GeneratePdf(View):
         my_focus_area = FocusArea.objects.filter(department_id=department_id)
         user_email = User.objects.get(id=department_id)
         dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))
+
         
         data = {
         "report_name":"Performance Report",
