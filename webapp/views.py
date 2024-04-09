@@ -129,6 +129,10 @@ def dashboard(request):
    
     
     my_measures = Measure.objects.filter(department_id=department_id) 
+
+    d_objective_names = {}
+    for i in my_objectives:
+        d_objective_names.update({i.id:i.name})
    
     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
@@ -184,6 +188,7 @@ def dashboard(request):
         'd2':d2,
         'd3':d3,
         'd4':d4,
+        'd_objective_names':d_objective_names,
        
 
         'dept_head':dept_head,
@@ -330,14 +335,30 @@ def create_quarterly_data(request,pk,quarter):
 
 
 @login_required(login_url='my-login')
-def view_quarterly_data(request):   
-    quarterly_data = QuarterlyPerformanceData.objects.all()  
-    
+def view_quarterly_data(request,pk):   
+    quarterly_data = QuarterlyPerformanceData.objects.filter(measure_id=pk)
+    measure = Measure.objects.get(id=pk)
+
+    q1_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q1").first()
+    q2_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q2").first()
+    q3_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q3").first()
+    q4_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q4").first()
+
+    q1_percentage = q1_data.get_percentage
     context = {
         'quarterly_data':quarterly_data,
+        'measure': measure,
+        'q1_data':q1_data,
+        'q2_data':q2_data,
+        'q3_data':q3_data,
+        'q4_data':q4_data,
+        'q1_percentage':q1_percentage
     } 
     
     return render(request, 'webapp/view-quarterly-data.html', context=context)
+
+
+
 
 def handler404(request, exception):
     context = {}

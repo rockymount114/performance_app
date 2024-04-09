@@ -10,7 +10,7 @@
             <table class="table table-hover table-bordered">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col"> Measure No. </th>
+                        <th scope="col"> Measure Title </th>
                         <th scope="col"> Q1 </th>
                         <th scope="col"> Q2 </th>
                         <th scope="col"> Q3 </th>
@@ -20,26 +20,47 @@
                 </thead>
 
                 <tr>
-                    <td> Obj1 01 </td>
-                    <td> 1/4
+                    <td> {{ measure.title}} </td>
+                    <td> {% if q1_data %}
+                            {{q1_data.numerator}} / {{q1_data.denominator}}
+                            
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                            <div class="progress-bar percentage" role="progressbar" style="width: 20%;"aria-valuenow={{q1_data.get_percentage}} aria-valuemin="0" aria-valuemax="100">{{q1_data.get_percentage}}</div>
                         </div>
+                        {% else %}
+                            None
+                        {% endif %}
+                     
                     </td>
-                    <td> 2/3 
+                    <td> {% if q2_data %}
+                            {{q2_data.numerator}} / {{q2_data.denominator}}
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                            <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">{{q2_data.get_percentage}}</div>
                         </div>
+                        {% else %}
+                            None
+                        {% endif %}
                     </td>
-                    <td> 4/5 
+                    <td> {% if q3_data %}
+                            {{q3_data.numerator}} / {{q3_data.denominator}}
+                   
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">80%</div>
+                            <div class="progress-bar" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{{q3_data.get_percentage}}</div>
                         </div>
+                        {% else %}
+                            None
+                        {% endif %}
                     </td>
-                    <td> 6/6 
+                    <td> {% if q4_data %}
+                            {{q4_data.numerator}} / {{q4_data.denominator}}
+                      
                         <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                            <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{q4_data.get_percentage}}</div>
                         </div>
+                        {% else %}
+                            None
+                        {% endif %}
+
                     </td>
 
                 </tr>

@@ -97,7 +97,7 @@
                 </b>
                 </li> 
 
-              {% for objective in objectives%}
+              {% for objective in objectives %}
               <ul style="list-style-type:square">
                 <li>{{objective}} </li> 
               </ul>
@@ -133,13 +133,13 @@
 
 {% if grouped_measures %}
 {% for objective_id, measures in grouped_measures.items %}
-    <h5 class="objective-header">Objective: {{ objective_id }}</h5>
+    <h5 class="objective-header">Objective: {{objective_id}} - {{ d_objective_names|get_item:objective_id }}</h5>
     <table class="table table-hover table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <!-- <th>ID</th> -->
                 <th class="title_column">Title</th>
-                <th>Direction</th>
+                <th id="centered-header">Direction</th>
                 <th id="centered-header">Frequency</th>
                 <th id="centered-header">Current Year Rate</th>
                 <th id="centered-header">Target Rate</th>
@@ -154,16 +154,16 @@
             <tbody>
                 {% for measure in measures %}
                     <tr>
-                        <td>{{ measure.id}}</td>
-                        <td class="title_column">{{ measure.title }}</td>
-                        <td>{{ measure.direction }}</td>
+                        <!-- <td>{{ measure.id}}</td> -->
+                        <td class="title_column" width="15%"> {{ measure.title }}</td>
+                        <td align="center">{{ measure.direction }}</td>
                         <td align="center">{{ measure.frequency }}</td>
                         <td align="center">{{ measure.current_year_rate }}</td>
                         <td align="center">{{ measure.target_rate }}</td>         
                         {% with measure_id=measure.id %}
 
                           {% if measure.id in d1 %}
-                            <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q1'%}">{{ d1|get_item:measure.id }}</a></td>
+                            <td align="center"><a href="{% url 'view-quarterly-data' measure.id %}">{{ d1|get_item:measure.id }}</a></td>
                           {% else %}
                             <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                           {% endif %}
@@ -193,6 +193,7 @@
                 {% endfor %}
             </tbody>
         </table>
+      
     {% endfor %}
 {% else %}
     <p class="text-bg-danger">You haven't created any measures.</p>
