@@ -21,6 +21,17 @@ class DepartmentAdmin(admin.ModelAdmin):
     )    
 admin.site.register(Department, DepartmentAdmin)
 
+class FiscalYearAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'created_at',)
+    fields = (
+       
+        'name',
+   
+
+    ) 
+    
+admin.site.register(FiscalYear, FiscalYearAdmin)
+
 class MissionAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
@@ -40,11 +51,14 @@ class OverviewAdmin(admin.ModelAdmin):
 admin.site.register(Overview, OverviewAdmin)
 
 class ObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'name', 'created_at',)
+    list_display = ('id', 'department', 'name', 'created_at', 'approved','fiscal_year',)
     fields = (
         # 'id',
+        'fiscal_year',
         'name',
         'department',
+        'approved'
+
     ) 
     
 admin.site.register(Objective, ObjectiveAdmin)

@@ -6,6 +6,7 @@ from datetime import datetime, date
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from django.utils import timezone
+from datetime import datetime
 
 class TimeStampMixin(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,7 +41,7 @@ class CustomUserManager(UserManager):
 
 class Department(TimeStampMixin): 
     
-    name = models.CharField(max_length=100, null=True)   
+    name = models.CharField(max_length=100)   
     description = models.CharField(max_length=100)    
     
     class Meta:
@@ -55,7 +56,7 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=100, null=True, blank=True, default='')
   
     
-    department = models.ForeignKey(Department, null=True, on_delete=models.SET_NULL)  
+    department = models.ForeignKey(Department, null=True, on_delete=models.CASCADE)  
      
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -98,31 +99,40 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
             return self.get_full_name()
         
  
- 
-    
+#  Fiscal Year Model
+class FiscalYear(TimeStampMixin):
+    name = models.CharField(max_length=6) 
+
+    def __str__(self) -> str:
+        return self.name         
              
 class Objective(TimeStampMixin):
     name = models.TextField(max_length=255)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)   
+    approved = models.BooleanField('Approved',default = False)
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)  
+
     def __str__(self) -> str:
         return self.name 
 
 class FocusArea(TimeStampMixin):
     name = models.TextField(max_length=255)
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
     def __str__(self) -> str:
         return self.name     
  
 class Overview(TimeStampMixin):
     name = models.TextField(max_length=800)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE) 
+    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE) 
     def __str__(self) -> str:
         return self.name  
          
 class Mission(TimeStampMixin):
     name = models.TextField(max_length=800, null=True)   
-    
     department = models.ForeignKey("Department", on_delete=models.CASCADE, related_name='missions')
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
       
     class Meta:
         ordering = ["name"]
@@ -153,6 +163,8 @@ class Measure(TimeStampMixin):
     
     current_year_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
     target_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+    
     
     
     def __str__(self) -> str:
@@ -192,10 +204,25 @@ class QuarterlyPerformanceData(TimeStampMixin):
     
     @property
     def get_percentage(self):
+        
+        
+        percentage = f"{int((self.numerator / self.denominator) * 100)} % "
+        return percentage
+    
+    @property
+    def get_annual_percentage(self):
         quarter = self.quarter
         if self.quarter == quarter:
             percentage = f"{int((self.numerator / self.denominator) * 100)} % "
         return percentage
+    
+    
+    @property
+    def fiscal_year(self):
+        f_year = self.created_at
+        y = self.created_at.strftime("%Y") 
+            
+        return y
     
     
 class StrategicInitiative(TimeStampMixin):
@@ -203,6 +230,7 @@ class StrategicInitiative(TimeStampMixin):
     title = models.TextField(max_length=255)
     description = models.TextField(max_length=255, null=True, blank=True)
     proposed_completion_date = models.DateField(auto_now=True)
+    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.title 

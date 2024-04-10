@@ -68,6 +68,13 @@ class CreateMeasureForm(forms.ModelForm):
         required=False,
     )
 
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
+    )
+
+
     class Meta:
         model = Measure
         fields = '__all__'
@@ -96,6 +103,13 @@ class CreateMissionForm(forms.ModelForm):
         max_length=800,
         required=False,
     )
+
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
+    )
+
     class Meta:
         model = Mission    
         # fields = "__all__"
@@ -108,6 +122,12 @@ class CreateOverviewForm(forms.ModelForm):
         # label="Please input Overview text here",
         max_length=800,
         required=False,
+    )
+
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
     )
 
     class Meta:
