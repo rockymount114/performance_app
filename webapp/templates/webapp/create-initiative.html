@@ -16,7 +16,7 @@
                 {% csrf_token %}  
 
                 {% comment %} {{ form.as_p }} {% endcomment %}
-
+                {{form.fiscal_year | as_crispy_field }}
                 {{form.department | as_crispy_field }}
                 {{form.title | as_crispy_field }}
                 {{form.description | as_crispy_field }}

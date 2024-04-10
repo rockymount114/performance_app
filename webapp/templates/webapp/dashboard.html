@@ -17,8 +17,15 @@
       {% endfor %}  
   {% else %}  
   {% endif %} </h6>
+
+  <a class="btn btn-outline-primary btn-sm" href="{% url 'next-fiscal-year' %}">
+    Next Fiscal Year &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+  </a>
+
     <hr>
 </div>
+
+
 
 <!--Mission statement & Department overview start-->
 
@@ -169,19 +176,19 @@
                           {% endif %}
 
                           {% if measure.id in d2 %}
-                            <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q2'%}">{{ d2|get_item:measure.id }}</a></td>
+                            <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d2|get_item:measure.id }}</a></td>
                           {% else %}
                             <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                           {% endif %}
 
                           {% if measure.id in d3 %}
-                            <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q3'%}">{{ d3|get_item:measure.id }}</a></td>
+                            <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d3|get_item:measure.id }}</a></td>
                           {% else %}
                             <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                           {% endif %}
 
                           {% if measure.id in d4 %}
-                            <td align="center"><a href="{% url 'create-quarterly-data' measure.id 'Q4'%}">{{ d4|get_item:measure.id }}</a></td>
+                            <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d4|get_item:measure.id }}</a></td>
                           {% else %}
                             <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                           {% endif %}

@@ -1,0 +1,78 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Strategic Initiative{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <body>
+
+        <div class="container bg-light shadow-md p-5 form-layout">
+
+            <h3> This is the profile page </h3>
+            <h6> See below: </h6>
+            <hr>
+
+            <div class="col ">
+                <div class="list-group mb-1">
+                  <li class="list-group-item bg-info-subtle">
+                    <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas) 
+                    </b>
+                    </li> 
+    
+                  {% for objective in Objectives %}
+                  <ul style="list-style-type:square">
+                    <li>{{objective}} </li> 
+                  </ul>
+                  {% endfor %}
+
+
+                  <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                          
+                            <th id="centered-header">Objective</th>
+                            <th id="centered-header">Approved</th>
+   
+                        </tr>
+                    </thead>
+            
+                       
+                        <tbody>
+                            {% for objective in Objectives %}
+                                <tr>
+                                    <!-- <td>{{ measure.id}}</td> -->
+                                    <td class="title_column" width="15%"> {{ objective.name }}</td>
+                                    <td align="center">
+                                        {% if objective.approved %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked="checked"value = {{objective.approved}}>
+                                        </div> 
+                                        {% else %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value = {{objective.approved}}>
+                                        </div> 
+                                        {% endif %}
+                                    </td>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table> 
+    
+            </div>
+
+        </div>
+        <br>
+
+       
+
+    </body>
+
+
+
+
+{% endblock %}
+
+
+
+

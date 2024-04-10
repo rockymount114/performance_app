@@ -29,6 +29,8 @@ def home(request):
     return render(request, 'webapp/index.html')
 
 
+
+
 # - Register a user
 def register(request):
     form = CreateUserForm()
@@ -59,6 +61,8 @@ def my_login(request):
     context = {'form':form}
 
     return render(request, 'webapp/my-login.html', context=context)
+
+
 
 # Permission to view performance data
 
@@ -124,7 +128,7 @@ def dashboard(request):
    
     my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
     my_overview = Overview.objects.filter(department_id=department_id).last()
-    my_objectives = Objective.objects.filter(department_id=department_id)
+    my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
     my_focus_area = FocusArea.objects.filter(department_id=department_id)
    
     
@@ -344,7 +348,7 @@ def view_quarterly_data(request,pk):
     q3_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q3").first()
     q4_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q4").first()
 
-    q1_percentage = q1_data.get_percentage
+    
     context = {
         'quarterly_data':quarterly_data,
         'measure': measure,
@@ -352,7 +356,7 @@ def view_quarterly_data(request,pk):
         'q2_data':q2_data,
         'q3_data':q3_data,
         'q4_data':q4_data,
-        'q1_percentage':q1_percentage
+        
     } 
     
     return render(request, 'webapp/view-quarterly-data.html', context=context)
@@ -404,7 +408,76 @@ class GeneratePdf(View):
             return response
         return HttpResponse("Page Not Found")
         
+# Create profile view
+    
+@login_required(login_url='my-login')
+def profile(request):
+    department_id = request.user.department_id 
+    my_objectives = Objective.objects.filter(department_id=department_id)
 
+    context = {
+        'objectives':my_objectives,
+
+    }
+    
+    return render(request,'webapp/profile.html', context = context)
+
+
+
+# Create fiscal year view
+
+@login_required(login_url='my-login')
+def next_fiscal_year(request):
+    department_id = request.user.department_id 
+    prev_year_mission = Mission.objects.filter(department_id=department_id,fiscal_year=1)
+    prev_year_overview = Overview.objects.filter(department_id=department_id,fiscal_year=1)
+    prev_year_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=1, approved = True)
+    prev_year_focus_areas = FocusArea.objects.filter(department_id=department_id,fiscal_year=1)
+    # prev_year_measures = Measure.objects.filter(department_id=department_id,fiscal_year=1)
+    prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department_id,fiscal_year=1)
+    fiscal_years =  FiscalYear.objects.all()
+    
+    if request.method=="POST":
+        carry_next_year_ids = request.POST.getlist('boxes')
+        year_selected = request.POST.get('years')
+        full_data = []
+
+        for x in carry_next_year_ids:
+
+            row = {'name': Objective.objects.get(pk=int(x)).name, 
+                   'department':Objective.objects.get(pk=int(x)).department,
+                   'approved':Objective.objects.get(pk=int(x)).approved,
+                   'fiscal_year': FiscalYear.objects.get(pk = year_selected),
+                   }
+            
+            full_data.append(row)
+
+        for item in full_data:
+            Objective.objects.create(**item)
+           
+
+
+
+
+        messages.success(request,(" Your data was submitted for review! "))
+        return redirect('dashboard')
+
+
+
+
+    context = {
+        # 'mission':prev_year_mission,
+        # 'overview':prev_year_overview,
+        'objectives':prev_year_objectives,
+        # 'focus_areas':prev_year_focus_areas,
+        # 'measures':prev_year_measures,
+        # 'initiatives':prev_year_initiatives,
+
+        "fiscal_years": fiscal_years,
+
+    }
+    
+    return render(request,'webapp/next-fiscal-year.html', context = context)
 
 
 

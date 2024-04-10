@@ -17,8 +17,9 @@
         <form method="POST" id="missionForm"  autocomplete="off" action="{% url 'create-mission' %}">
 
             {% csrf_token %}
-           {{ form.name | as_crispy_field }}        
-           {% comment %} {{ form.department|as_crispy_field }}     {% endcomment %}
+            {{ form.fiscal_year | as_crispy_field }}
+            {{ form.name | as_crispy_field }}        
+             
 
 
             <br>              
