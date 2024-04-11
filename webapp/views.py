@@ -577,6 +577,7 @@ def next_fiscal_year(request):
 
         # Create mission that need to be carried out the next fiscal year
 
+
         carry_next_year_mission = []
 
         for x in carry_next_year_mission_id:
@@ -593,6 +594,7 @@ def next_fiscal_year(request):
 
 
         # Create overview that need to be carried out the next fiscal year
+
 
         carry_next_year_overview = []
 
