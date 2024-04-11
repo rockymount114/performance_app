@@ -1,7 +1,7 @@
 from itertools import groupby
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from .forms import *
+from . forms import *
 from django.db.models import Q
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Department, Measure, Mission, Overview, StrategicInitiative, Objective, FocusArea
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from . import forms
+
 from datetime import datetime, date
 import pandas as pd
 from dateutil.relativedelta import relativedelta 
@@ -17,9 +17,10 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from operator import attrgetter
-
+from django.views.generic import ListView
 from django.views.generic import View
 from .utils import render_to_pdf
+
 
 
 User = get_user_model()
@@ -108,96 +109,184 @@ def performance_data(request):
     return render(request, 'webapp/performance_data.html', context=context)
 
 
+
+
+# - Dashboard2
+# @login_required(login_url='my-login')
+# class Dashboard2(ListView):  
+#     model = Department
+#     template_name = 'webapp/dashboard2.html'    
+    
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['filter'] = DepartmentFilter(self.request.GET, queryset=self.get_queryset()
+          
+#         )
+     
+        
+#         return context
+      
+
+    
+    
+    
 # - Dashboard
 @login_required(login_url='my-login')
-def dashboard(request):        
+def dashboard(request):    
+
+    
     PAGES = 5
     CURRENT_YEAR = date.today().year
     TARGET_YEAR = date.today().year + 1
     
+    # fiscal_years = FiscalYear.objects.all().order_by('id')
+    # departments = Department.objects.all().order_by('id')
     
-    # try:
-    #     department = get_object_or_404(Department, user=request.user)
-    #     department_id = department.id
-    # except Department.DoesNotExist:
-    #     raise handler404
+    if request.user.is_citymanager_office:
+        dept_cmo = request.user.id  
+        department_id = request.GET.get('departments') 
+        fiscal_year = request.GET.get('fiscal_year')    
+        
+        my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
+        my_overview = Overview.objects.filter(department_id=department_id).last()
+        my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id)
+        my_measures = Measure.objects.filter(department_id=department_id) 
+
+        d_objective_names = {}
+        for i in my_objectives:
+            d_objective_names.update({i.id:i.name})
     
+        grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+        grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
+        
+        # Quarterly data
+        objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
+        my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
+
+        quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+        quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+        quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+        quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+
+        d1 = {}
+        for i in quarterly_data_q1:
+            d1.update({i.measure_id:i.get_percentage})
+
+        d2 = {}
+        for i in quarterly_data_q2:
+            d2.update({i.measure_id:i.get_percentage})
+            
+        d3 = {}
+        for i in quarterly_data_q3:
+            d3.update({i.measure_id:i.get_percentage})
+            
+        d4 = {}
+        for i in quarterly_data_q4:
+            d4.update({i.measure_id:i.get_percentage})
+        
+        context = {
+            'form': DepartmentFilterForm(),
+            'mission': my_mission,
+            'initiatives': my_initiatives,
+            'overview': my_overview, 
+            'objectives': my_objectives, 
+            'focus_areas': my_focus_area,
+            'quarterly_data': my_quarterly_data,
+            'current_year': CURRENT_YEAR,
+            'target_year': TARGET_YEAR,
+            'grouped_measures': grouped_measures,
+
+        
+            'quarterly_data_q1':quarterly_data_q1,
+            'quarterly_data_q2':quarterly_data_q2,
+            'quarterly_data_q3':quarterly_data_q3,
+            'quarterly_data_q4':quarterly_data_q4,
+            'd1':d1,
+            'd2':d2,
+            'd3':d3,
+            'd4':d4,
+            'd_objective_names':d_objective_names,
+            'dept_cmo': dept_cmo,
+        
+
+                
+                }
+        return render(request, 'webapp/dashboard.html', context=context)
+            
+
+            
+    else:
      
-    department_id = request.user.department_id 
-    dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
-   
-    my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
-    my_overview = Overview.objects.filter(department_id=department_id).last()
-    my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
-    my_focus_area = FocusArea.objects.filter(department_id=department_id)
-   
+        department_id = request.user.department_id 
+        dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
     
-    my_measures = Measure.objects.filter(department_id=department_id) 
+        my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
+        my_overview = Overview.objects.filter(department_id=department_id).last()
+        my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id)
+        my_measures = Measure.objects.filter(department_id=department_id) 
 
-    d_objective_names = {}
-    for i in my_objectives:
-        d_objective_names.update({i.id:i.name})
-   
-    grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
-    grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-  
-
+        d_objective_names = {}
+        for i in my_objectives:
+            d_objective_names.update({i.id:i.name})
     
-    my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
-    
-    # Quarterly data
-    objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
-
-    my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
-    
-
-    quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
-    quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
-    quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
-    quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
-
-    d1 = {}
-    for i in quarterly_data_q1:
-        d1.update({i.measure_id:i.get_percentage})
-
-    d2 = {}
-    for i in quarterly_data_q2:
-        d2.update({i.measure_id:i.get_percentage})
+        grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+        grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
         
-    d3 = {}
-    for i in quarterly_data_q3:
-        d3.update({i.measure_id:i.get_percentage})
+        # Quarterly data
+        objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
+        my_quarterly_data = QuarterlyPerformanceData.objects.filter(department_id=department_id)
+
+        quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+        quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+        quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+        quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+
+        d1 = {}
+        for i in quarterly_data_q1:
+            d1.update({i.measure_id:i.get_percentage})
+
+        d2 = {}
+        for i in quarterly_data_q2:
+            d2.update({i.measure_id:i.get_percentage})
+            
+        d3 = {}
+        for i in quarterly_data_q3:
+            d3.update({i.measure_id:i.get_percentage})
+            
+        d4 = {}
+        for i in quarterly_data_q4:
+            d4.update({i.measure_id:i.get_percentage})
         
-    d4 = {}
-    for i in quarterly_data_q4:
-        d4.update({i.measure_id:i.get_percentage})
-    
-    context = {
-        'mission': my_mission,
-        'initiatives': my_initiatives,
-        'overview': my_overview, 
-        'objectives': my_objectives, 
-        'focus_areas': my_focus_area,
-        'quarterly_data': my_quarterly_data,
-        'current_year': CURRENT_YEAR,
-        'target_year': TARGET_YEAR,
-        'grouped_measures': grouped_measures,
+        context = {
+            'mission': my_mission,
+            'initiatives': my_initiatives,
+            'overview': my_overview, 
+            'objectives': my_objectives, 
+            'focus_areas': my_focus_area,
+            'quarterly_data': my_quarterly_data,
+            'current_year': CURRENT_YEAR,
+            'target_year': TARGET_YEAR,
+            'grouped_measures': grouped_measures,
 
-       
-        'quarterly_data_q1':quarterly_data_q1,
-        'quarterly_data_q2':quarterly_data_q2,
-        'quarterly_data_q3':quarterly_data_q3,
-        'quarterly_data_q4':quarterly_data_q4,
-        'd1':d1,
-        'd2':d2,
-        'd3':d3,
-        'd4':d4,
-        'd_objective_names':d_objective_names,
-       
+        
+            'quarterly_data_q1':quarterly_data_q1,
+            'quarterly_data_q2':quarterly_data_q2,
+            'quarterly_data_q3':quarterly_data_q3,
+            'quarterly_data_q4':quarterly_data_q4,
+            'd1':d1,
+            'd2':d2,
+            'd3':d3,
+            'd4':d4,
+            'd_objective_names':d_objective_names,
+        
 
-        'dept_head':dept_head,
-               
-               }
+            'dept_head':dept_head,
+                
+                }
     
     return render(request, 'webapp/dashboard.html', context=context)
 
@@ -413,15 +502,49 @@ class GeneratePdf(View):
 @login_required(login_url='my-login')
 def profile(request):
     department_id = request.user.department_id 
-    my_objectives = Objective.objects.filter(department_id=department_id)
+
+    prev_year_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=1, approved = True)
+
+    fiscal_years =  FiscalYear.objects.all()
+    
+    if request.method=="POST":
+        carry_next_year_ids = request.POST.getlist('boxes')
+        year_selected = request.POST.get('years')
+        full_data = []
+
+        for x in carry_next_year_ids:
+
+            row = {'name': Objective.objects.get(pk=int(x)).name, 
+                   'department':Objective.objects.get(pk=int(x)).department,
+                   'approved':Objective.objects.get(pk=int(x)).approved,
+                   'fiscal_year': FiscalYear.objects.get(pk = year_selected),
+                   }
+            
+            full_data.append(row)
+
+        for item in full_data:
+            Objective.objects.create(**item)    
+
+
+        messages.success(request,(" Your data was submitted for review! "))
+        return redirect('dashboard')
+
+
+
 
     context = {
-        'objectives':my_objectives,
+        # 'mission':prev_year_mission,
+        # 'overview':prev_year_overview,
+        'objectives':prev_year_objectives,
+        # 'focus_areas':prev_year_focus_areas,
+        # 'measures':prev_year_measures,
+        # 'initiatives':prev_year_initiatives,
+
+        "fiscal_years": fiscal_years,
 
     }
     
     return render(request,'webapp/profile.html', context = context)
-
 
 
 # Create fiscal year view
@@ -454,6 +577,7 @@ def next_fiscal_year(request):
 
         # Create mission that need to be carried out the next fiscal year
 
+
         carry_next_year_mission = []
 
         for x in carry_next_year_mission_id:
@@ -470,6 +594,7 @@ def next_fiscal_year(request):
 
 
         # Create overview that need to be carried out the next fiscal year
+
 
         carry_next_year_overview = []
 
@@ -585,6 +710,7 @@ def next_fiscal_year(request):
     }
     
     return render(request,'webapp/next-fiscal-year.html', context = context)
+
 
 
 

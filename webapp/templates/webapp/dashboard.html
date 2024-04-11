@@ -9,13 +9,24 @@
 
 <div class="container-fluid ">
 
-    <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}}, <b>Department Head Name & Email:</b> 
+    <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}} 
       {% if dept_head %}
+      , <b>Department Head Name & Email:</b>
       {% for user in dept_head %}           
               {{ user.first_name }} {{ user.last_name }},
               {{ user.email }}          
       {% endfor %}  
-  {% else %}  
+  {% elif dept_cmo %}  
+    <b>City Manager Officer</b>
+
+    <form method="GET" action="{% url 'dashboard'%}">
+
+      Departments: {{ form.departments}} Fiscal Year: {{ form.fiscal_year}}
+    
+    
+    <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+    
   {% endif %} </h6>
 
   <a class="btn btn-outline-primary btn-sm" href="{% url 'next-fiscal-year' %}">
@@ -25,6 +36,31 @@
     <hr>
 </div>
 
+
+
+
+
+
+
+
+<!--if city manager office logined in-->
+{% comment %} <div class="filter">
+  <label for="years">Choose a year:</label>
+  <select >
+      {% for year in fiscal_years %}
+    <option name="years" value="{{ year.id }}">{{ year.name }}</option>
+      {% endfor %}
+  </select>
+
+  <label for="years">Choose a department:</label>
+  <select >
+      {% for department in departments %}
+    <option name="departments" value="{{ department.id }}">{{ department.name }}</option>
+      {% endfor %}
+  </select>
+  &nbsp &nbsp <button type="button" class="btn btn-light btn-sm">Go</button>
+
+</div> {% endcomment %}
 
 
 <!--Mission statement & Department overview start-->
@@ -145,11 +181,11 @@
         <thead>
             <tr>
                 <!-- <th>ID</th> -->
-                <th class="title_column">Title</th>
+                <th class="title_column">Metric</th>
                 <th id="centered-header">Direction</th>
                 <th id="centered-header">Frequency</th>
-                <th id="centered-header">Current Year Rate</th>
-                <th id="centered-header">Target Rate</th>
+                <th id="centered-header">FY24 Actual</th>
+                <th id="centered-header">FY25 Target</th>
                 <th id="centered-header">Q1</th>
                 <th id="centered-header">Q2</th>
                 <th id="centered-header">Q3</th>
