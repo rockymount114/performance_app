@@ -7,22 +7,17 @@
 
     <div class="container bg-light shadow-md p-5 form-layout">
 
-        <h3> This is the next fiscal year </h3>
-        <h6> See below: </h6>
+        <h3> Next Fiscal Year Migration Tool </h3>
+        <br>
+        <h4> Please review and select below: </h4>
         <hr>
-
-            
-                
-
-
-
 
     
                 <form action="" method="POST">
                     {% csrf_token %}
 
 
-                    <label for="years">Choose a year:</label>
+                    <label for="years">Select next fiscal year:</label>
 
                     <select name="years" >
                         {% for year in fiscal_years %}
@@ -33,33 +28,63 @@
 
                     <br>
                     <br>
-                    <h6><b>Previous Year Objectives:</b></h6>
+                    <h6><b>Previous Year Mission:</b></h6>
                     <br>
                     <table class="table table-hover table-bordered">
                         <thead>
                             <tr>
-                                <th id="centered-header">Objective</th>
-                                <th id="centered-header">Approved</th>
+                                <th id="centered-header">Mission</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
     
                             </tr>
                         </thead>
             
                     
                         <tbody>
-                            {% for objective in objectives %}
+                            {% for mission in mission %}
                                 <tr>
                                     <!-- <td>{{ measure.id}}</td> -->
-                                    <td class="title_column" width="15%"> {{ objective.name }}</td>
-                                    <td align="center">
-                                        {% if objective.approved %}
+                                    <td class="title_column" > {{ mission.name }}</td>
+                                    <td align="center" width="25%">
+     
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" checked="checked"value = {{objective.id}} name="boxes">
-                                        </div> 
-                                        {% else %}
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value = {{objective.id}} name="boxes">
+                                            <input class="form-check-input" type="checkbox" value = {{mission.id}} name="boxes-mission">
                                         </div>  
-                                        {% endif %}
+                       
+                                    </td>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table> 
+
+
+                    <br>
+                    <br>
+                    <h6><b>Previous Year Overview:</b></h6>
+                    <br>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th id="centered-header">Overview</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
+    
+                            </tr>
+                        </thead>
+            
+                    
+                        <tbody>
+                            {% for overview in overview %}
+                                <tr>
+                                    <!-- <td>{{ measure.id}}</td> -->
+                                    <td class="title_column" > {{ overview.name }}</td>
+                                    <td align="center" width="25%">
+                               
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value = {{overview.id}} name="boxes-overview">
+                                        </div>  
+                                      
                                     </td>
 
                             {% endfor %}
@@ -77,7 +102,7 @@
                         <thead>
                             <tr>
                                 <th id="centered-header">Objective</th>
-                                <th id="centered-header">Approved</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
     
                             </tr>
                         </thead>
@@ -87,17 +112,115 @@
                             {% for objective in objectives %}
                                 <tr>
                                     <!-- <td>{{ measure.id}}</td> -->
-                                    <td class="title_column" width="15%"> {{ objective.name }}</td>
-                                    <td align="center">
-                                        {% if objective.approved %}
+                                    <td class="title_column" > {{ objective.name }}</td>
+                                    <td align="center" width="25%">
+
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" checked="checked"value = {{objective.id}} name="boxes">
-                                        </div> 
-                                        {% else %}
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value = {{objective.id}} name="boxes">
+                                            <input class="form-check-input" type="checkbox" value = {{objective.id}} name="boxes-objectives">
                                         </div>  
-                                        {% endif %}
+                                     
+                                    </td>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table> 
+
+
+                    <br>
+                    <br>
+                    <h6><b>Previous Year Focus Areas:</b></h6>
+                    <br>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th id="centered-header">Focus Area</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
+    
+                            </tr>
+                        </thead>
+            
+                    
+                        <tbody>
+                            {% for focus_area in focus_areas %}
+                                <tr>
+                                    <!-- <td>{{ measure.id}}</td> -->
+                                    <td class="title_column" > {{ focus_area.name }}</td>
+                                    <td align="center" width="25%">
+                               
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value = {{focus_area.id}} name="boxes-focus_areas">
+                                        </div>  
+                                        
+                                    </td>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table> 
+
+
+                    <br>
+                    <br>
+                    <h6><b>Previous Year Measures:</b></h6>
+                    <br>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th id="centered-header">Objective</th>
+                                <th id="centered-header">Measure</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
+    
+                            </tr>
+                        </thead>
+            
+                    
+                        <tbody>
+                            {% for measure in measures %}
+                                <tr>
+                                    
+                                    <td class="title_column" > {{ measure.objective }}</td>
+                                    <td class="title_column" > {{ measure.title }}</td>
+                                    <td align="center" width="25%">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value = {{measure.id}} name="boxes-measures">
+                                        </div>  
+                                        
+                                    </td>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table> 
+
+
+                    <br>
+                    <br>
+                    <h6><b>Previous Year Strategic Initiatives:</b></h6>
+                    <br>
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th id="centered-header">Initiative</th>
+                                <th id="centered-header">Bring into Next Fiscal Year</th>
+    
+                            </tr>
+                        </thead>
+            
+                    
+                        <tbody>
+                            {% for initiative in initiatives %}
+                                <tr>
+                                    <td class="title_column" > {{ initiative.title }}</td>
+                                    <td align="center" width="25%">
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value = {{initiative.id}} name="boxes-initiatives">
+                                        </div>  
+                                   
                                     </td>
 
                             {% endfor %}
@@ -108,9 +231,13 @@
 
                     <br>
 
-                    <button class="btn btn-outline-primary btn-sm" type="submit">
-                        Submit &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    <button class="btn btn-primary" type="submit">
+                        Submit &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
                     </button>
+
+                    &nbsp;
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                    </a>
 
                 </form>
 
@@ -122,7 +249,6 @@
 
 
 {% endblock %}
-
 
 
 
