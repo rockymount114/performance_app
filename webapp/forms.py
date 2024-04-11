@@ -167,4 +167,20 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
         model =  QuarterlyPerformanceData  
         fields = '__all__' 
         
+        
+class DepartmentFilterForm(forms.Form):
+    departments = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=False,
+        required=True,
+    )
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
+    )
+        
+  
+        
+        
 
