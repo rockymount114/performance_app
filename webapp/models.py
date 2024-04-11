@@ -125,14 +125,14 @@ class FocusArea(TimeStampMixin):
 class Overview(TimeStampMixin):
     name = models.TextField(max_length=800)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE) 
+    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE) 
     def __str__(self) -> str:
         return self.name  
          
 class Mission(TimeStampMixin):
     name = models.TextField(max_length=800, null=True)   
     department = models.ForeignKey("Department", on_delete=models.CASCADE, related_name='missions')
-    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
       
     class Meta:
         ordering = ["name"]
