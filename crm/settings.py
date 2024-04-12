@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'webapp',
     'crispy_forms',
     'easyaudit',
-    'django_filters',
+ 
    
     
 ]
