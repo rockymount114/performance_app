@@ -309,6 +309,8 @@
     <thead class="table-light">
         <tr>
 
+
+
             <th scope="col" id="centered-header" width="25%"> Strategic Initiative Title </th>
             <th scope="col" id="centered-header" width="25%"> Description </th>
             <th scope="col" id="centered-header" width="8%"> Proposed Completion Date </th>
@@ -316,6 +318,7 @@
             <th scope="col" id="centered-header"> Description of Project Status</th>
             <th scope="col" id="centered-header"> Expected Impacts </th>
             <th scope="col" id="centered-header"> Notes </th>
+
 
         </tr>
     </thead>
@@ -330,10 +333,35 @@
             <td> {{initiative.title}} </td>
             <td> {{initiative.description}} </td>
             <td> {{initiative.proposed_completion_date}} </td>
-            <td> {{initiative.status}} </td>
-            <td> {{initiative.description_project_status}} </td>
-            <td> {{initiative.expected_impact}} </td>
-            <td> {{initiative.notes}} </td>
+
+
+            {% if initiative.id in initiative_status %}
+              <td align="center"><a href="{% url 'create-initiative-detail' initiative.id %}">{{ initiative_status|get_item:initiative.id }}</a></td>
+            {% else %}
+              <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            {% endif %}
+
+
+            {% if initiative.id in initiative_desc_of_s %}
+              <td align="center"><a href="{% url 'create-initiative-detail' initiative.id %}">{{ initiative_desc_of_s|get_item:initiative.id }}</a></td>
+            {% else %}
+              <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            {% endif %}
+
+
+            {% if initiative.id in initiative_expected_impact %}
+              <td align="center"><a href="{% url 'create-initiative-detail' initiative.id %}">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
+            {% else %}
+              <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            {% endif %}
+
+            {% if initiative.id in initiative_notes %}
+              <td align="center"><a href="{% url 'create-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
+            {% else %}
+              <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+            {% endif %}
+            
+            
         </tr>
 
         {% endfor %} 
