@@ -134,7 +134,35 @@ class CreateOverviewForm(forms.ModelForm):
         model = Overview    
         fields = ['name']  
         exclude = ['department']
-        
+
+
+class CreateObjectiveForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 300 characters'}),
+        label='Objective title',
+        max_length=300,
+        required=False,
+
+    )
+
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=True,
+    
+    )
+
+    class Meta:
+        model = Objective    
+
+
+        fields = ['name', 'fiscal_year' ]  
+        exclude = ['department', 'approved']
+         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fiscal_year'].queryset = FiscalYear.objects.order_by('name')   
+                
 class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
     objective = forms.ModelChoiceField(

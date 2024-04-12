@@ -31,6 +31,14 @@ def home(request):
 
 
 
+def get_current_fiscal_year():                
+    current_month = date.today().month        
+    if current_month > 7:
+        fiscal_year = f'FY{date.today().year + 1}'
+    else:
+        fiscal_year = f'FY{date.today().year}'     
+    
+    return fiscal_year  
 
 # - Register a user
 def register(request):
@@ -110,24 +118,6 @@ def performance_data(request):
 
 
 
-
-# - Dashboard2
-# @login_required(login_url='my-login')
-# class Dashboard2(ListView):  
-#     model = Department
-#     template_name = 'webapp/dashboard2.html'    
-    
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['filter'] = DepartmentFilter(self.request.GET, queryset=self.get_queryset()
-          
-#         )
-     
-        
-#         return context
-      
-
-    
     
     
 # - Dashboard
@@ -145,7 +135,9 @@ def dashboard(request):
     if request.user.is_citymanager_office:
         dept_cmo = request.user.id  
         department_id = request.GET.get('departments') 
-        fiscal_year = request.GET.get('fiscal_year')    
+        fiscal_year = request.GET.get('fiscal_year')  
+        
+        department = Department.objects.filter(id=department_id).first()   # for filter mission, overview title
         
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
@@ -209,6 +201,7 @@ def dashboard(request):
             'd4':d4,
             'd_objective_names':d_objective_names,
             'dept_cmo': dept_cmo,
+            'department': department,
         
 
                 
@@ -289,6 +282,41 @@ def dashboard(request):
                 }
     
     return render(request, 'webapp/dashboard.html', context=context)
+
+
+# - Create a object record 
+
+@login_required(login_url='my-login')
+def create_objective(request):   
+    
+    department = Department.objects.get(id=request.user.department_id)
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
+
+    form = CreateObjectiveForm(initial={
+                                        'department': department,
+                                        'fiscal_year': fiscal_year,
+                                        
+                                        })  
+
+    
+    if request.method == "POST":
+        form = CreateObjectiveForm(request.POST)
+        if form.is_valid():   
+            objective = form.save(commit=False)
+            objective.department = department
+            objective.fiscal_year = fiscal_year
+            objective.save() 
+            messages.success(request, "Your objective was created and pending to review!")
+            return redirect("dashboard")
+
+            
+    context = {'form': form}
+    print(context)
+    
+    return render(request, 'webapp/create-objective.html', context=context)
+
+
+
 
 
 # - Create a measure record 
