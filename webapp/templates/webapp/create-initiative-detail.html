@@ -1,0 +1,52 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Quarterly Data{% endblock title %}
+{% load crispy_forms_tags %}
+{% load static %} 
+{% block content %}
+
+
+<h3>Quarterly data</h1>
+
+<hr>
+
+
+
+<!--Quarterly data form-->
+
+<div class="container bg-light shadow-md p-5 form-layout">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ form.department|as_crispy_field }}
+        {{ form.strategic_initiative|as_crispy_field }}
+        {{ form.status|as_crispy_field }}
+        {{ form.expected_impact|as_crispy_field }}
+        {{ form.description_project_status|as_crispy_field }}
+        {{ form.notes|as_crispy_field }}
+        
+        <br>
+
+
+        <button type="submit" class="btn btn-primary">                     
+            Submit Initiative Data &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+        </button>
+        &nbsp;
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
+            Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+        </a>
+
+
+
+    </form>
+
+</div>
+
+
+
+{% endblock content %}
+
+
+    <!-- <a href="{% url 'view-quarterly-data' measure.id %}" class="btn btn-secondary"> 
+      View quarterly data &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+  </a> -->

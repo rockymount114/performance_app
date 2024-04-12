@@ -210,5 +210,21 @@ class DepartmentFilterForm(forms.Form):
         
   
         
-        
+class StrategicInitiativeDetailForm(forms.ModelForm):
+
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    strategic_initiative = forms.ModelChoiceField(
+        queryset=StrategicInitiative.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    class Meta:
+        model =  StrategicInitiativeDetail  
+        fields = '__all__' 
 
