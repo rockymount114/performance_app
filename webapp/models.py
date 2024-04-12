@@ -104,7 +104,9 @@ class FiscalYear(TimeStampMixin):
     name = models.CharField(max_length=6) 
 
     def __str__(self) -> str:
-        return self.name         
+        return self.name    
+    
+
              
 class Objective(TimeStampMixin):
     name = models.TextField(max_length=255)

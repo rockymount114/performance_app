@@ -24,9 +24,10 @@ urlpatterns = [
     path('dashboard', views.dashboard, name="dashboard"),
     # path('dashboard2/', views.Dashboard2.as_view(), name="dashboard2"),
     
-    path('create-measure', views.create_measure, name="create-measure"),
-    path('create-mission', views.create_mission, name="create-mission"),
-    path('create-overview', views.create_overview, name="create-overview"),
+    path('create-measure/', views.create_measure, name="create-measure"),
+    path('create-mission/', views.create_mission, name="create-mission"),
+    path('create-overview/', views.create_overview, name="create-overview"),
+    path('create-objective/', views.create_objective, name="create-objective"),
     
     path('create-initiative', views.create_initiative, name="create-initiative"),
     
