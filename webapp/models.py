@@ -104,10 +104,27 @@ class FiscalYear(TimeStampMixin):
     name = models.CharField(max_length=6) 
 
     def __str__(self) -> str:
-        return self.name    
-    
+        return self.name  
 
-             
+class Mission(TimeStampMixin):
+    name = models.TextField(max_length=800, null=True)   
+    department = models.ForeignKey("Department", on_delete=models.CASCADE, related_name='missions')
+    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+      
+    class Meta:
+        ordering = ["name"]
+        
+    def __str__(self) -> str:
+        return self.name  
+         
+class Overview(TimeStampMixin):
+    name = models.TextField(max_length=800)
+    department = models.ForeignKey("Department", on_delete=models.CASCADE)
+    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE) 
+    def __str__(self) -> str:
+        return self.name  
+         
+              
 class Objective(TimeStampMixin):
     name = models.TextField(max_length=255)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)   
@@ -124,23 +141,7 @@ class FocusArea(TimeStampMixin):
     def __str__(self) -> str:
         return self.name     
  
-class Overview(TimeStampMixin):
-    name = models.TextField(max_length=800)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE) 
-    def __str__(self) -> str:
-        return self.name  
-         
-class Mission(TimeStampMixin):
-    name = models.TextField(max_length=800, null=True)   
-    department = models.ForeignKey("Department", on_delete=models.CASCADE, related_name='missions')
-    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
-      
-    class Meta:
-        ordering = ["name"]
-        
-    def __str__(self) -> str:
-        return self.name   
+  
 
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]  
@@ -218,13 +219,7 @@ class QuarterlyPerformanceData(TimeStampMixin):
             percentage = f"{int((self.numerator / self.denominator) * 100)} % "
         return percentage
     
-    
-    @property
-    def fiscal_year(self):
-        f_year = self.created_at
-        y = self.created_at.strftime("%Y") 
-            
-        return y
+
     
     
 class StrategicInitiative(TimeStampMixin):
