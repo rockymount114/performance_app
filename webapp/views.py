@@ -131,19 +131,25 @@ def dashboard(request):
     
     # fiscal_years = FiscalYear.objects.all().order_by('id')
     # departments = Department.objects.all().order_by('id')
+    current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())
     
     if request.user.is_citymanager_office:
         dept_cmo = request.user.id  
+        
+        # those dept id and fiscal year is getting from the filterform
         department_id = request.GET.get('departments') 
         fiscal_year = request.GET.get('fiscal_year')  
+        
+        
         
         department = Department.objects.filter(id=department_id).first()   # for filter mission, overview title
         
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
-        my_focus_area = FocusArea.objects.filter(department_id=department_id)
-        my_measures = Measure.objects.filter(department_id=department_id) 
+        my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
+        my_measures = Measure.objects.filter(department_id=department_id, fiscal_year=fiscal_year) 
+        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
 
         d_objective_names = {}
         for i in my_objectives:
@@ -151,7 +157,7 @@ def dashboard(request):
     
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
+        
         
         # Quarterly data
         objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
@@ -217,9 +223,10 @@ def dashboard(request):
     
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, approved = True)
-        my_focus_area = FocusArea.objects.filter(department_id=department_id)
-        my_measures = Measure.objects.filter(department_id=department_id) 
+        my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+        my_measures = Measure.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id) 
+        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
         d_objective_names = {}
         for i in my_objectives:
@@ -227,7 +234,7 @@ def dashboard(request):
     
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id)
+        
         
         # Quarterly data
         objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
@@ -497,7 +504,7 @@ class GeneratePdf(View):
         my_overviews = Overview.objects.filter(department_id=department_id).last()
         my_objectives = Objective.objects.filter(department_id=department_id)
         my_focus_area = FocusArea.objects.filter(department_id=department_id)
-        user_email = User.objects.get(id=department_id)
+        user_email = User.objects.get(department_id=department_id)
         dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))
 
         
