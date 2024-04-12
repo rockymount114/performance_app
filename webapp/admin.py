@@ -36,8 +36,10 @@ class MissionAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
         # 'id',
+        'fiscal_year',
         'name',
         'department',
+        
     ) 
 admin.site.register(Mission, MissionAdmin)
 
@@ -45,6 +47,7 @@ class OverviewAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
         # 'id',
+        'fiscal_year',
         'name',
         'department',
     ) 
@@ -67,6 +70,7 @@ class FocusAreaAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
         # 'id',
+        'fiscal_year',
         'name',
         'department',
     ) 
@@ -76,6 +80,7 @@ class MeasureAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'objective_id', 'title', 'direction', 'frequency', 'current_year_rate','target_rate','created_at',)
     fields = (
         # 'id',
+        'fiscal_year',
         'title',
         'department',
     ) 
@@ -86,6 +91,7 @@ class StrategicInitiativeAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'title',  'proposed_completion_date',  'created_at',)
     fields = (
         # 'id',
+        'fiscal_year',
         'title',
         'department',
 
