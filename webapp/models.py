@@ -226,7 +226,7 @@ class StrategicInitiative(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     title = models.TextField(max_length=255)
     description = models.TextField(max_length=255, null=True, blank=True)
-    proposed_completion_date = models.DateField(auto_now=True)
+    proposed_completion_date = models.DateField()
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
 
     def __str__(self) -> str:

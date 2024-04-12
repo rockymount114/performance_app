@@ -318,12 +318,35 @@ def create_objective(request):
 
             
     context = {'form': form}
-    print(context)
+   
     
     return render(request, 'webapp/create-objective.html', context=context)
 
+# Create focus area
 
+@login_required(login_url='my-login')
+def create_focus_area(request):
+    department = Department.objects.get(id=request.user.department_id)
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
 
+    form = CreateFocusAreaForm(initial={
+                                        'department': department,
+                                        'fiscal_year': fiscal_year,                                        
+                                        }) 
+    if request.method == "POST":
+        form = CreateFocusAreaForm(request.POST)
+        if form.is_valid():   
+            objective = form.save(commit=False)
+            objective.department = department
+            objective.fiscal_year = fiscal_year
+            objective.save() 
+            messages.success(request, "Your Focus Aread was created!")
+            return redirect("dashboard")
+    
+    context = {'form': form}
+   
+    
+    return render(request, 'webapp/create-focus-area.html', context=context)
 
 
 # - Create a measure record 
@@ -361,9 +384,11 @@ def create_measure(request):
 def create_initiative(request):
     
     department = Department.objects.get(id=request.user.department_id)
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
 
     form = CreateInitiativeForm(initial={
                                     'department': department,
+                                    'fiscal_year': fiscal_year,
                                         })  
     
 
@@ -372,13 +397,13 @@ def create_initiative(request):
         if form.is_valid():            
             instance = form.save(commit=False)
             instance.department = department
+            instance.fiscal_year = fiscal_year
             instance.save() 
             messages.success(request, "Your Strategic Initiative was created!")
             return redirect("dashboard")
         
     context = {'form': form}
-    print(context)
-    
+        
     return render(request, 'webapp/create-initiative.html', context=context)
 
 

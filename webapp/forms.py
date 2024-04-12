@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.utils import ErrorList
-
+from django.forms import DateInput
 from .models import *
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
@@ -57,7 +57,8 @@ class CustomUserChangeForm(UserChangeForm):
 
 class CreateMeasureForm(forms.ModelForm):
     title = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure title here, max 200 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
+        label="Metric name",
         max_length=255,
         required=False,
     )
@@ -87,14 +88,27 @@ class CreateQuarterlyMeasureForm(forms.ModelForm):
         fields = '__all__' 
 
 class CreateInitiativeForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 200 characters'}),
+        label="Please input Initative here",
+        max_length=200,
+        required=False,
+    )
+
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
+    )
+    proposed_completion_date = forms.DateField(
+        widget=DateInput(attrs={'type': 'date'}),
+        required=False,
+    )
 
     class Meta:
-        model =  StrategicInitiative  
-        fields = '__all__'  
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['department'].disabled = True
+        model = StrategicInitiative    
+        fields = ['title','description','proposed_completion_date']  
+        exclude = ['department']
 
 
 class CreateMissionForm(forms.ModelForm):
@@ -148,7 +162,7 @@ class CreateObjectiveForm(forms.ModelForm):
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
         disabled=True,
-        required=True,
+        required=False,
     
     )
 
@@ -162,7 +176,28 @@ class CreateObjectiveForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fiscal_year'].queryset = FiscalYear.objects.order_by('name')   
-                
+ 
+class CreateFocusAreaForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Focus Area text here, max 300 characters'}),
+        label='Focus Areas',
+        max_length=300,
+        required=False,
+    )
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=False,    
+    )
+    class Meta:
+        model = FocusArea  
+        fields = ['name', 'fiscal_year' ]  
+        exclude = ['department']
+         
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fiscal_year'].queryset = FiscalYear.objects.order_by('name') 
+                   
 class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
     objective = forms.ModelChoiceField(
@@ -195,7 +230,8 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
         model =  QuarterlyPerformanceData  
         fields = '__all__' 
         
-        
+# this filter is for dashboard.html filter out department & fiscal year if you login as CMO
+    
 class DepartmentFilterForm(forms.Form):
     departments = forms.ModelChoiceField(
         queryset=Department.objects.all(),

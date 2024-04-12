@@ -1,5 +1,5 @@
 {% extends 'webapp/base.html' %}
-{% block title %}Create Strategic Initiative{% endblock title %}
+{% block title %}Create Focus Areas{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
 
@@ -7,26 +7,24 @@
 
         <div class="container bg-light shadow-md p-5 form-layout">
 
-            <h3> Create a Strategic Initiative </h3>
-            <h6> Start adding in the required details for your strategic initiative. </h6>
+            <h3> Create a Focus Area </h3>
+            <h6> Start adding in the required details for your focus area. </h6>
             <hr>
 
             <form method="POST" autocomplete="off" >
 
                 {% csrf_token %}  
+                {% comment %} {{form.as_p}} {% endcomment %}
 
-                {% comment %} {{ form.as_p }} {% endcomment %}
-                {{form.fiscal_year | as_crispy_field }}
+                {{ form.fiscal_year|as_crispy_field }}
+                {{ form.name|as_crispy_field }}
 
-                {{form.title | as_crispy_field }}
-                {{form.description | as_crispy_field }}
-                {{form.proposed_completion_date | as_crispy_field }}
 
-                
+
 
                 <br>
                 <button type="submit" class="btn btn-primary">                     
-                    Create a initiative &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+                    Create a Focus Area &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
                 </button>
                 &nbsp;
                 <a href="{% url 'dashboard' %}" class="btn btn-secondary"> 
@@ -36,7 +34,7 @@
         </div>
         <br>
 
-       
+
 
     </body>
 
