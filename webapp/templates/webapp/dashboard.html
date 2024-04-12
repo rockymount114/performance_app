@@ -18,7 +18,7 @@
       {% endfor %}  
   {% elif dept_cmo %}  
     <b>City Manager Officer</b>
-
+      <br><br>
     <form method="GET" action="{% url 'dashboard'%}">
 
       Departments: {{ form.departments}} Fiscal Year: {{ form.fiscal_year}}
@@ -166,21 +166,21 @@
           {% endif%}
 
         </div>
+
 <!--Mission statement & Department overview end-->
 
 
 <!--Strategic Objectives & Focus area start-->
-<a class="btn btn-outline-primary btn-sm" href="{% url 'create-objective' %}">
-  Create a new objective &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
-</a>
 
         <div class="row">
           <div class="col ">
             <div class="list-group mb-1">
               <li class="list-group-item bg-info-subtle">
-                <a class="btn btn-outline-primary btn-sm" href="{% url 'create-objective' %}">
+
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'create-objective' %}" title="Add a new objective">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                </a>
+                </a> &nbsp
+
                 <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas) 
                 </b>
                 </li> 
@@ -194,9 +194,13 @@
             </div>
 
             <div class="list-group ">
-              <li class="list-group-item bg-info-subtle"><b>
-                FOCUS AREAS IMPACTED (Must align with at least 3)
-              </b>
+              <li class="list-group-item bg-info-subtle">
+
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'create-focus-area' %}" title="Add a new focus area">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a> &nbsp
+                
+                <b>FOCUS AREAS IMPACTED (Must align with at least 3)</b>
              </li> 
 
               {% for focus_area in focus_areas%}
@@ -226,15 +230,15 @@
         <thead>
             <tr>
                 <!-- <th>ID</th> -->
-                <th class="title_column">Metric</th>
-                <th id="centered-header">Direction</th>
-                <th id="centered-header">Frequency</th>
-                <th id="centered-header">FY24 Actual</th>
-                <th id="centered-header">FY25 Target</th>
-                <th id="centered-header">Q1</th>
-                <th id="centered-header">Q2</th>
-                <th id="centered-header">Q3</th>
-                <th id="centered-header">Q4</th>
+                <th class="title_column" width="50%">Metric</th>
+                <th id="centered-header" width="5%">Direction</th>
+                <th id="centered-header" width="5%">Frequency</th>
+                <th id="centered-header" width="6%">FY24 Actual</th>
+                <th id="centered-header" width="6%">FY25 Target</th>
+                <th id="centered-header" width="5%">Q1</th>
+                <th id="centered-header" width="5%">Q2</th>
+                <th id="centered-header" width="5%">Q3</th>
+                <th id="centered-header" width="5%">Q4</th>
             </tr>
         </thead>
 
@@ -304,14 +308,17 @@
 <table class="table table-hover table-bordered">
     <thead class="table-light">
         <tr>
-         
-            <th scope="col"> Strategic Initiative Title </th>
-            <th scope="col"> Description </th>
-            <th scope="col"> Proposed Completion Date </th>
-            <th scope="col"> Status </th>
-            <th scope="col"> Description of Project Status</th>
-            <th scope="col"> Expected Impacts </th>
-            <th scope="col"> Notes </th>
+
+
+
+            <th scope="col" id="centered-header" width="25%"> Strategic Initiative Title </th>
+            <th scope="col" id="centered-header" width="25%"> Description </th>
+            <th scope="col" id="centered-header" width="8%"> Proposed Completion Date </th>
+            <th scope="col" id="centered-header"> Status </th>
+            <th scope="col" id="centered-header"> Description of Project Status</th>
+            <th scope="col" id="centered-header"> Expected Impacts </th>
+            <th scope="col" id="centered-header"> Notes </th>
+
 
         </tr>
     </thead>
@@ -322,7 +329,7 @@
         
         {% for initiative in initiatives %}
         <tr>
-    
+
             <td> {{initiative.title}} </td>
             <td> {{initiative.description}} </td>
             <td> {{initiative.proposed_completion_date}} </td>

@@ -26,6 +26,7 @@ urlpatterns = [
     path('create-mission/', views.create_mission, name="create-mission"),
     path('create-overview/', views.create_overview, name="create-overview"),
     path('create-objective/', views.create_objective, name="create-objective"),
+    path('create-focus-area/', views.create_focus_area, name="create-focus-area"),
     
     path('create-initiative', views.create_initiative, name="create-initiative"),
     
