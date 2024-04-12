@@ -15,9 +15,7 @@ urlpatterns = [
     path('my-login', views.my_login, name="my-login"),
 
     path('profile',views.profile, name='profile'),
-    path('next-fiscal-year',views.next_fiscal_year, name='next-fiscal-year'),
 
-    
 
     # CRUD
 
