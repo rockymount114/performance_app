@@ -183,6 +183,29 @@ def dashboard(request):
         d4 = {}
         for i in quarterly_data_q4:
             d4.update({i.measure_id:i.get_percentage})
+
+        initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id = department_id)
+
+        initiative_status = {}
+
+        for i in initiative_detail_data:
+            initiative_status.update({i.strategic_initiative.id:i.status})
+
+        initiative_desc_of_s = {}
+
+        for i in initiative_detail_data:
+            initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
+
+        initiative_expected_impact = {}
+
+        for i in initiative_detail_data:
+            initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
+
+        initiative_notes = {}
+
+        for i in initiative_detail_data:
+            initiative_notes.update({i.strategic_initiative.id:i.notes})
+
         
         context = {
             'form': DepartmentFilterForm(),
@@ -208,7 +231,10 @@ def dashboard(request):
             'd_objective_names':d_objective_names,
             'dept_cmo': dept_cmo,
             'department': department,
-        
+            'initiative_status': initiative_status,
+            'initiative_desc_of_s': initiative_desc_of_s,
+            'initiative_expected_impact': initiative_expected_impact,
+            'initiative_notes':initiative_notes,
 
                 
                 }
@@ -260,6 +286,30 @@ def dashboard(request):
         d4 = {}
         for i in quarterly_data_q4:
             d4.update({i.measure_id:i.get_percentage})
+
+        initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id=department_id)
+
+        initiative_status = {}
+
+        for i in initiative_detail_data:
+            initiative_status.update({i.strategic_initiative.id:i.status})
+
+        initiative_desc_of_s = {}
+
+        for i in initiative_detail_data:
+            initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
+
+        initiative_expected_impact = {}
+
+        for i in initiative_detail_data:
+            initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
+
+        initiative_notes = {}
+
+        for i in initiative_detail_data:
+            initiative_notes.update({i.strategic_initiative.id:i.notes})
+
+        print(initiative_status)
         
         context = {
             'mission': my_mission,
@@ -285,6 +335,11 @@ def dashboard(request):
         
 
             'dept_head':dept_head,
+
+            'initiative_status': initiative_status,
+            'initiative_desc_of_s': initiative_desc_of_s,
+            'initiative_expected_impact': initiative_expected_impact,
+            'initiative_notes':initiative_notes,
                 
                 }
     
@@ -605,6 +660,45 @@ def profile(request):
     }
     
     return render(request,'webapp/profile.html', context = context)
+
+
+
+
+
+
+# Create initiative detail
+
+@login_required(login_url='my-login')
+def create_initiative_detail(request,pk):
+
+    initial_data = {
+        'department':request.user.department_id,
+        'strategic_initiative':StrategicInitiative.objects.get(id=pk),
+      
+    
+    }
+
+    department = Department.objects.get(id=request.user.department_id)
+    strategic_initiative = StrategicInitiative.objects.get(id=pk)
+    
+
+    
+    form = StrategicInitiativeDetailForm(initial=initial_data)
+
+    if request.method=="POST":
+        form=StrategicInitiativeDetailForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.department = department
+            instance.strategic_initiative = strategic_initiative
+            instance.save() 
+            messages.success(request, "Your Quaterly data was created!")
+            return redirect("dashboard")    
+    
+    context = {'form': form,
+               } 
+    
+    return render(request, 'webapp/create-initiative-detail.html', context=context)
 
 
 
