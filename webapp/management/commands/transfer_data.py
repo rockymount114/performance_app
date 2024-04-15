@@ -56,7 +56,7 @@ class Command(BaseCommand):
             prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved = True)
             prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
             prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
-            prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
+            prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id).exclude(status='completed')
 
             current_fiscal_year = FiscalYear.objects.get(name=fiscal_year)
           

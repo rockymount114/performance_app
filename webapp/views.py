@@ -287,7 +287,7 @@ def dashboard(request):
         for i in quarterly_data_q4:
             d4.update({i.measure_id:i.get_percentage})
 
-        initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id=department_id)
+        initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id=department_id).order_by('status','created_at')
 
         initiative_status = {}
 
@@ -699,6 +699,28 @@ def create_initiative_detail(request,pk):
                } 
     
     return render(request, 'webapp/create-initiative-detail.html', context=context)
+
+
+# View Initiative Detail
+@login_required(login_url='my-login')
+def view_initiative_detail(request,pk):
+        
+     department = Department.objects.get(id=request.user.department_id)
+     strategic_initiative = StrategicInitiative.objects.get(id=pk)
+     details = StrategicInitiativeDetail.objects.filter(strategic_initiative=pk).order_by('status','created_at')
+     
+
+
+
+    
+     context = {
+        'strategic_initiative':strategic_initiative,
+        'details':details
+        
+    } 
+    
+     return render(request, 'webapp/view-initiative-detail.html', context=context)
+
 
 
 

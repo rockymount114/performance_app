@@ -1,0 +1,57 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Quarterly Data Details{% endblock title %}
+{% block content %}
+
+<h3>Initiative Detail Data</h3>
+<hr>
+    <div class="card">
+        <div class="card-body">
+
+            <p><strong> Initiative:</strong>  {{strategic_initiative.title}}</p>
+            <p><strong> Initiative Description:</strong>  {{strategic_initiative.description}}</p>
+            <p><strong> Proposed Completion Date:</strong>  {{strategic_initiative.proposed_completion_date}}</p>
+
+
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                
+                        <th id="centered-header" width="5%">Status</th>
+                        <th id="centered-header" width="5%">Expected Impact</th>
+                        <th id="centered-header" width="15%">Description of Status</th>
+                        <th id="centered-header" width="15%">Notes</th>
+                        <th id="centered-header" width="5%">Created on</th>
+                        <th id="centered-header" width="5%">Updated on</th>
+             
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in details %}
+                    <tr>
+                        
+                        <td align="center">{{ detail.status }}</td>
+                        <td align="center">{{ detail.expected_impact }}</td>
+                        <td align="Left">{{ detail.description_project_status }}</td>
+                        <td align="Left">{{ detail.notes }}</td>
+                        <td align="center">{{ detail.created_at }}</td>
+                        <td align="center">{{ detail.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+            <br>
+            <a class="btn btn-outline-primary btn-sm" href="{%  url 'create-initiative-detail' strategic_initiative.id  %}" title="Add a new objective">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </a> 
+  
+            
+
+        </div>
+
+    </div>
+    <br>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary"> Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i> </a>
+
+{% endblock %}
+
