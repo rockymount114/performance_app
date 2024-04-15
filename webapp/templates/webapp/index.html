@@ -1,9 +1,15 @@
 {% extends 'webapp/base.html' %}
+{%load static%}
 {% block title %}Home{% endblock title %}
-{% block content %}    
+{% block content %}   
+
+
+
     <body>
         <br>
         <br>
+        <img class="falling-leaf" src="{% static 'img/leaf.svg' %}" style="display: block; margin-left: auto; margin-right: auto; width: 150px; height: 150px;" alt="Leaf Image">
+
         <div class="text-center">
             <h3> Performance Measure Application of City Rocky Mount </h3>
             <br>
@@ -12,6 +18,8 @@
             <br>
             <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
         </div>
+
+        
 
 
     </body>      
