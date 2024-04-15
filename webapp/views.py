@@ -148,12 +148,13 @@ def dashboard(request):
         my_overview = Overview.objects.filter(department_id=department_id).last()
         my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
         my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
-        my_measures = Measure.objects.filter(department_id=department_id, fiscal_year=fiscal_year) 
+        my_measures = Measure.objects.filter(objective_id__in= my_objectives)  
         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
 
         d_objective_names = {}
         for i in my_objectives:
             d_objective_names.update({i.id:i.name})
+        print(d_objective_names)
     
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
@@ -243,7 +244,7 @@ def dashboard(request):
 
             
     else:
-     
+        
         department_id = request.user.department_id 
         dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
     
@@ -251,12 +252,15 @@ def dashboard(request):
         my_overview = Overview.objects.filter(department_id=department_id).last()
         my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
         my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-        my_measures = Measure.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id) 
+        my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-
+        print(my_measures)
+        print(my_objectives)
         d_objective_names = {}
         for i in my_objectives:
             d_objective_names.update({i.id:i.name})
+
+        print(d_objective_names)
     
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
