@@ -30,7 +30,7 @@ urlpatterns = [
     
     path('create-initiative', views.create_initiative, name="create-initiative"),
     
-    
+
     path('create-quarterly-data/<int:pk>/<str:quarter>', views.create_quarterly_data, name="create-quarterly-data"),
     path('create-initiative-detail/<int:pk>', views.create_initiative_detail, name="create-initiative-detail"),
     path('view-quarterly-data/<int:pk>', views.view_quarterly_data, name="view-quarterly-data"),

@@ -33,6 +33,7 @@ Original code
 body{
 	background-color: hsl(0, 5%, 98%);
     font-family: lato;
+    /*Inter var,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Helvetica,Ubuntu,Roboto,Noto,Arial,sans-serif*/
 }
 
 /* for measure actual and target col*/
@@ -72,3 +73,48 @@ td
  white-space: nowrap;
 }
 
+/*leaf animation*/
+@keyframes falling-leaf {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    20% {
+      transform: translate(20px, 20px) rotate(18deg);
+    }
+    40% {
+      transform: translate(-15px, 40px) rotate(-12deg);
+    }
+    60% {
+      transform: translate(10px, 60px) rotate(8deg);
+    }
+    80% {
+      transform: translate(-5px, 80px) rotate(-4deg);
+    }
+    100% {
+      transform: translate(0, 100vh) rotate(0deg);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes reset-leaf {
+    0% {
+      transform: translate(0, 100vh) rotate(0deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+    }
+  }
+  
+  img[alt="Leaf Image"] {
+    animation: falling-leaf 5s linear forwards, reset-leaf 0s 5s linear forwards;
+    animation-play-state: paused;
+  }
+  
+  img[alt="Leaf Image"]:hover {
+    animation-play-state: running;
+  }
+
+  /* leaf animation end */
