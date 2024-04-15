@@ -637,7 +637,11 @@ class GeneratePdf(View):
 def profile(request):
     department_id = request.user.department_id 
 
-    prev_year_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=1, approved = True)
+    
+    objectives_pending_approval = Objective.objects.filter(approved = False)
+    focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
+    measures_pending_approval = Measure.objects.filter(approved = False)
+    initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
 
     fiscal_years =  FiscalYear.objects.all()
     
@@ -669,7 +673,7 @@ def profile(request):
     context = {
         # 'mission':prev_year_mission,
         # 'overview':prev_year_overview,
-        'objectives':prev_year_objectives,
+        # 'objectives':prev_year_objectives,
         # 'focus_areas':prev_year_focus_areas,
         # 'measures':prev_year_measures,
         # 'initiatives':prev_year_initiatives,
