@@ -40,6 +40,21 @@ def get_current_fiscal_year():
     
     return fiscal_year  
 
+def get_current_quarter():
+    current_date = date.today()
+    current_month = current_date.month
+
+    if current_month in range(4, 7):
+        quarter = 'Q4'
+    elif current_month in range(7, 10):
+        quarter = 'Q1'
+    elif current_month in range(10, 13):
+        quarter = 'Q2'
+    else:
+        quarter = 'Q3'
+
+    return quarter
+
 # - Register a user
 def register(request):
     form = CreateUserForm()
