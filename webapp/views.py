@@ -641,7 +641,7 @@ def profile(request):
     objectives_pending_approval = Objective.objects.filter(approved = False)
     focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
     measures_pending_approval = Measure.objects.filter(approved = False)
-    initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
+    # initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
 
     fiscal_years =  FiscalYear.objects.all()
     
