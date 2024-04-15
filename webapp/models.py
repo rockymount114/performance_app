@@ -150,7 +150,8 @@ class Measure(TimeStampMixin):
     
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)   
     title = models.TextField(max_length=500)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)   
+    department = models.ForeignKey("Department", on_delete=models.CASCADE)  
+    approved = models.BooleanField('Approved',default=False) 
     DIRECTIONS = (
         ("Upwards", "Upwards"),
         ("Downwards", "Downwards"),
