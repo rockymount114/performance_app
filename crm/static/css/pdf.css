@@ -1,0 +1,16 @@
+
+.table {     
+    position:absolute;       
+    width: 100%;
+    border-collapse: collapse;
+    border:1px solid #6F6F6F;
+    background-color: #f1f1f1;
+}
+.table .table-light th .col1{
+    width:550px;
+
+}
+
+th{
+    height:30px;
+}

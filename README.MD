@@ -1,18 +1,26 @@
-# DROP database db_performance
-# CREATE DATABASE db_performance CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+# How to use
 
+### City Performance Management System
+This application is designed to help city departments track and manage their performance metrics and initiatives.
 
+## User Registration
+All users must be registered with a valid city email address.
+After registration, an administrator will assign each user to the appropriate department.
+Department Data Entry
+Once assigned to a department, users can add records for the following data elements:
 
-## 
-03/21/2024 Review meeting
+Mission
+Overview
+Objectives
+Focus Areas
+Initiatives
+Quarterly Data
+For each Objective and Initiative, users can enter quarterly data updates. When a user clicks on an Objective or Initiative, they will be able to view and edit the associated quarterly data details.
 
-1. Date will be based on fiscal year
-2. Direction change to select field, no calculation needed
-3. Quaterly actual data need to be fill in another page/form for details, explaination, extra supports etc.
-4. Same as strategic initiatives, 
-    4.1 Status as 0-25%, 25-50% etc selectable, 
-    4.2 Description of project status, fill quaterly in a sep form/page
-    4.3 Same as Expected impacts, Notes
+## Adding New Data Elements
+If a department needs to add more data elements, such as new Objectives or Focus Areas, users can click the "+" sign to create a new entry. However, these new entries will be flagged and require approval from the Performance Chief before becoming visible to other users.
 
+Note: Adding new Strategic Initiatives does not require approval.
 
-5. office365 integrations for login?
+## Data Approval Process
+When a user adds a new Objective or Focus Area, it will be flagged for review. Once the Performance Chief approves the new entry, the flag will automatically disappear, and the data will be visible to all users in that department.

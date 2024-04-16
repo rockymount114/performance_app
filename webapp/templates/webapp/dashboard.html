@@ -337,20 +337,23 @@
                   <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_desc_of_s|get_item:initiative.id }}</a></td>
                   {% else %}
                   <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
-                  {% endif %}
+                  {% endif %} 
+               
 
 
                   {% if initiative.id in initiative_expected_impact %}
-                  <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
+                  <td align="center">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
                   {% else %}
-                  <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                  <td> - </td>
+                  {% endif %}
+                <!--
+                  {% if initiative.id in initiative_notes %}
+                  <td align="center"><a href="#">{{ initiative_notes|get_item:initiative.id }}</a></td>
+                  {% else %}
+                  <td> - </td>
                   {% endif %}
 
-                  {% if initiative.id in initiative_notes %}
-                  <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
-                  {% else %}
-                  <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
-                  {% endif %}
+                  -->
                   
                   
               </tr>
