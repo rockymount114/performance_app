@@ -32,7 +32,19 @@
       </h6>
     </div>
 
+    <div>
+      <h3>
+      {% if dept_cmo %}  
+      {{department.name}}
+      {% else %}
+        {{user.department}}
+      {% endif %}
+      </h3>
+    </div>
+
   </section>
+
+  
 
 
   <section> <!--Mission statement & Overview -->
@@ -45,10 +57,7 @@
 
         <div class="col">
           <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Mission Statement 
-                  {{department.name}} 
-              
-              </b>  </div>
+              <div class="card-header bg-info-subtle"><b>Mission Statement </b>  </div>
               <div class="card-body">
                 <p class="card-text">
                     {{mission}}   
@@ -62,10 +71,7 @@
         {% if mission %}  
         <div class="col">
           <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Mission Statement of 
-                  {{user.department.name}} 
-              
-              </b>  </div>
+              <div class="card-header bg-info-subtle"><b>Mission Statement</b>  </div>
               <div class="card-body">
                 <p class="card-text">
                   {{mission}}   
@@ -79,11 +85,7 @@
 
         <div class="col">
           <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Mission Statement  
-
-                  {{user.department}}
-
-              </b></div>
+              <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
               <div class="card-body">
                 <p class="card-text">
                   <a class="list-group-item text-bg-danger" href="create-mission"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
@@ -105,10 +107,7 @@
 
         <div class="col">
           <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Overview 
-                  {{department.name}} 
-              
-              </b>  </div>
+              <div class="card-header bg-info-subtle"><b>Overview</b>  </div>
               <div class="card-body">
                 <p class="card-text">
                   {{overview}}   
@@ -122,12 +121,8 @@
         {% if overview %}  
         <div class="col">
           <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Overview of 
-                {% if dept_cmo %}  
-                {{department.name}}
-                {% else %}
-                  {{user.department}}
-                {% endif %}
+              <div class="card-header bg-info-subtle"><b>Overview
+                
 
               </b>  </div>
               <div class="card-body">
@@ -342,18 +337,17 @@
 
 
                   {% if initiative.id in initiative_expected_impact %}
-                  <td align="center">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
+                  <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
                   {% else %}
-                  <td> - </td>
-                  {% endif %}
-                <!--
-                  {% if initiative.id in initiative_notes %}
-                  <td align="center"><a href="#">{{ initiative_notes|get_item:initiative.id }}</a></td>
-                  {% else %}
-                  <td> - </td>
+                  <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                   {% endif %}
 
-                  -->
+                  {% if initiative.id in initiative_notes %}
+                  <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
+                  {% else %}
+                  <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                  {% endif %}
+
                   
                   
               </tr>
