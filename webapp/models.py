@@ -137,6 +137,7 @@ class Objective(TimeStampMixin):
 class FocusArea(TimeStampMixin):
     name = models.TextField(max_length=255)
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
+    approved = models.BooleanField('Approved',default=False)
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
     def __str__(self) -> str:
         return self.name     
@@ -150,7 +151,8 @@ class Measure(TimeStampMixin):
     
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)   
     title = models.TextField(max_length=500)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE)   
+    department = models.ForeignKey("Department", on_delete=models.CASCADE)  
+    approved = models.BooleanField('Approved',default=False) 
     DIRECTIONS = (
         ("Upwards", "Upwards"),
         ("Downwards", "Downwards"),

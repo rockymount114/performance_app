@@ -40,6 +40,21 @@ def get_current_fiscal_year():
     
     return fiscal_year  
 
+def get_current_quarter():
+    current_date = date.today()
+    current_month = current_date.month
+
+    if current_month in range(4, 7):
+        quarter = 'Q4'
+    elif current_month in range(7, 10):
+        quarter = 'Q1'
+    elif current_month in range(10, 13):
+        quarter = 'Q2'
+    else:
+        quarter = 'Q3'
+
+    return quarter
+
 # - Register a user
 def register(request):
     form = CreateUserForm()
@@ -626,7 +641,7 @@ def profile(request):
     objectives_pending_approval = Objective.objects.filter(approved = False)
     focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
     measures_pending_approval = Measure.objects.filter(approved = False)
-    initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
+    # initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
 
     fiscal_years =  FiscalYear.objects.all()
     
