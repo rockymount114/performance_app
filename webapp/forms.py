@@ -248,6 +248,20 @@ class DepartmentFilterForm(forms.Form):
         disabled=False,
         required=True,
     )
+
+# This is a test form to filter pending approvals dynamically based on Departmnet and fiscal year
+    
+class ApprovalsFilterForm(forms.Form):
+    departments = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=False,
+        required=True,
+    )
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=False,
+        required=True,
+    )
         
   
         

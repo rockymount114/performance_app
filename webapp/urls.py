@@ -15,7 +15,8 @@ urlpatterns = [
 
     path('my-login', views.my_login, name="my-login"),
 
-    path('approval/',views.profile, name='approval'),
+    path('approvals',views.approvals, name='approvals'),
+
     path('profile/',views.profile, name='profile'),
 
 
@@ -46,6 +47,8 @@ urlpatterns = [
     path('pdf/', GeneratePdf.as_view(), name="pdf"),
     path('pdf2/', views.render_pdf, name="pdf2"),
     path('pdf_download/', views.render_pdf_view, name='pdf_download'),
+
+
 
 
     

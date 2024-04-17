@@ -143,8 +143,10 @@ class FocusArea(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
     approved = models.BooleanField('Approved',default=False)
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+
     created_by = models.CharField(max_length=50, null=True)
     modified_by = models.CharField(max_length=50, null=True)
+
     def __str__(self) -> str:
         return self.name     
  

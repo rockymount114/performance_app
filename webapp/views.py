@@ -19,9 +19,13 @@ from operator import attrgetter
 from django.views.generic import ListView
 from django.views.generic import View
 from .utils import render_to_pdf
+
+from django.http import JsonResponse
+
 from io import BytesIO
 import os
 from xhtml2pdf import pisa
+
 
 from django.template.loader import get_template
 from django.contrib.staticfiles import finders
@@ -932,7 +936,9 @@ def render_pdf_view(request):
     
            
 # Create profile view
+
     
+
 @login_required(login_url='my-login')
 def profile(request):
     # code to do
@@ -976,6 +982,80 @@ def profile(request):
     }
     
     return render(request,'webapp/profile.html', context = context)
+        
+# Create profile view
+    
+@login_required(login_url='my-login')
+def approvals(request):
+    department_id_fetched = request.GET.get('department_id')
+    fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
+    
+    
+    if department_id_fetched and fiscal_year_id_fetched:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+        context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+        return JsonResponse(context)
+    elif department_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    elif fiscal_year_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+      
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    else:
+    
+        objectives_pending_approval = Objective.objects.filter(approved=False)
+        focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
+        measures_pending_approval = Measure.objects.filter(approved=False)
+
+        print(department_id_fetched)
+        print(fiscal_year_id_fetched)
+
+        context = {
+            'form1': ApprovalsFilterForm(),
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+   
+        }
+       
+        return render(request,'webapp/approvals.html', context = context)
+    
+
+
+
+    
+
+
 
 
 
