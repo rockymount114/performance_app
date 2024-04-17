@@ -78,14 +78,17 @@ class CreateMeasureForm(forms.ModelForm):
 
     class Meta:
         model = Measure
-        fields = '__all__'
+        # fields = '__all__'
+        
+        fields = ['objective','title','fiscal_year', 'direction', 'frequency', 'current_year_rate', 'target_rate']  
+        exclude = ['department', 'created_by']
 
 
 
-class CreateQuarterlyMeasureForm(forms.ModelForm):
-    class Meta:
-        model = QuarterlyPerformanceData    
-        fields = '__all__' 
+# class CreateQuarterlyMeasureForm(forms.ModelForm):
+#     class Meta:
+#         model = QuarterlyPerformanceData    
+#         fields = '__all__' 
 
 class CreateInitiativeForm(forms.ModelForm):
     title = forms.CharField(
@@ -169,9 +172,10 @@ class CreateObjectiveForm(forms.ModelForm):
     class Meta:
         model = Objective    
 
+        # fields= "__all__"
 
         fields = ['name', 'fiscal_year' ]  
-        exclude = ['department', 'approved']
+        exclude = ['department', 'approved', 'created_by', 'modified_by']
          
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -228,7 +232,8 @@ class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
     class Meta:
         model =  QuarterlyPerformanceData  
-        fields = '__all__' 
+        fields = ['numerator','denominator','impact','descriptive_impact']
+        exclude = ['department','objective','measure', 'quarter']
         
 # this filter is for dashboard.html filter out department & fiscal year if you login as CMO
     
@@ -276,5 +281,7 @@ class StrategicInitiativeDetailForm(forms.ModelForm):
 
     class Meta:
         model =  StrategicInitiativeDetail  
-        fields = '__all__' 
+        fields = ['status','expected_impact','description_project_status','notes']
+        exclude = ['department','strategic_initiative']
+
 

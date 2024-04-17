@@ -1,0 +1,51 @@
+
+/*
+@page {
+    size: landscape;
+} 
+*/
+
+body{
+    background-image: url("{{ city_logo }}");
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 200px; 
+    
+}
+
+.table {     
+    position:absolute;       
+    width: 100%;
+    border:1px solid #6F6F6F;
+    background-color: #f1f1f1;
+}
+.table .table-light th .col1{
+    width:550px;
+
+}
+
+th{
+    height:30px;
+}
+
+tr{
+    white-space: nowrap;
+}
+
+.data{
+    background-color: #f1f1f1;
+    margin-left: 5px;
+
+}
+
+.data_col{
+    margin-left: 5px;
+    padding-top: 3px;
+    white-space: nowrap;
+
+}
+/* Logo */
+.header-container {
+    margin-bottom: 20px; 
+}
+

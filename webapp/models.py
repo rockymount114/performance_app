@@ -42,7 +42,7 @@ class CustomUserManager(UserManager):
 class Department(TimeStampMixin): 
     
     name = models.CharField(max_length=100)   
-    description = models.CharField(max_length=100)    
+    description = models.CharField(max_length=100, null=True, blank=True)    
     
     class Meta:
         ordering = ["name"]        
@@ -78,8 +78,10 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'CustomerUser'
         verbose_name_plural = 'CustomerUsers'
         
+              
     def get_full_name(self):
-        return self.first_name + self.last_name
+        full_name = f"{self.first_name} {self.last_name}"
+        return full_name.strip()
 
     def get_short_name(self):
         return self.first_name or self.email.split('@')[0]
@@ -130,6 +132,8 @@ class Objective(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)   
     approved = models.BooleanField('Approved',default = False)
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)  
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
 
     def __str__(self) -> str:
         return self.name 
@@ -139,7 +143,10 @@ class FocusArea(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
     approved = models.BooleanField('Approved',default=False)
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
-    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
+
     def __str__(self) -> str:
         return self.name     
  
@@ -154,6 +161,9 @@ class Measure(TimeStampMixin):
     title = models.TextField(max_length=500)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)  
     approved = models.BooleanField('Approved',default=False) 
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
+    
     DIRECTIONS = (
         ("Upwards", "Upwards"),
         ("Downwards", "Downwards"),
@@ -181,6 +191,9 @@ class QuarterlyPerformanceData(TimeStampMixin):
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)       
     department = models.ForeignKey("Department", on_delete=models.CASCADE) 
     measure = models.ForeignKey("Measure", on_delete=models.CASCADE) 
+    
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
     
     QUARTER_CHOICES = (
         ("Q1", "Q1"),
@@ -231,6 +244,9 @@ class StrategicInitiative(TimeStampMixin):
     description = models.TextField(max_length=255, null=True, blank=True)
     proposed_completion_date = models.DateField()
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+    
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
 
     def __str__(self) -> str:
         return self.title 
@@ -238,6 +254,9 @@ class StrategicInitiative(TimeStampMixin):
 class StrategicInitiativeDetail(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     strategic_initiative = models.ForeignKey("StrategicInitiative", on_delete=models.CASCADE)
+    
+    created_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True)
     
     STATUS_CHOICES = (
         ("0-25%", "0-25%"),
