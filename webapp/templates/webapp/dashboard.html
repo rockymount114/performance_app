@@ -31,16 +31,14 @@
         {% endif %} 
       </h6>
     </div>
-
-    <div>
-      <h3>
-      {% if dept_cmo %}  
-      {{department.name}}
-      {% else %}
-        {{user.department}}
-      {% endif %}
-      </h3>
-    </div>
+    <h3>
+        {% if dept_cmo %}  
+        {{department.name}}
+        {% else %}
+          {{user.department}}
+        {% endif %}
+     
+    </h3>
 
   </section>
 
@@ -212,7 +210,7 @@
   <section class="Metrc-table">
     <div>
       <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
-        Create a new measure &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new measure  
       </a>
       <br><br>
     
@@ -292,14 +290,14 @@
   <section class="Iniatives-table">
     <div>
       <a class="btn btn-outline-primary btn-sm" href="{% url 'create-initiative' %}">
-        Create a new initative &nbsp; <i class="fa fa-plus-circle" aria-hidden="true"></i>
+         <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new initative 
       </a>
       
       <br><br>
       <table class="table table-hover table-bordered">
           <thead class="table-light">
               <tr>
-                <th scope="col" id="centered-header" width="25%"> Strategic Initiative Title </th>
+                <th scope="col" id="centered-header" width="25%"> Strategic Initiatives </th>
                 <th scope="col" id="centered-header" width="25%"> Description </th>
                 <th scope="col" id="centered-header" width="12%"> Proposed Completion Date </th>
                 <th scope="col" id="centered-header" width="10%"> Status </th>
