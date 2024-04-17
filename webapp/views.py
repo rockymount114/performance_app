@@ -631,11 +631,56 @@ class GeneratePdf(View):
             response['Content-Disposition']=content
             return response
         return HttpResponse("Page Not Found")
+    
+
+@login_required(login_url='my-login')
+def profile(request):
+    # code to do
+    department_id = request.user.department_id 
+    
+    objectives_pending_approval = Objective.objects.filter(approved = False)
+    focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
+    measures_pending_approval = Measure.objects.filter(approved = False)
+    # initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
+
+    fiscal_years =  FiscalYear.objects.all()
+    
+    if request.method=="POST":
+        carry_next_year_ids = request.POST.getlist('boxes')
+        year_selected = request.POST.get('years')
+        full_data = []
+
+        for x in carry_next_year_ids:
+
+            row = {'name': Objective.objects.get(pk=int(x)).name, 
+                   'department':Objective.objects.get(pk=int(x)).department,
+                   'approved':Objective.objects.get(pk=int(x)).approved,
+                   'fiscal_year': FiscalYear.objects.get(pk = year_selected),
+                   }
+            
+            full_data.append(row)
+
+        for item in full_data:
+            Objective.objects.create(**item)    
+
+
+        messages.success(request,(" Your data was submitted for review! "))
+        return redirect('dashboard')
+
+
+
+
+    context = {
+        
+
+    }
+    
+    return render(request,'webapp/profile.html', context = context)
         
 # Create profile view
     
 @login_required(login_url='my-login')
-def profile(request):
+def approvals(request):
     department_id_fetched = request.GET.get('department_id')
     fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
     
@@ -697,7 +742,7 @@ def profile(request):
    
         }
        
-        return render(request,'webapp/profile.html', context = context)
+        return render(request,'webapp/approvals.html', context = context)
     
 
 

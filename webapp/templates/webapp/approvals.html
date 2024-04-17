@@ -10,7 +10,7 @@
         <h3> Pending approvals: </h3>
         <h6> See below: </h6>
         <hr>
-                <form action="" method="POST" id="approvalsForm" data-approvals-filter-url="{% url 'profile' %}">
+                <form action="" method="POST" id="approvalsForm" data-approvals-filter-url="{% url 'approvals' %}">
                     {% csrf_token %}
                                 <div class="form-group">
                                 Departments: {{ form1.departments}} Fiscal Year: {{ form1.fiscal_year}} 

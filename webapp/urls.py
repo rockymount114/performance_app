@@ -15,7 +15,7 @@ urlpatterns = [
     path('my-login', views.my_login, name="my-login"),
 
     path('profile',views.profile, name='profile'),
-
+    path('approvals',views.approvals, name='approvals'),
 
     # CRUD
 
