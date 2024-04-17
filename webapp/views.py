@@ -19,9 +19,16 @@ from operator import attrgetter
 from django.views.generic import ListView
 from django.views.generic import View
 from .utils import render_to_pdf
+
+from django.http import JsonResponse
+
 from io import BytesIO
+import os
 from xhtml2pdf import pisa
+
+
 from django.template.loader import get_template
+from django.contrib.staticfiles import finders
 
 
 User = get_user_model()
@@ -329,7 +336,7 @@ def dashboard(request):
 
 @login_required(login_url='my-login')
 def create_objective(request):   
-    
+    print(request.user.get_full_name())
     department = Department.objects.get(id=request.user.department_id)
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
 
@@ -346,6 +353,7 @@ def create_objective(request):
             objective = form.save(commit=False)
             objective.department = department
             objective.fiscal_year = fiscal_year
+            objective.created_by = request.user.get_full_name()
             objective.save() 
             messages.success(request, "Your objective was created and pending to review!")
             return redirect("dashboard")
@@ -362,7 +370,7 @@ def create_objective(request):
 def create_focus_area(request):
     department = Department.objects.get(id=request.user.department_id)
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
-
+    
     form = CreateFocusAreaForm(initial={
                                         'department': department,
                                         'fiscal_year': fiscal_year,                                        
@@ -373,6 +381,7 @@ def create_focus_area(request):
             objective = form.save(commit=False)
             objective.department = department
             objective.fiscal_year = fiscal_year
+            objective.created_by = request.user.get_full_name()
             objective.save() 
             messages.success(request, "Your Focus Aread was created!")
             return redirect("dashboard")
@@ -400,6 +409,7 @@ def create_measure(request):
         if form.is_valid():            
             measure = form.save(commit=False)
             measure.department = department
+            measure.created_by = request.user.get_full_name()
             measure.save() 
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
@@ -418,6 +428,7 @@ def create_initiative(request):
     
     department = Department.objects.get(id=request.user.department_id)
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+    
 
     form = CreateInitiativeForm(initial={
                                     'department': department,
@@ -431,6 +442,7 @@ def create_initiative(request):
             instance = form.save(commit=False)
             instance.department = department
             instance.fiscal_year = fiscal_year
+            instance.created_by = request.user.get_full_name()
             instance.save() 
             messages.success(request, "Your Strategic Initiative was created!")
             return redirect("dashboard")
@@ -509,6 +521,7 @@ def create_quarterly_data(request,pk,quarter):
             instance.objective = objective_id
             instance.measure = measure
             instance.quarter = quarter
+            instance.created_by = request.user.get_full_name()
             instance.save() 
             messages.success(request, "Your Quaterly data was created!")
             return redirect("dashboard")    
@@ -530,6 +543,26 @@ def view_quarterly_data(request,pk):
     q3_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q3").first()
     q4_data = QuarterlyPerformanceData.objects.filter(measure_id=pk,quarter ="Q4").first()
 
+    # Calculate the percentages for each quarter
+    if q1_data and q1_data.denominator > 0:
+        q1_data.percentage = (q1_data.numerator / q1_data.denominator) * 100
+    else:
+        q1_data={}
+
+    if q2_data and q2_data.denominator > 0:
+        q2_data.percentage = (q2_data.numerator / q2_data.denominator) * 100
+    else:
+        q2_data = {}
+
+    if q3_data and q3_data.denominator > 0:
+        q3_data.percentage = (q3_data.numerator / q3_data.denominator) * 100
+    else:
+        q3_data = {}
+
+    if q4_data and q4_data.denominator > 0:
+        q4_data.percentage = (q4_data.numerator / q4_data.denominator) * 100
+    else:
+        q4_data = {}
     
     context = {
         'quarterly_data':quarterly_data,
@@ -562,8 +595,12 @@ class GeneratePdf(View):
         prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())        
 
         user_email = User.objects.get(department_id=department_id)
-        dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))       
-
+        dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id)) 
+        
+        image_path = finders.find('./img/city_logo.png')      
+        css_path = os.path.join(settings.BASE_DIR, 'static', 'css', 'pdf.css')
+        with open(css_path, 'r', encoding='utf-8') as css_file:
+            css_content = css_file.read()
 
         my_mission = Mission.objects.filter(department_id=department_id).last()              
         my_overview = Overview.objects.filter(department_id=department_id).last()
@@ -632,6 +669,8 @@ class GeneratePdf(View):
             "dept_head":User.get_head_name,
             "current_fiscal_year":current_fiscal_year,
             "prev_fiscal_year":prev_fiscal_year,
+            'city_logo': image_path,
+            'css_content': css_content,
             
             
             "missions": my_mission,
@@ -658,7 +697,14 @@ class GeneratePdf(View):
             'initiative_notes':initiative_notes,
     
         }
+        
+        from django.template import Context, engines
+        
+        template = engines['django'].from_string('{% extends "webapp/report.html" %}{% block style %}{{ css_content|safe }}{% endblock %}')
+        html = template.render(data)
+        
         pdf = render_to_pdf('webapp/report.html',data)
+        
         if pdf:
             response=HttpResponse(pdf,content_type='application/pdf')
             filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
@@ -890,11 +936,13 @@ def render_pdf_view(request):
     
            
 # Create profile view
+
     
+
 @login_required(login_url='my-login')
 def profile(request):
+    # code to do
     department_id = request.user.department_id 
-
     
     objectives_pending_approval = Objective.objects.filter(approved = False)
     focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
@@ -929,18 +977,85 @@ def profile(request):
 
 
     context = {
-        # 'mission':prev_year_mission,
-        # 'overview':prev_year_overview,
-        # 'objectives':prev_year_objectives,
-        # 'focus_areas':prev_year_focus_areas,
-        # 'measures':prev_year_measures,
-        # 'initiatives':prev_year_initiatives,
-
-        "fiscal_years": fiscal_years,
+        
 
     }
     
     return render(request,'webapp/profile.html', context = context)
+        
+# Create profile view
+    
+@login_required(login_url='my-login')
+def approvals(request):
+    department_id_fetched = request.GET.get('department_id')
+    fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
+    
+    
+    if department_id_fetched and fiscal_year_id_fetched:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+        context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+        return JsonResponse(context)
+    elif department_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    elif fiscal_year_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+      
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    else:
+    
+        objectives_pending_approval = Objective.objects.filter(approved=False)
+        focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
+        measures_pending_approval = Measure.objects.filter(approved=False)
+
+        print(department_id_fetched)
+        print(fiscal_year_id_fetched)
+
+        context = {
+            'form1': ApprovalsFilterForm(),
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+   
+        }
+       
+        return render(request,'webapp/approvals.html', context = context)
+    
+
+
+
+    
+
+
 
 
 
@@ -972,6 +1087,7 @@ def create_initiative_detail(request,pk):
             instance = form.save(commit=False)
             instance.department = department
             instance.strategic_initiative = strategic_initiative
+            instance.created_by = request.user.get_full_name()
             instance.save() 
             messages.success(request, "Your Quaterly data was created!")
             return redirect("dashboard")    
