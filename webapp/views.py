@@ -20,6 +20,7 @@ from operator import attrgetter
 from django.views.generic import ListView
 from django.views.generic import View
 from .utils import render_to_pdf
+from django.http import JsonResponse
 
 
 
@@ -635,54 +636,75 @@ class GeneratePdf(View):
     
 @login_required(login_url='my-login')
 def profile(request):
-    department_id = request.user.department_id 
+    department_id_fetched = request.GET.get('department_id')
+    fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
+    
+    
+    if department_id_fetched and fiscal_year_id_fetched:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+        context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+        return JsonResponse(context)
+    elif department_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    elif fiscal_year_id_fetched:
+         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+      
+
+         context = {
+      
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+
+        }
+         return JsonResponse(context)
+    else:
+    
+        objectives_pending_approval = Objective.objects.filter(approved=False)
+        focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
+        measures_pending_approval = Measure.objects.filter(approved=False)
+
+        print(department_id_fetched)
+        print(fiscal_year_id_fetched)
+
+        context = {
+            'form1': ApprovalsFilterForm(),
+            'objectives':objectives_pending_approval,
+            'focus_areas':focus_areas_pending_approval,
+            'measures':measures_pending_approval,
+   
+        }
+       
+        return render(request,'webapp/profile.html', context = context)
+    
+
+
 
     
-    objectives_pending_approval = Objective.objects.filter(approved = False)
-    focus_areas_pending_approval = FocusArea.objects.filter(approved = False)
-    measures_pending_approval = Measure.objects.filter(approved = False)
-    # initiative_pending_approvals = StrategicInitiative.objects.filter(approved = False)
-
-    fiscal_years =  FiscalYear.objects.all()
-    
-    if request.method=="POST":
-        carry_next_year_ids = request.POST.getlist('boxes')
-        year_selected = request.POST.get('years')
-        full_data = []
-
-        for x in carry_next_year_ids:
-
-            row = {'name': Objective.objects.get(pk=int(x)).name, 
-                   'department':Objective.objects.get(pk=int(x)).department,
-                   'approved':Objective.objects.get(pk=int(x)).approved,
-                   'fiscal_year': FiscalYear.objects.get(pk = year_selected),
-                   }
-            
-            full_data.append(row)
-
-        for item in full_data:
-            Objective.objects.create(**item)    
 
 
-        messages.success(request,(" Your data was submitted for review! "))
-        return redirect('dashboard')
-
-
-
-
-    context = {
-        # 'mission':prev_year_mission,
-        # 'overview':prev_year_overview,
-        # 'objectives':prev_year_objectives,
-        # 'focus_areas':prev_year_focus_areas,
-        # 'measures':prev_year_measures,
-        # 'initiatives':prev_year_initiatives,
-
-        "fiscal_years": fiscal_years,
-
-    }
-    
-    return render(request,'webapp/profile.html', context = context)
 
 
 

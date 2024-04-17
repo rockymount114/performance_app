@@ -43,6 +43,8 @@ urlpatterns = [
 
     path('pdf/', GeneratePdf.as_view(), name="pdf"),
 
+
+
     
     
 ]
