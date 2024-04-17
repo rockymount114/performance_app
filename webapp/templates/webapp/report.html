@@ -12,40 +12,19 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ report_name }}</title>
-    {% comment %} <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/flatly/bootstrap.min.css">   {% endcomment %}
 
     <link rel="stylesheet" href="{% static 'css/pdf.css' %}">
 
-    <style type="text/css">
-        {% comment %} @page {
-            size: landscape;
-        } {% endcomment %}
-
-        .table {     
-            position:absolute;       
-            width: 100%;
-            border:1px solid #6F6F6F;
-            background-color: #f1f1f1;
-        }
-        .table .table-light th .col1{
-            width:550px;
-
-        }
-
-        th{
-            height:30px;
-        }
-
-        .data{
-            background-color: #f1f1f1;
-        }
-        
+    <style>   {{ css_content|safe }}   </style>
     
-      </style>
 
 </head>
-<body>
-    <h3>{{department_name}} - {{ report_name }} - {{current_fiscal_year}}</h3>
+<body class="pdf-body">
+    <div class="header-container">
+        <img src="{{ city_logo }}" alt="City logo" width="120" height="55" style="display: inline-block; vertical-align: middle; margin-right: 10px;">
+        <h3 style="display: inline-block; vertical-align: middle;">{{department_name}} - {{ report_name }} - {{current_fiscal_year}}</h3>
+    </div>
+    
 
     <p><b>Name:</b> {{ username }} <b>Email:</b> {{user_email}}</p>
 
@@ -163,35 +142,35 @@
                         {% for measure in measures %}
                             <tr>
                                 <!-- <td>{{ measure.id}}</td> -->
-                                <td class="title_column" width="36%"> {{ measure.title }}</td>
-                                <td align="center" width="12%">{{ measure.direction }}</td>
-                                <td align="center" width="12%">{{ measure.frequency }}</td>
-                                <td align="center" width="12%">{{ measure.current_year_rate }}</td>
-                                <td align="center" width="12%">{{ measure.target_rate }}</td>         
+                                <td class="data_col" width="36%"> {{ measure.title }}</td>
+                                <td  class="data_col" align="center" width="12%">{{ measure.direction }}</td>
+                                <td class="data_col" align="center" width="12%">{{ measure.frequency }}</td>
+                                <td class="data_col" align="center" width="12%">{{ measure.current_year_rate }}</td>
+                                <td class="data_col" align="center" width="12%">{{ measure.target_rate }}</td>         
                                 {% with measure_id=measure.id %}
         
                                   {% if measure.id in d1 %}
-                                    <td align="center" width="4%">{{ d1|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="4%">{{ d1|get_item:measure.id }}</td>
                                   {% else %}
-                                    <td align="center" width="4%"> - </td>
+                                    <td class="data_col" align="center" width="4%"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d2 %}
-                                    <td align="center" width="4%">{{ d2|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="4%">{{ d2|get_item:measure.id }}</td>
                                   {% else %}
                                     <td align="center"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d3 %}
-                                    <td align="center" width="4%">{{ d3|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="4%">{{ d3|get_item:measure.id }}</td>
                                   {% else %}
-                                    <td align="center"> - </td>
+                                    <td class="data_col" align="center"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d4 %}
-                                    <td align="center" width="4%">{{ d4|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="4%">{{ d4|get_item:measure.id }}</td>
                                   {% else %}
-                                    <td align="center"> - </td>
+                                    <td class="data_col" align="center"> - </td>
                                   {% endif %}
                  
                                 {% endwith %}
@@ -222,7 +201,7 @@
           <table class="table table-hover table-bordered">
               <thead class="table-light">
                   <tr>
-                    <th class="col1" scope="col" id="centered-header" > Strategic Initiative Title </th>
+                    <th class="col1" scope="col" id="centered-header" > Strategic Initiatives </th>
                     <th class="col2"scope="col" id="centered-header" > Description </th>
                     <th class="col3"scope="col" id="centered-header" > Proposed Completion Date </th>
                     <th class="col4"scope="col" id="centered-header" > Status </th>
@@ -239,29 +218,29 @@
                   {% for initiative in initiatives %}
                   <tr>
           
-                      <td width="35%"> {{initiative.title}} </td>
-                      <td width="35%"> {{initiative.description}} </td>
-                      <td align="center" width="10%"> {{initiative.proposed_completion_date}} </td>
+                      <td class="data data_col" width="35%"> {{initiative.title}} </td>
+                      <td class="data data_col" width="35%"> {{initiative.description}} </td>
+                      <td class="data data_col" align="center" width="10%"> {{initiative.proposed_completion_date}} </td>
           
           
                       {% if initiative.id in initiative_status %}
-                      <td align="center" width=6% >{{ initiative_status|get_item:initiative.id }}</td>
+                      <td class="data data_col" align="center" width=6% >{{ initiative_status|get_item:initiative.id }}</td>
                       {% else %}
-                      <td align="center"> - </td>
+                      <td class="data data_col" align="center"> - </td>
                       {% endif %}
     
     
                       {% if initiative.id in initiative_desc_of_s %}
-                      <td align="center" width=6%> {{ initiative_desc_of_s|get_item:initiative.id }}</td>
+                      <td class="data data_col" align="center" width=6%> {{ initiative_desc_of_s|get_item:initiative.id }}</td>
                       {% else %}
-                      <td align="center"> - </td>
+                      <td class="data data_col" align="center"> - </td>
                       {% endif %}
     
     
                       {% if initiative.id in initiative_expected_impact %}
-                      <td align="center" width=8%>{{ initiative_expected_impact|get_item:initiative.id }}</td>
+                      <td class="data data_col" align="center" width=8%>{{ initiative_expected_impact|get_item:initiative.id }}</td>
                       {% else %}
-                      <td align="center"> - </td>
+                      <td class="data data_col" align="center"> - </td>
                       {% endif %}
     
 

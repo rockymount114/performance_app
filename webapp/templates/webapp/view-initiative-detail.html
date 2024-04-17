@@ -16,9 +16,9 @@
                 <thead class="table-light">
                     <tr>
                 
-                        <th id="centered-header" width="5%">Status</th>
-                        <th id="centered-header" width="5%">Expected Impact</th>
+                        <th id="centered-header" width="5%">Status</th>                        
                         <th id="centered-header" width="15%">Description of Status</th>
+                        <th id="centered-header" width="5%">Expected Impact</th>
                         <th id="centered-header" width="15%">Notes</th>
                         <th id="centered-header" width="5%">Created on</th>
                         <th id="centered-header" width="5%">Updated on</th>
@@ -30,8 +30,9 @@
                     <tr>
                         
                         <td align="center">{{ detail.status }}</td>
-                        <td align="center">{{ detail.expected_impact }}</td>
+                        
                         <td align="Left">{{ detail.description_project_status }}</td>
+                        <td align="center">{{ detail.expected_impact }}</td>
                         <td align="Left">{{ detail.notes }}</td>
                         <td align="center">{{ detail.created_at }}</td>
                         <td align="center">{{ detail.updated_at }}</td>
