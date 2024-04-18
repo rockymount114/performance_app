@@ -32,6 +32,9 @@ urlpatterns = [
     path('create-initiative-detail/<int:pk>/', views.create_initiative_detail, name="create-initiative-detail"),
     path('view-quarterly-data/<int:pk>/', views.view_quarterly_data, name="view-quarterly-data"),
     path('view-initiative-detail/<int:pk>/', views.view_initiative_detail, name="view-initiative-detail"),
+    path('view-objective-info/<int:pk>/', views.view_objective_info, name="view-objective-info"),
+    path('view-measure-info/<int:pk>/', views.view_measure_info, name="view-measure-info"),
+    path('view-focus-area-info/<int:pk>/', views.view_focus_area_info, name="view-focus-area-info"),
     
 
 
