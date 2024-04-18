@@ -46,9 +46,7 @@ body{
     word-wrap: break-word;
 }
 
-.objective-header {
-    background-color: hsl(43, 85%, 90%);
-}
+
 
 /*for card*/
 .card {
@@ -62,7 +60,12 @@ body{
     text-transform: uppercase;
 }
 
-table {width: 100%;}
+table 
+{width: 100%;}
+
+th{
+  vertical-align: middle;
+}
 
 
 td
@@ -72,6 +75,19 @@ td
  text-overflow: ellipsis;
  white-space: nowrap;
 }
+
+.profile_pic{
+
+  width: 200px;
+  height: 200px;
+
+}
+
+/* for profile label*/
+.label-width {
+  width: 250px; /* Adjust this value as per your desired label width */
+}
+
 
 /*leaf animation*/
 @keyframes falling-leaf {

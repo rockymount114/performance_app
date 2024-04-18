@@ -7,6 +7,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from django.utils import timezone
 from datetime import datetime
+from .validators import PhoneNumberField  
+
 
 class TimeStampMixin(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -98,7 +100,12 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     @property
     def get_head_name(self):
         if self.is_dept_head:
-            return self.get_full_name()
+            full_name = f"{self.first_name} {self.last_name}"
+            return full_name.strip()
+    @property
+    def get_head_email(self):
+        if self.is_dept_head:
+            return self.email
         
  
 #  Fiscal Year Model
@@ -278,3 +285,14 @@ class StrategicInitiativeDetail(TimeStampMixin):
     
     notes = models.TextField(max_length=255, null=True, blank=True)
     
+
+
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
+    image = models.ImageField(default='media/default.jpg', upload_to = 'media', null = True, blank = True)
+    work_phone = PhoneNumberField(max_length=14, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}'s Profile"
