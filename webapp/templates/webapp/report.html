@@ -120,7 +120,7 @@
         
             {% if grouped_measures %}
             {% for objective_id, measures in grouped_measures.items %}
-            <h5 class="objective-header">Objective: {{objective_id}} - {{ d_objective_names|get_item:objective_id }}</h5>
+            <h5 class="objective-header">Objective: {{ d_objective_names|get_item:objective_id }}</h5>
             <table class="table table-hover table-bordered">
                 <thead >
                     <tr>
@@ -143,32 +143,32 @@
                             <tr>
                                 <!-- <td>{{ measure.id}}</td> -->
                                 <td class="data_col" width="36%"> {{ measure.title }}</td>
-                                <td  class="data_col" align="center" width="12%">{{ measure.direction }}</td>
-                                <td class="data_col" align="center" width="12%">{{ measure.frequency }}</td>
-                                <td class="data_col" align="center" width="12%">{{ measure.current_year_rate }}</td>
-                                <td class="data_col" align="center" width="12%">{{ measure.target_rate }}</td>         
+                                <td  class="data_col" align="center" width="11%">{{ measure.direction }}</td>
+                                <td class="data_col" align="center" width="11%">{{ measure.frequency }}</td>
+                                <td class="data_col" align="center" width="11%">{{ measure.current_year_rate }}</td>
+                                <td class="data_col" align="center" width="11%">{{ measure.target_rate }}</td>         
                                 {% with measure_id=measure.id %}
         
                                   {% if measure.id in d1 %}
-                                    <td class="data_col" align="center" width="4%">{{ d1|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="5%">{{ d1|get_item:measure.id }}</td>
                                   {% else %}
-                                    <td class="data_col" align="center" width="4%"> - </td>
+                                    <td class="data_col" align="center" width="5%"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d2 %}
-                                    <td class="data_col" align="center" width="4%">{{ d2|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="5%">{{ d2|get_item:measure.id }}</td>
                                   {% else %}
                                     <td align="center"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d3 %}
-                                    <td class="data_col" align="center" width="4%">{{ d3|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="5%">{{ d3|get_item:measure.id }}</td>
                                   {% else %}
                                     <td class="data_col" align="center"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d4 %}
-                                    <td class="data_col" align="center" width="4%">{{ d4|get_item:measure.id }}</td>
+                                    <td class="data_col" align="center" width="5%">{{ d4|get_item:measure.id }}</td>
                                   {% else %}
                                     <td class="data_col" align="center"> - </td>
                                   {% endif %}
@@ -193,7 +193,7 @@
 
 
      <!-- Initiatives start --> 
-    <hr>
+    <h3> Strategic Iniatives</h3>
 
      <section class="Iniatives-table">
         <div>

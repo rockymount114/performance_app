@@ -159,7 +159,7 @@
   </section>
 
   <section> <!--Strategic Objectives & Focus area start-->
-    <div class="objectives">
+    <div class="objectives mt-3">
       <div class="row">
         <div class="col ">
           <div class="list-group mb-1">
@@ -212,13 +212,19 @@
       <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
         <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new measure  
       </a>
-      <br><br>
+   
     
         {% if grouped_measures %}
         {% for objective_id, measures in grouped_measures.items %}
-        <h5 class="objective-header">Objective: {{objective_id}} - {{ d_objective_names|get_item:objective_id }}</h5>
+
+        <div class="list-group mt-3">
+          <li class="list-group-item bg-info-subtle">
+            <b>Objective: {{ d_objective_names|get_item:objective_id }}</b>
+          </li>
+        </div>
+
         <table class="table table-hover table-bordered">
-            <thead >
+            <thead class="table-light">
                 <tr>
                   
                     <th class="title_column" width="50%">Metric</th>
@@ -293,8 +299,8 @@
          <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new initative 
       </a>
       
-      <br><br>
-      <table class="table table-hover table-bordered">
+      
+      <table class="table table-hover table-bordered mt-3">
           <thead class="table-light">
               <tr>
                 <th scope="col" id="centered-header" width="25%"> Strategic Initiatives </th>
