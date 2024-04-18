@@ -1,0 +1,32 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Objective Details{% endblock title %}
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Objective Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Department:</strong> {{ objective.department }}</p>
+                    <p><strong>Objective:</strong> {{ objective.name }}</p>
+                    <p><strong>Created On:</strong> {{ objective.created_at }}</p>
+                    <p><strong>Last Updated:</strong> {{ objective.updated_at }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fiscal Year:</strong> {{ objective.fiscal_year }}</p>
+                    <p><strong>Approval Status:</strong> {% if objective.approved %}Approved{% else %}Pending{% endif %}</p>
+                    <p><strong>Created By:</strong> {{ objective.created_by }}</p>
+                    <p><strong>Modified By:</strong> {{ objective.modified_by }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-end mt-3">
+        <a href="{% url 'approvals' %}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Return
+        </a>
+    </div>
+</div>
+{% endblock %}

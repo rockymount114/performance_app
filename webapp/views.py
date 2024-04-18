@@ -992,9 +992,9 @@ def approvals(request):
     
     
     if department_id_fetched and fiscal_year_id_fetched:
-        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
-        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name', 'department__name','created_at','created_by'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
 
         context = {
       
@@ -1005,9 +1005,9 @@ def approvals(request):
         }
         return JsonResponse(context)
     elif department_id_fetched:
-         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
-         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'department__name'))
-         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
 
          context = {
       
@@ -1018,9 +1018,9 @@ def approvals(request):
         }
          return JsonResponse(context)
     elif fiscal_year_id_fetched:
-         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
-         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'department__name'))
-         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'department__name'))
+         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'fiscal_year__name','objective__name', 'department__name','created_at','created_by'))
       
 
          context = {
@@ -1117,6 +1117,53 @@ def view_initiative_detail(request,pk):
     } 
     
      return render(request, 'webapp/view-initiative-detail.html', context=context)
+
+# View Objective Info
+@login_required(login_url='my-login')
+def view_objective_info(request,pk):
+        
+    #  department = Department.objects.get(id=request.user.department_id)
+     objective = Objective.objects.get(id=pk)
+  
+     context = {
+        # 'department':department,
+        'objective':objective,
+        
+    } 
+    
+     return render(request, 'webapp/view-objective-info.html', context=context)
+
+# View Objective Info
+@login_required(login_url='my-login')
+def view_measure_info(request,pk):
+        
+    #  department = Department.objects.get(id=request.user.department_id)
+     measure = Measure.objects.get(id=pk)
+  
+     context = {
+        # 'department':department,
+        'measure':measure,
+        
+    } 
+    
+     return render(request, 'webapp/view-measure-info.html', context=context)
+
+
+# View Objective Info
+@login_required(login_url='my-login')
+def view_focus_area_info(request,pk):
+        
+    #  department = Department.objects.get(id=request.user.department_id)
+     focus_area = FocusArea.objects.get(id=pk)
+  
+     context = {
+        # 'department':department,
+        'focus_area':focus_area,
+        
+    } 
+    
+     return render(request, 'webapp/view-focus-area-info.html', context=context)
+
 
 
 
