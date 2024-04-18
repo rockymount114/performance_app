@@ -25,7 +25,7 @@ body{
 }
 
 th{
-    height:30px;
+    height:25px;
 }
 
 tr{
@@ -48,4 +48,6 @@ tr{
 .header-container {
     margin-bottom: 20px; 
 }
+
+
 
