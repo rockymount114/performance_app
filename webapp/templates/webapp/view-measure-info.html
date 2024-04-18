@@ -1,0 +1,42 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Measure Details{% endblock title %}
+{% block content %}
+<div class="container my-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">Measure Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Department:</strong> {{ measure.department }}</p>
+                    <p><strong>Objective:</strong> {{ measure.title }}</p>
+                    <p><strong>Created On:</strong> {{ measure.created_at }}</p>
+                    <p><strong>Last Updated:</strong> {{ measure.updated_at }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Fiscal Year:</strong> {{ measure.fiscal_year }}</p>
+                    <p><strong>Direction:</strong> {{ measure.direction }}</p>
+                    <p><strong>Frequency:</strong> {{ measure.frequency }}</p>
+                    <p><strong>Last Year Average:</strong> {{ measure.current_year_rate }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Target Rate:</strong> {{ measure.target_rate }}</p>
+                    <p><strong>Approval Status:</strong> {% if measure.approved %}Approved{% else %}Pending{% endif %}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Created By:</strong> {{ measure.created_by }}</p>
+                    <p><strong>Modified By:</strong> {{ measure.modified_by }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-end mt-3">
+        <a href="{% url 'approvals' %}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Return
+        </a>
+    </div>
+</div>
+{% endblock %}
