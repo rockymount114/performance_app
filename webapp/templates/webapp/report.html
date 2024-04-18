@@ -1,34 +1,25 @@
-{% comment %} {% extends 'webapp/base_pdf.html' %} {% endcomment %}
+
 {% block title %}PDF{% endblock title %}
 {% load static %}
-{% load custom_tags %}
 
 
-
-<!DOCTYPE html>
-<html lang="en">
-    {% block content %}
-
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>{{ report_name }}</title>
-
     <link rel="stylesheet" href="{% static 'css/pdf.css' %}">
-
-    <style>   {{ css_content|safe }}   </style>
-    
+    <style>   {{ css_content|safe }}   </style>    
 
 </head>
 <body class="pdf-body">
     <div class="header-container">
         <img src="{{ city_logo }}" alt="City logo" width="120" height="55" style="display: inline-block; vertical-align: middle; margin-right: 10px;">
         <h3 style="display: inline-block; vertical-align: middle;">{{department_name}} - {{ report_name }} - {{current_fiscal_year}}</h3>
-    </div>
-    
+    </div>    
 
     <p><b>Name:</b> {{ username }} <b>Email:</b> {{user_email}}</p>
 
-    <p><b>Department:</b> {{ department_name }} <b>Dept Head Name:</b>{{user.get_user_info}} <b>Dept Head Email:</b>{{dept_head}}</p>
+    <p><b>Department:</b> {{ department_name }} <b>Dept Head Name:</b>{{dept_head_name}} <b>Dept Head Email:</b>{{dept_head_email}}</p>
     
     <!--Mission & Overview start -->
     <section class="section"> 
@@ -125,7 +116,7 @@
                 <thead >
                     <tr>
                       
-                        <th class="title_column"> Metric</th>
+                        <th class="title_column"> Metrics</th>
                         <th class="th1" id="centered-header" >Direction</th>
                         <th id="centered-header">Frequency</th>
                         <th id="centered-header" >{{prev_fiscal_year}} Actual</th>
@@ -263,6 +254,5 @@
      <!-- Initiatives end --> 
 
 </body>
-</html>
 
 {% endblock content%}

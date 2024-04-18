@@ -76,6 +76,19 @@ td
  white-space: nowrap;
 }
 
+.profile_pic{
+
+  width: 200px;
+  height: 200px;
+
+}
+
+/* for profile label*/
+.label-width {
+  width: 250px; /* Adjust this value as per your desired label width */
+}
+
+
 /*leaf animation*/
 @keyframes falling-leaf {
     0% {

@@ -96,6 +96,24 @@ function fadeIn(el, display) {
 };
 
 
+function animateProgressBar(progressBarId, currentValue, targetValue, duration) {
+    var progressBar = document.querySelector(`#${progressBarId} .progress-bar`);
+    var start = null;
+    var step = function (timestamp) {
+        if (!start) start = timestamp;
+        var progress = timestamp - start;
+        var percentage = Math.min(currentValue + (progress / duration) * (targetValue - currentValue), targetValue);
+        progressBar.style.width = percentage + '%';
+        progressBar.setAttribute('aria-valuenow', percentage);
+        progressBar.textContent = percentage.toFixed(0) + '%';
+        if (progress < duration) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+
 
 
 

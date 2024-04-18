@@ -101,4 +101,7 @@ admin.site.register(StrategicInitiative, StrategicInitiativeAdmin)
 admin.site.register(QuarterlyPerformanceData)
 
 
+admin.site.register(Profile)
+
+
 
