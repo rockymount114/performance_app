@@ -250,7 +250,7 @@ def dashboard(request):
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
         
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-        print(grouped_measures)
+        
         
         # Quarterly data
         objective_id = Measure.objects.filter(department_id=department_id, objective_id=1)
@@ -996,8 +996,8 @@ def approvals(request):
     if request.method == "POST":
         objectives_id_list = request.POST.getlist('objective_boxes')
         measures_id_list = request.POST.getlist('measure_boxes')
-        focus_areas_id_list = request.POST.getlist('focus_areas_boxes')
-        print(objectives_id_list)
+        focus_areas_id_list = request.POST.getlist('focus_area_boxes')
+        print(focus_areas_id_list)
         # update the db objectives
         for id in objectives_id_list:
             print(id)

@@ -158,50 +158,55 @@
     </div>
   </section>
 
-  <section> <!--Strategic Objectives & Focus area start-->
+  <section>
+    <!--Strategic Objectives & Focus area start-->
     <div class="objectives mt-3">
       <div class="row">
-        <div class="col ">
+        <div class="col">
           <div class="list-group mb-1">
-            <li class="list-group-item bg-info-subtle">
-
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'create-objective' %}" title="Add a new objective">
+            <div class="list-group-item bg-info-subtle d-flex align-items-center">
+              <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-objective' %}" title="Add a new objective">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
-              </a> &nbsp
-
-              <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas) 
-              </b>
-              </li> 
-
+              </a>
+              <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas)</b>
+            </div>
             {% for objective in objectives %}
-            <ul style="list-style-type:square">
-              <li>{{objective}} </li> 
-            </ul>
-            {% endfor %}
-
-          </div>
-
-          <div class="list-group ">
-            <li class="list-group-item bg-info-subtle">
-
-              <a class="btn btn-outline-primary btn-sm" href="{% url 'create-focus-area' %}" title="Add a new focus area">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i>
-              </a> &nbsp
-              
-              <b>FOCUS AREAS IMPACTED (Must align with at least 3)</b>
-           </li> 
-
-            {% for focus_area in focus_areas%}
-            <ul style="list-style-type:square">
-              <li>{{focus_area}}</li>
-            </ul>
+              {% if objective.approved %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <div class="objective-text">{{objective.name}}</div>
+                  <span class="badge bg-success">Approved</span>
+                </div>
+              {% else %}
+                <div class="list-group-item d-flex justify-content-between align-items-center pending-approval">
+                  <div class="objective-text">{{objective.name}}</div>
+                  <span class="badge bg-warning">Pending Approval</span>
+                </div>
+              {% endif %}
             {% endfor %}
           </div>
-          
-
+        </div>
       </div>
     </div>
-
+    <div class="list-group">
+      <div class="list-group-item bg-info-subtle d-flex align-items-center">
+        <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-focus-area' %}" title="Add a new focus area">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </a>
+        <b>FOCUS AREAS IMPACTED (Must align with at least 3)</b>
+      </div>
+      {% for focus_area in focus_areas %}
+      {% if focus_area.approved %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="objective-text">{{focus_area.name}}</div>
+          <span class="badge bg-success">Approved</span>
+        </div>
+      {% else %}
+        <div class="list-group-item d-flex justify-content-between align-items-center pending-approval">
+          <div class="objective-text">{{focus_area.name}}</div>
+          <span class="badge bg-warning">Pending Approval</span>
+        </div>
+      {% endif %}
+    {% endfor %}
     </div>
   </section>
 
