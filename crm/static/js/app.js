@@ -98,6 +98,16 @@ function fadeIn(el, display) {
 
 function animateProgressBar(progressBarId, currentValue, targetValue, duration) {
     var progressBar = document.querySelector(`#${progressBarId} .progress-bar`);
+
+    
+    if (isNaN(targetValue)) {
+        
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressBar.textContent = '0%';
+        return; 
+    }
+
     var start = null;
     var step = function (timestamp) {
         if (!start) start = timestamp;
@@ -112,7 +122,6 @@ function animateProgressBar(progressBarId, currentValue, targetValue, duration) 
     };
     window.requestAnimationFrame(step);
 }
-
 
 
 
