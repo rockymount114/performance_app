@@ -130,7 +130,7 @@ def dashboard(request):
         
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
+        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
         my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
         my_measures = Measure.objects.filter(objective_id__in= my_objectives)  
         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
@@ -234,9 +234,11 @@ def dashboard(request):
     
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
+        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+  
         my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
         my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
+
         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
         d_objective_names = {}
@@ -246,6 +248,7 @@ def dashboard(request):
 
     
         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+        
         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
         
         
@@ -394,30 +397,54 @@ def create_focus_area(request):
 
 # - Create a measure record 
 
+# @login_required(login_url='my-login')
+# def create_measure(request):
+    
+#     department = Department.objects.get(id=request.user.department_id)
+#     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())   
+
+#     form = CreateMeasureForm(initial={
+#                                         'department': department,
+#                                         'fiscal_year':fiscal_year,
+#                                         })  
+
+    
+#     if request.method == "POST":
+#         form = CreateMeasureForm(request.POST)
+#         if form.is_valid():            
+#             measure = form.save(commit=False)
+#             measure.department = department
+#             measure.fiscal_year = fiscal_year
+#             measure.created_by = request.user.get_full_name()
+#             measure.save() 
+#             messages.success(request, "Your measure was created!")
+#             return redirect("dashboard")
+#     # else:
+#     #     form = CreateMeasureForm()
+            
+#     context = {'form': form}
+    
+#     return render(request, 'webapp/create-measure.html', context=context)
+
 @login_required(login_url='my-login')
 def create_measure(request):
-    
     department = Department.objects.get(id=request.user.department_id)
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
 
-    form = CreateMeasureForm(initial={
-                                        'department': department,
-                                        })  
-
-    
     if request.method == "POST":
-        form = CreateMeasureForm(request.POST)
-        if form.is_valid():            
+        form = CreateMeasureForm(request.POST, user=request.user)
+        if form.is_valid():
             measure = form.save(commit=False)
             measure.department = department
+            measure.fiscal_year = fiscal_year
             measure.created_by = request.user.get_full_name()
-            measure.save() 
+            measure.save()
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
-    # else:
-    #     form = CreateMeasureForm()
-            
+    else:
+        form = CreateMeasureForm(initial={'department': department, 'fiscal_year': fiscal_year}, user=request.user)
+
     context = {'form': form}
-    
     return render(request, 'webapp/create-measure.html', context=context)
 
 
@@ -985,8 +1012,8 @@ def approvals(request):
     if request.method == "POST":
         objectives_id_list = request.POST.getlist('objective_boxes')
         measures_id_list = request.POST.getlist('measure_boxes')
-        focus_areas_id_list = request.POST.getlist('focus_areas_boxes')
-        print(objectives_id_list)
+        focus_areas_id_list = request.POST.getlist('focus_area_boxes')
+        print(focus_areas_id_list)
         # update the db objectives
         for id in objectives_id_list:
             print(id)
