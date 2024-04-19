@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Quarterly Data Details{% endblock title %}
 {% block content %}
-<h3>Quarterly data</h3>
+<h3>Quarterly Data Details</h3>
 <hr>
 <div class="card">
     <div class="card-body">
@@ -25,37 +25,37 @@
                         <div class="progress-bar percentage" role="progressbar" style="width: {{ q1_data.percentage }}%;" aria-valuenow="{{ q1_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q1_data.percentage }}%</div>
                     </div>
                     {% else %}
-                    None
+                    -
                     {% endif %}
                 </td>
-                <td>
+                <td style="text-align: center;">
                     {% if q2_data %}
                     {{q2_data.numerator}} / {{q2_data.denominator}}
                     <div class="progress" id="progress-bar-q2">
                         <div class="progress-bar" role="progressbar" style="width: {{ q2_data.percentage }}%;" aria-valuenow="{{ q2_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q2_data.percentage }}%</div>
                     </div>
                     {% else %}
-                    None
+                    -
                     {% endif %}
                 </td>
-                <td>
+                <td style="text-align: center;">
                     {% if q3_data %}
                     {{q3_data.numerator}} / {{q3_data.denominator}}
                     <div class="progress" id="progress-bar-q3">
                         <div class="progress-bar" role="progressbar" style="width: {{ q3_data.percentage }}%;" aria-valuenow="{{ q3_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q3_data.percentage }}%</div>
                     </div>
                     {% else %}
-                    None
+                    -
                     {% endif %}
                 </td>
-                <td>
+                <td style="text-align: center;">
                     {% if q4_data %}
                     {{q4_data.numerator}} / {{q4_data.denominator}}
                     <div class="progress" id="progress-bar-q4">
                         <div class="progress-bar" role="progressbar" style="width: {{ q4_data.percentage }}%;" aria-valuenow="{{ q4_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q4_data.percentage }}%</div>
                     </div>
                     {% else %}
-                    None
+                    -
                     {% endif %}
                 </td>
             </tr>
@@ -88,9 +88,9 @@
     }
 
     animateProgressBar('progress-bar-q1', 0, {{ q1_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q2', 0, {{ q1_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q3', 0, {{ q1_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q4', 0, {{ q1_data.percentage }}, 2000);
+    animateProgressBar('progress-bar-q2', 0, {{ q2_data.percentage }}, 2000);
+    animateProgressBar('progress-bar-q3', 0, {{ q3_data.percentage }}, 2000);
+    animateProgressBar('progress-bar-q4', 0, {{ q4_data.percentage }}, 2000);
 </script>
 
 
