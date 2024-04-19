@@ -134,6 +134,11 @@ td
   }
 
   /* leaf animation end */
+  .pending-approval-badge {
+    display: inline-block;
+   
+     /* Ensure the span takes up only the necessary width */
+  }
 
   .objective-text {
 
@@ -143,7 +148,7 @@ td
   }
   
   .pending-approval {
-    background-color: #fff3cd; /* Light yellow background */
+    /* background-color: #fff3cd; Light yellow background */
     position: relative; /* Required for the hover message */
   }
   
@@ -166,3 +171,38 @@ td
   .pending-approval:hover::before {
     opacity: 1;
   }
+  .objective-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+  
+  /* Default max-width for larger screens */
+  @media (min-width: 992px) {
+    .objective-name {
+      max-width: 800px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for medium screens */
+  @media (max-width: 991px) {
+    .objective-name {
+      max-width: 8000px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for small screens */
+  @media (max-width: 767px) {
+    .objective-name {
+      max-width: 200px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for extra-small screens */
+  @media (max-width: 575px) {
+    .objective-name {
+      max-width: 150px; /* Adjust the value as needed */
+    }
+  }
+

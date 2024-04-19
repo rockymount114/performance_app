@@ -129,7 +129,8 @@ class CreateMeasureForm(forms.ModelForm):
             current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
             self.fields['objective'].queryset = Objective.objects.filter(
                 department_id=department_id,
-                fiscal_year=current_fiscal_year
+                fiscal_year=current_fiscal_year,
+                approved=True
             )
 
     class Meta:
