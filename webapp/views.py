@@ -531,7 +531,7 @@ def create_quarterly_data(request,pk,quarter):
     
     return render(request, 'webapp/create-quarterly-data.html', context=context)
 
-
+from django.db.models import Sum
 
 @login_required(login_url='my-login')
 def view_quarterly_data(request,pk):   
@@ -545,24 +545,38 @@ def view_quarterly_data(request,pk):
 
     # Calculate the percentages for each quarter
     if q1_data and q1_data.denominator > 0:
-        q1_data.percentage = (q1_data.numerator / q1_data.denominator) * 100
+        q1_data.percentage = int((q1_data.numerator / q1_data.denominator) * 100)
     else:
         q1_data={}
 
     if q2_data and q2_data.denominator > 0:
-        q2_data.percentage = (q2_data.numerator / q2_data.denominator) * 100
+        q2_data.percentage = int((q2_data.numerator / q2_data.denominator) * 100)
     else:
         q2_data = {}
 
     if q3_data and q3_data.denominator > 0:
-        q3_data.percentage = (q3_data.numerator / q3_data.denominator) * 100
+        q3_data.percentage = int((q3_data.numerator / q3_data.denominator) * 100)
     else:
         q3_data = {}
 
     if q4_data and q4_data.denominator > 0:
-        q4_data.percentage = (q4_data.numerator / q4_data.denominator) * 100
+        q4_data.percentage = int((q4_data.numerator / q4_data.denominator) * 100)
     else:
         q4_data = {}
+       
+    # Calculate annual_percentage 
+    quarterly_percentages = [
+        q1_data.percentage if q1_data else None,
+        q2_data.percentage if q2_data else None,
+        q3_data.percentage if q3_data else None,
+        q4_data.percentage if q4_data else None,
+    ]
+    quarterly_percentages = [p for p in quarterly_percentages if p is not None]
+
+    if quarterly_percentages:
+        annual_percentage = int(sum(quarterly_percentages) / len(quarterly_percentages))
+    else:
+        annual_percentage = 0
     
     context = {
         'quarterly_data':quarterly_data,
@@ -571,6 +585,8 @@ def view_quarterly_data(request,pk):
         'q2_data':q2_data,
         'q3_data':q3_data,
         'q4_data':q4_data,
+
+        'annual_percentage': annual_percentage,
         
     } 
     
