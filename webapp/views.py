@@ -966,13 +966,34 @@ def profile(request):
 def approvals(request):
     department_id_fetched = request.GET.get('department_id')
     fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
-    
+    if request.method == "POST":
+        objectives_id_list = request.POST.getlist('objective_boxes')
+        measures_id_list = request.POST.getlist('measure_boxes')
+        focus_areas_id_list = request.POST.getlist('focus_areas_boxes')
+        print(objectives_id_list)
+        # update the db objectives
+        for id in objectives_id_list:
+            print(id)
+            Objective.objects.filter(pk=int(id)).update(approved=True)
+            
+
+        # update the db measures 
+        for id in measures_id_list:
+            Measure.objects.filter(pk=int(id)).update(approved=True)
+        
+        # update the db focusareas
+        for id in focus_areas_id_list:
+            FocusArea.objects.filter(pk=int(id)).update(approved=True)
+
+        messages.success(request,("Your approvals were successfully submitted!"))
+
+        
     
     if department_id_fetched and fiscal_year_id_fetched:
         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name', 'department__name','created_at','created_by'))
         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
-
+        
         context = {
       
             'objectives':objectives_pending_approval,
@@ -981,6 +1002,7 @@ def approvals(request):
 
         }
         return JsonResponse(context)
+    
     elif department_id_fetched:
          objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
          focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
@@ -1023,6 +1045,8 @@ def approvals(request):
         }
        
         return render(request,'webapp/approvals.html', context = context)
+    
+    
     
 
 
