@@ -134,3 +134,75 @@ td
   }
 
   /* leaf animation end */
+  .pending-approval-badge {
+    display: inline-block;
+   
+     /* Ensure the span takes up only the necessary width */
+  }
+
+  .objective-text {
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .pending-approval {
+    /* background-color: #fff3cd; Light yellow background */
+    position: relative; /* Required for the hover message */
+  }
+  
+  .pending-approval::before {
+    content: "Pending approval";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none; /* Allows clicking through the hover message */
+  }
+  
+  .pending-approval:hover::before {
+    opacity: 1;
+  }
+  .objective-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+  
+  /* Default max-width for larger screens */
+  @media (min-width: 992px) {
+    .objective-name {
+      max-width: 800px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for medium screens */
+  @media (max-width: 991px) {
+    .objective-name {
+      max-width: 8000px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for small screens */
+  @media (max-width: 767px) {
+    .objective-name {
+      max-width: 200px; /* Adjust the value as needed */
+    }
+  }
+  
+  /* Max-width for extra-small screens */
+  @media (max-width: 575px) {
+    .objective-name {
+      max-width: 150px; /* Adjust the value as needed */
+    }
+  }
+

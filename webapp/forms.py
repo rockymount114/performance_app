@@ -26,6 +26,16 @@ import re
 
 User = get_user_model()
 
+
+def get_current_fiscal_year():                
+    current_month = date.today().month        
+    if current_month > 7:
+        fiscal_year = f'FY{date.today().year + 1}'
+    else:
+        fiscal_year = f'FY{date.today().year}'     
+    
+    return fiscal_year  
+
 # - Register/Create a user
 
 class CreateUserForm(UserCreationForm):
@@ -62,6 +72,37 @@ class CustomUserChangeForm(UserChangeForm):
     
 # - Create a measure
 
+# class CreateMeasureForm(forms.ModelForm):
+#     title = forms.CharField(
+#         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
+#         label="Metric name",
+#         max_length=255,
+#         required=False,
+#     )
+
+#     department = forms.ModelChoiceField(
+#         queryset=Department.objects.all(),
+#         disabled=True,
+#         required=False,
+#     )
+
+#     fiscal_year = forms.ModelChoiceField(
+#         queryset=FiscalYear.objects.all(),
+#         disabled=True,
+#         required=False,
+    
+#     )
+
+
+#     class Meta:
+#         model = Measure
+#         # fields = '__all__'
+        
+#         fields = ['objective','title','fiscal_year', 'direction', 'frequency', 'current_year_rate', 'target_rate']  
+#         exclude = ['department', 'created_by']
+
+
+
 class CreateMeasureForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
@@ -69,27 +110,33 @@ class CreateMeasureForm(forms.ModelForm):
         max_length=255,
         required=False,
     )
-
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
         disabled=True,
         required=False,
     )
-
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
-        required=True,
+        disabled=True,
+        required=False,
     )
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            department_id = user.department_id
+            current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+            self.fields['objective'].queryset = Objective.objects.filter(
+                department_id=department_id,
+                fiscal_year=current_fiscal_year,
+                approved=True
+            )
 
     class Meta:
         model = Measure
-        # fields = '__all__'
-        
-        fields = ['objective','title','fiscal_year', 'direction', 'frequency', 'current_year_rate', 'target_rate']  
+        fields = ['objective', 'title', 'fiscal_year', 'direction', 'frequency', 'current_year_rate', 'target_rate']
         exclude = ['department', 'created_by']
-
 
 
 # class CreateQuarterlyMeasureForm(forms.ModelForm):
