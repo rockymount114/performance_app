@@ -10,7 +10,7 @@
   <section>
 
     <div class="header1">
-      <h6> Welcome, {{user}}! 👋  {{user.first_name}} {{user.last_name}}, {{user.email}} 
+      <h6> Welcome, {{user.first_name}} {{user.last_name}} 👋  {{user.email}} 
         {% if dept_head %}
         , <b>Department Head Name & Email:</b>
         {% for user in dept_head %}           
@@ -86,7 +86,7 @@
               <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
               <div class="card-body">
                 <p class="card-text">
-                  <a class="list-group-item text-bg-danger" href="create-mission"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
+                  <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
                 </p>
               </div>
             </div>
@@ -145,7 +145,7 @@
               </b></div>
               <div class="card-body">
                 <p class="card-text">
-                  <a class="list-group-item text-bg-danger" href="create-overview"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview</a> 
+                  <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview</a> 
                 </p>
               </div>
             </div>
