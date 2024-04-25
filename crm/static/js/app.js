@@ -8,7 +8,7 @@ if (message_timeout) {
       message_timeout.style.display = "none";
     }, 5000);
   } else {
-    console.log("Element not found");
+    // console.log("Element not found");
   }
 
 
