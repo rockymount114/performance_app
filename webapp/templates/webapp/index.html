@@ -24,14 +24,4 @@
 
     </body>      
 
-    <canvas id="myChart"></canvas>
-    
-<script>
-    var data = {{ chartJSON | safe }}
-    var ctx = document.getElementById("myChart").getContext('2d');
-    var myChart = new Chart(ctx, data);
-</script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-
 {% endblock %}
