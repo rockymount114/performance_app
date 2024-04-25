@@ -23,7 +23,7 @@
                     {% if q1_data %}
                     {{q1_data.numerator}} / {{q1_data.denominator}}
                     <div class="progress" id="progress-bar-q1">
-                        <div class="progress-bar percentage" role="progressbar" style="width: {{ q1_data.percentage }}%;" aria-valuenow="{{ q1_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q1_data.percentage }}%</div>
+                        <div class="progress-bar percentage" role="progressbar"  {{ q1_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -33,7 +33,7 @@
                     {% if q2_data %}
                     {{q2_data.numerator}} / {{q2_data.denominator}}
                     <div class="progress" id="progress-bar-q2">
-                        <div class="progress-bar" role="progressbar" style="width: {{ q2_data.percentage }}%;" aria-valuenow="{{ q2_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q2_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar"   {{ q2_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -43,7 +43,7 @@
                     {% if q3_data %}
                     {{q3_data.numerator}} / {{q3_data.denominator}}
                     <div class="progress" id="progress-bar-q3">
-                        <div class="progress-bar" role="progressbar" style="width: {{ q3_data.percentage }}%;" aria-valuenow="{{ q3_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q3_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar"  {{ q3_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -53,7 +53,7 @@
                     {% if q4_data %}
                     {{q4_data.numerator}} / {{q4_data.denominator}}
                     <div class="progress" id="progress-bar-q4">
-                        <div class="progress-bar" role="progressbar" style="width: {{ q4_data.percentage }}%;" aria-valuenow="{{ q4_data.percentage }}" aria-valuemin="0" aria-valuemax="100">{{ q4_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar"  {{ q4_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -65,7 +65,7 @@
                     {% comment %} {{annual_numerator}} / {{annual_denominator}} {% endcomment %}
                         &nbsp
                     <div class="progress" id="progress-bar-annual">
-                        <div class="progress-bar" role="progressbar" style="width:{{ annual_percentage }}%; " aria-valuenow="{{ annual_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ annual_percentage }}%</div>
+                        <div class="progress-bar" role="progressbar" {{ annual_percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -82,41 +82,36 @@
 <br>
 <a href="{% url 'dashboard' %}" class="btn btn-secondary"> Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i> </a>
 
-
 <script>
-    function animateProgressBar(progressBarId, currentValue, targetValue, duration) {
-        var progressBar = document.querySelector(`#${progressBarId} .progress-bar`);
-    
-        
-        if (isNaN(targetValue)) {
-            
-            progressBar.style.width = '0%';
-            progressBar.setAttribute('aria-valuenow', 0);
-            progressBar.textContent = '0%';
-            return; 
-        }
-    
-        var start = null;
-        var step = function (timestamp) {
-            if (!start) start = timestamp;
-            var progress = timestamp - start;
-            var percentage = Math.min(currentValue + (progress / duration) * (targetValue - currentValue), targetValue);
-            progressBar.style.width = percentage + '%';
-            progressBar.setAttribute('aria-valuenow', percentage);
-            progressBar.textContent = percentage.toFixed(0) + '%';
-            if (progress < duration) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
-    }
-    
-    animateProgressBar('progress-bar-q1', 0, {{ q1_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q2', 0, {{ q2_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q3', 0, {{ q3_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-q4', 0, {{ q4_data.percentage }}, 2000);
-    animateProgressBar('progress-bar-annual', 0, {{ annual_percentage }}, 2000);
-    </script>
+    window.addEventListener('DOMContentLoaded', function() {
+        {% if q1_data %}
+        animateProgressBar('progress-bar-q1', 0, {{ q1_data.percentage }}, 2000);
+        {% else %}
+        {% endif %}
 
+        {% if q2_data %}
+        animateProgressBar('progress-bar-q2', 0, {{ q2_data.percentage }}, 2000);
+        {% else %}
+        {% endif %}
+
+        {% if q3_data %}
+        animateProgressBar('progress-bar-q3', 0, {{ q3_data.percentage }}, 2000);
+        {% else %}
+        {% endif %}
+
+        {% if q4_data %}
+        animateProgressBar('progress-bar-q4', 0, {{ q4_data.percentage }}, 2000);
+        {% else %}
+        {% endif %}
+
+        {% if annual_percentage %}
+        animateProgressBar('progress-bar-annual', 0, {{ annual_percentage }}, 2000);
+        {% else %}
+        {% endif %}
+    });
+  </script>
+
+<script src="{% static 'js/app.js' %}"></script>
+    
 
 {% endblock %}

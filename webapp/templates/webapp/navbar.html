@@ -20,7 +20,13 @@
         <a class="nav-link" href="{% url 'approvals' %}"> <i class="fa fa-check" aria-hidden="true"></i> &nbsp; Approvals </a>
       </li>
       <li class="nav-item">
+        {% if dept_cmo%}
+        <a class="nav-link" href="{% url 'pdf2' %}?departments={{ department.id }}&fiscal_year={{ fiscal_year }}"><i class="fa-regular fa-file-pdf"></i> &nbsp; PDF </a>
+
+        {% else %}
         <a class="nav-link" href="{% url 'pdf' %}"><i class="fa-regular fa-file-pdf"></i> &nbsp; PDF </a>
+        {% endif %}
+        
       </li>
       {% else %}
       <li class="nav-item">
