@@ -602,7 +602,6 @@ def handler404(request, exception):
 
 
 
-# @login_required(login_url='my-login')
 class GeneratePdf(View):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
