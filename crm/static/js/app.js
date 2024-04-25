@@ -3,14 +3,13 @@
 
 var message_timeout = document.getElementById("message-timer");
 
-setTimeout(function()
-
-{
-
-    message_timeout.style.display = "none";
-
-
-}, 5000);
+if (message_timeout) {
+    setTimeout(function() {
+      message_timeout.style.display = "none";
+    }, 5000);
+  } else {
+    console.log("Element not found");
+  }
 
 
 
@@ -19,18 +18,22 @@ setTimeout(function()
 * Copyright 2013-2022 Start Bootstrap
 * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-stylish-portfolio/blob/master/LICENSE)
 */
-window.addEventListener('DOMContentLoaded', event => {
+document.addEventListener('DOMContentLoaded', event => {
 
     const sidebarWrapper = document.getElementById('sidebar-wrapper');
     let scrollToTopVisible = false;
     // Closes the sidebar menu
     const menuToggle = document.body.querySelector('.menu-toggle');
-    menuToggle.addEventListener('click', event => {
-        event.preventDefault();
-        sidebarWrapper.classList.toggle('active');
-        _toggleMenuIcon();
-        menuToggle.classList.toggle('active');
-    })
+
+    if (menuToggle){
+        menuToggle.addEventListener('click', event => {
+            event.preventDefault();
+            sidebarWrapper.classList.toggle('active');
+            _toggleMenuIcon();
+            menuToggle.classList.toggle('active');
+        })
+    }
+    
 
     // Closes responsive menu when a scroll trigger link is clicked
     var scrollTriggerList = [].slice.call(document.querySelectorAll('#sidebar-wrapper .js-scroll-trigger'));
