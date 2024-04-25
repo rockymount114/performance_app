@@ -744,6 +744,157 @@ class GeneratePdf(View):
         return HttpResponse("Page Not Found")
 
 
+# for CMO
+class GeneratePdf2(View):
+    def get(self, request, *args, **kwargs):
+        
+        if not request.user.is_authenticated and not request.user.is_citymanager_office:
+            # messages.success(request, "Only department head can generate pdf")
+            return redirect('my-login')
+        else:
+            
+            department_id = request.GET.get('departments') 
+            fiscal_year = request.GET.get('fiscal_year')  
+            print(fiscal_year)
+            if not department_id or not fiscal_year:
+                return redirect('dashboard')
+        
+            department_name = Department.objects.filter(id=department_id).last()
+            
+            current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
+            prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
+            
+            first_name = User.objects.get(department_id=department_id, is_dept_head=False).first_name
+            last_name = User.objects.get(department_id=department_id, is_dept_head=False).last_name
+            username = first_name + ' ' + last_name
+            user_email = User.objects.get(department_id=department_id, is_dept_head=False)
+            
+            dept_head_query = {
+                'department_id': department_id,
+                'is_dept_head': True
+            }
+            
+            try:
+                dept_head = User.objects.get(**dept_head_query)
+                dept_head_name = f"{dept_head.first_name} {dept_head.last_name}"
+                dept_head_email = dept_head.email
+            except User.DoesNotExist:
+                dept_head_name = ''
+                dept_head_email = ''
+            
+            image_path = finders.find('./img/city_logo.png')      
+            css_path = os.path.join(settings.BASE_DIR, 'static', 'css', 'pdf.css')
+            with open(css_path, 'r', encoding='utf-8') as css_file:
+                css_content = css_file.read()
+
+            my_mission = Mission.objects.filter(department_id=department_id).last()              
+            my_overview = Overview.objects.filter(department_id=department_id).last()
+            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+            my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
+            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+
+            d_objective_names = {}
+            for i in my_objectives:
+                d_objective_names.update({i.id:i.name})
+                
+            grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+            grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+            
+            quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+            quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+            quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+            quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+            
+            d1 = {}
+            for i in quarterly_data_q1:
+                d1.update({i.measure_id:i.get_percentage})
+
+            d2 = {}
+            for i in quarterly_data_q2:
+                d2.update({i.measure_id:i.get_percentage})
+                
+            d3 = {}
+            for i in quarterly_data_q3:
+                d3.update({i.measure_id:i.get_percentage})
+                
+            d4 = {}
+            for i in quarterly_data_q4:
+                d4.update({i.measure_id:i.get_percentage})
+
+            initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id = department_id)
+
+            initiative_status = {}
+
+            for i in initiative_detail_data:
+                initiative_status.update({i.strategic_initiative.id:i.status})
+
+            initiative_desc_of_s = {}
+
+            for i in initiative_detail_data:
+                initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
+
+            initiative_expected_impact = {}
+
+            for i in initiative_detail_data:
+                initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
+
+            initiative_notes = {}
+
+            for i in initiative_detail_data:
+                initiative_notes.update({i.strategic_initiative.id:i.notes})
+                
+            data = {
+                "page_orientation": "landscape",
+                "report_name":"Performance Report",
+                "name": "City of Rocky Mount", 
+                "department_name": department_name,
+                "username": username,
+                "user_email": user_email,
+                "dept_head_name":dept_head_name,
+                "dept_head_email": dept_head_email,
+                
+                "current_fiscal_year":current_fiscal_year,
+                "prev_fiscal_year":prev_fiscal_year,
+                'city_logo': image_path,
+                'css_content': css_content,
+                
+                
+                "missions": my_mission,
+                "overviews": my_overview,
+                "objectives": my_objectives,
+                "focus_areas": my_focus_area,
+                "measures": my_measures,
+                "initiatives": my_initiatives,
+                
+                'grouped_measures': grouped_measures,
+                'quarterly_data_q1':quarterly_data_q1,
+                'quarterly_data_q2':quarterly_data_q2,
+                'quarterly_data_q3':quarterly_data_q3,
+                'quarterly_data_q4':quarterly_data_q4,
+                'd1':d1,
+                'd2':d2,
+                'd3':d3,
+                'd4':d4,
+                'd_objective_names':d_objective_names,
+
+                'initiative_status': initiative_status,
+                'initiative_desc_of_s': initiative_desc_of_s,
+                'initiative_expected_impact': initiative_expected_impact,
+                'initiative_notes':initiative_notes,
+        
+            }
+        
+            pdf = render_to_pdf('webapp/report.html',data)
+        
+            if pdf:
+                response=HttpResponse(pdf,content_type='application/pdf')
+                filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                content = "inline; filename= %s" %(filename)
+                response['Content-Disposition']=content
+                return response
+        return HttpResponse("Page Not Found")
+
 ### Render html for downloading pdf
 
 # def render_pdf(request):
