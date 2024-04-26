@@ -29,6 +29,7 @@ from xhtml2pdf import pisa
 
 from django.template.loader import get_template
 from django.contrib.staticfiles import finders
+import json
 
 
 User = get_user_model()
@@ -988,16 +989,33 @@ def profile(request):
     return render(request,'webapp/profile.html', context = context)
         
 # Create profile view
-    
+
+
 @login_required(login_url='my-login')
 def approvals(request):
-    department_id_fetched = request.GET.get('department_id')
-    fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
+     # Check if any record needs to be approved
+    approve_objective = request.GET.get('approve_objective')
+    approve_measure = request.GET.get('approve_measure')
+    approve_focus_area = request.GET.get('approve_focus_area')
+    # print(approve_objective)
+    prechecked_objectives = request.session.get('prechecked_objectives', [])
+    print(prechecked_objectives)
+
+    # approve
+    if approve_objective:
+        Objective.objects.filter(pk=int(approve_objective)).update(approved=True)
+
+    if approve_measure:
+        Measure.objects.filter(pk=int(approve_measure)).update(approved=True)
+        
+    if approve_focus_area:
+        FocusArea.objects.filter(pk=int(approve_focus_area)).update(approved=True)
+ 
     if request.method == "POST":
         objectives_id_list = request.POST.getlist('objective_boxes')
         measures_id_list = request.POST.getlist('measure_boxes')
         focus_areas_id_list = request.POST.getlist('focus_area_boxes')
-        print(focus_areas_id_list)
+        
         # update the db objectives
         for id in objectives_id_list:
             print(id)
@@ -1012,70 +1030,269 @@ def approvals(request):
         for id in focus_areas_id_list:
             FocusArea.objects.filter(pk=int(id)).update(approved=True)
 
+        # Clear session variables
+        if 'prechecked_objectives' in request.session:
+            del request.session['prechecked_objectives']
+        if 'prechecked_measures' in request.session:
+            del request.session['prechecked_measures']
+        if 'prechecked_focus_areas' in request.session:
+            del request.session['prechecked_focus_areas']
+
         messages.success(request,("Your approvals were successfully submitted!"))
 
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        department_id_fetched = request.GET.get('department_id')
+        fiscal_year_id_fetched = request.GET.get('fiscal_year_id')
         
-    
-    if department_id_fetched and fiscal_year_id_fetched:
-        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name', 'department__name','created_at','created_by'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
+        objectives_pending_approval, focus_areas_pending_approval, measures_pending_approval = get_pending_approvals(department_id_fetched, fiscal_year_id_fetched)
         
         context = {
-      
-            'objectives':objectives_pending_approval,
-            'focus_areas':focus_areas_pending_approval,
-            'measures':measures_pending_approval,
-
+            'objectives': objectives_pending_approval,
+            'focus_areas': focus_areas_pending_approval,
+            'measures': measures_pending_approval,
+            'prechecked_objectives_json': json.dumps(request.session.get('prechecked_objectives', [])),
+            'prechecked_measures_json': json.dumps(request.session.get('prechecked_measures', [])),
+            'prechecked_focus_areas_json': json.dumps(request.session.get('prechecked_focus_areas', [])),
+            
         }
+        
         return JsonResponse(context)
     
-    elif department_id_fetched:
-         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
+    context = {
+        'form1': ApprovalsFilterForm(),
 
-         context = {
-      
-            'objectives':objectives_pending_approval,
-            'focus_areas':focus_areas_pending_approval,
-            'measures':measures_pending_approval,
+    }
+    
+    return render(request, 'webapp/approvals.html', context=context)
 
-        }
-         return JsonResponse(context)
-    elif fiscal_year_id_fetched:
-         objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-         focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-         measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'fiscal_year__name','objective__name', 'department__name','created_at','created_by'))
-      
 
-         context = {
-      
-            'objectives':objectives_pending_approval,
-            'focus_areas':focus_areas_pending_approval,
-            'measures':measures_pending_approval,
-
-        }
-         return JsonResponse(context)
+def get_pending_approvals(department_id, fiscal_year_id):
+    if department_id and fiscal_year_id:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+    elif department_id:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+    elif fiscal_year_id:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'title', 'fiscal_year__name', 'objective__name', 'department__name', 'created_at', 'created_by'))
     else:
+        objectives_pending_approval = list(Objective.objects.filter(approved=False).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+        measures_pending_approval = list(Measure.objects.filter(approved=False).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
     
-        objectives_pending_approval = Objective.objects.filter(approved=False)
-        focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
-        measures_pending_approval = Measure.objects.filter(approved=False)
+    return objectives_pending_approval, focus_areas_pending_approval, measures_pending_approval
 
-        context = {
-            'form1': ApprovalsFilterForm(),
-            'objectives':objectives_pending_approval,
-            'focus_areas':focus_areas_pending_approval,
-            'measures':measures_pending_approval,
+    
+# @login_required(login_url='my-login')
+# def approvals(request):
+#     department_id_fetched = request.GET.get('department_id')
+#     fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
+
+    # # Check if any record needs to be approved
+    # approve_objective = request.GET.get('approve_objective')
+    # approve_measure = request.GET.get('approve_measure')
+    # approve_focus_area = request.GET.get('approve_focus_area')
+    # print(approve_objective)
+    
+
+    # # approve
+    # if approve_objective:
+    #     Objective.objects.filter(pk=int(approve_objective)).update(approved=True)
+
+    # if approve_measure:
+    #     Measure.objects.filter(pk=int(approve_measure)).update(approved=True)
+        
+    # if approve_focus_area:
+    #     FocusArea.objects.filter(pk=int(approve_focus_area)).update(approved=True)
+
+    # # Pass Pre-checked records
+    # prechecked_objectives = request.session.get('prechecked_objectives', [])
+    # prechecked_measures = request.session.get('prechecked_measures', [])
+    # prechecked_focus_areas = request.session.get('prechecked_focus_areas', [])
+
+ 
+    # if request.method == "POST":
+    #     objectives_id_list = request.POST.getlist('objective_boxes')
+    #     measures_id_list = request.POST.getlist('measure_boxes')
+    #     focus_areas_id_list = request.POST.getlist('focus_area_boxes')
+        
+    #     # update the db objectives
+    #     for id in objectives_id_list:
+    #         print(id)
+    #         Objective.objects.filter(pk=int(id)).update(approved=True)
+            
+
+    #     # update the db measures 
+    #     for id in measures_id_list:
+    #         Measure.objects.filter(pk=int(id)).update(approved=True)
+        
+    #     # update the db focusareas
+    #     for id in focus_areas_id_list:
+    #         FocusArea.objects.filter(pk=int(id)).update(approved=True)
+
+    #     # Clear session variables
+    #     if 'prechecked_objectives' in request.session:
+    #         del request.session['prechecked_objectives']
+    #     if 'prechecked_measures' in request.session:
+    #         del request.session['prechecked_measures']
+    #     if 'prechecked_focus_areas' in request.session:
+    #         del request.session['prechecked_focus_areas']
+
+    #     messages.success(request,("Your approvals were successfully submitted!"))
+
+#     if department_id_fetched and fiscal_year_id_fetched:
+#         objectives_pending_approval = Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
+#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
+#         measures_pending_approval = Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
+#     elif department_id_fetched:
+#         # print(department_id_fetched)
+#         objectives_pending_approval = Objective.objects.filter(approved=False, department_id=department_id_fetched)
+#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, department_id=department_id_fetched)
+#         measures_pending_approval = Measure.objects.filter(approved=False, department_id=department_id_fetched)
+#     elif fiscal_year_id_fetched:
+#         # print(fiscal_year_id_fetched)
+#         objectives_pending_approval = Objective.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
+#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
+#         measures_pending_approval = Measure.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
+#     else:
+#         objectives_pending_approval = Objective.objects.filter(approved=False)
+#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
+#         measures_pending_approval = Measure.objects.filter(approved=False)
+
+#     context = {
+#         'form1': ApprovalsFilterForm(),
+#         'objectives': objectives_pending_approval,
+#         'focus_areas': focus_areas_pending_approval,
+#         'measures': measures_pending_approval,
+#         'prechecked_data': json.dumps({
+#             'prechecked_objectives': prechecked_objectives,
+#             'prechecked_measures': prechecked_measures,
+#             'prechecked_focus_areas': prechecked_focus_areas,
+#         })
+#     }
+
+#     return render(request, 'webapp/approvals.html', context=context)
+    
+    # if department_id_fetched and fiscal_year_id_fetched:
+    #     objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name', 'department__name','created_at','created_by'))
+    #     focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+    #     measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
+        
+    #     context = {
+      
+    #         'objectives':objectives_pending_approval,
+    #         'focus_areas':focus_areas_pending_approval,
+    #         'measures':measures_pending_approval,
+    #         'prechecked_data':json.dumps({
+    #         'prechecked_objectives': prechecked_objectives,
+    #         'prechecked_measures': prechecked_measures,
+    #         'prechecked_focus_areas': prechecked_focus_areas,
+    #         })
+
+    #     }
+    #     return JsonResponse(context)
+    
+    # elif department_id_fetched:
+    #      objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+    #      focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+    #      measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
+
+    #      context = {
+      
+    #         'objectives':objectives_pending_approval,
+    #         'focus_areas':focus_areas_pending_approval,
+    #         'measures':measures_pending_approval,
+    #         'prechecked_data':json.dumps({
+    #         'prechecked_objectives': prechecked_objectives,
+    #         'prechecked_measures': prechecked_measures,
+    #         'prechecked_focus_areas': prechecked_focus_areas,
+    #         })
+
+    #     }
+    #      return JsonResponse(context)
+    # elif fiscal_year_id_fetched:
+    #      objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+    #      focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
+    #      measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'fiscal_year__name','objective__name', 'department__name','created_at','created_by'))
+      
+
+    #      context = {
+      
+    #         'objectives':objectives_pending_approval,
+    #         'focus_areas':focus_areas_pending_approval,
+    #         'measures':measures_pending_approval,
+    #         'prechecked_data':json.dumps({
+    #         'prechecked_objectives': prechecked_objectives,
+    #         'prechecked_measures': prechecked_measures,
+    #         'prechecked_focus_areas': prechecked_focus_areas,
+    #         })
+
+    #     }
+    #      return JsonResponse(context)
+    # else:
+    
+    #     objectives_pending_approval = Objective.objects.filter(approved=False)
+    #     focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
+    #     measures_pending_approval = Measure.objects.filter(approved=False)
+
+    #     context = {
+    #         'form1': ApprovalsFilterForm(),
+    #         'objectives':objectives_pending_approval,
+    #         'focus_areas':focus_areas_pending_approval,
+    #         'measures':measures_pending_approval,
+            
+    #         'prechecked_objectives': prechecked_objectives,
+    #         'prechecked_measures': prechecked_measures,
+    #         'prechecked_focus_areas': prechecked_focus_areas,
+            
    
-        }
+    #     }
        
-        return render(request,'webapp/approvals.html', context = context)
+    #     return render(request,'webapp/approvals.html', context = context)
     
     
     
+@login_required
+def update_session(request):
+    # Load the session data
+    session_data = request.session
 
+    if request.method == 'POST':
+        
+        item_type = request.POST.get('item_type')
+        item_id = int(request.POST.get('item_id'))
+        is_checked = request.POST.get('is_checked') == 'true'
+        
+        if item_type == 'objective':
+            prechecked_objectives = session_data.get('prechecked_objectives', [])
+            if is_checked:
+                prechecked_objectives.append(item_id)
+            else:
+                prechecked_objectives.remove(item_id)
+            session_data['prechecked_objectives'] = prechecked_objectives
+        elif item_type == 'measure':
+            prechecked_measures = session_data.get('prechecked_measures', [])
+            if is_checked:
+                prechecked_measures.append(item_id)
+            else:
+                prechecked_measures.remove(item_id)
+            session_data['prechecked_measures'] = prechecked_measures
+        elif item_type == 'focus':
+            prechecked_focus_areas = session_data.get('prechecked_focus_areas', [])
+            if is_checked:
+                prechecked_focus_areas.append(item_id)
+            else:
+                prechecked_focus_areas.remove(item_id)
+            session_data['prechecked_focus_areas'] = prechecked_focus_areas
+
+        # Manually save the session data
+        request.session.modified = True
+
+        return JsonResponse({'message': 'Session updated successfully'})
 
 
     

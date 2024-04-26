@@ -35,6 +35,7 @@ urlpatterns = [
     path('view-objective-info/<int:pk>/', views.view_objective_info, name="view-objective-info"),
     path('view-measure-info/<int:pk>/', views.view_measure_info, name="view-measure-info"),
     path('view-focus-area-info/<int:pk>/', views.view_focus_area_info, name="view-focus-area-info"),
+    path('update-session/', views.update_session, name='update_session'),
     
 
 
