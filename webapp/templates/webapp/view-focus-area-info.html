@@ -23,7 +23,11 @@
             </div>
         </div>
     </div>
-    <div class="text-end mt-3">
+    <div class="d-flex justify-content-between mt-3">
+        <form method="GET" action="{% url 'approvals' %}">
+            <input type="hidden" name="approve_focus_area" value="{{ focus_area.id }}">
+            <button type="submit" class="btn btn-primary">Approve</button>
+        </form>
         <a href="{% url 'approvals' %}" class="btn btn-secondary">
             <i class="fa fa-arrow-left"></i> Return
         </a>
