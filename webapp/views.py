@@ -613,14 +613,13 @@ class GeneratePdf(View):
             # messages.success(request, "Only department head can generate pdf")
             return redirect('my-login')
         else:
-            
-            department_id = request.user.department_id
-   
+            fiscal_year_is = request.GET.get('fiscal_year') # for selection
+            department_id = request.user.department_id   
             department_name = Department.objects.filter(id=department_id).last()
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
-            user_email = User.objects.get(department_id=department_id)
+            user_email = User.objects.get(department_id=department_id, pk=request.user.id)
             
             dept_head_query = {
                 'department_id': department_id,
@@ -801,10 +800,11 @@ class GeneratePdf2(View):
 
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
-            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id, approved=True)
-            my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
-            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+            
+            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year, approved=True)
+            my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
+            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
 
             d_objective_names = {}
             for i in my_objectives:
