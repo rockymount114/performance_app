@@ -2,7 +2,7 @@
 from django.urls import path
 from django.conf.urls import (handler404)
 from . import views
-from .views import GeneratePdf
+from .views import GeneratePdf, GeneratePdf2
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -43,6 +43,7 @@ urlpatterns = [
     
     # pdf
     path('pdf/', GeneratePdf.as_view(), name="pdf"),
+    path('pdf2/', GeneratePdf2.as_view(), name="pdf2"),
     # path('pdf2/', views.render_pdf, name="pdf2"),
     # path('pdf_download/', views.render_pdf_view, name='pdf_download'),
     
