@@ -109,7 +109,6 @@ def my_login(request):
 @login_required(login_url='my-login')
 def dashboard(request):    
 
-    
     PAGES = 5
     CURRENT_YEAR = date.today().year
     TARGET_YEAR = date.today().year + 1
@@ -228,6 +227,9 @@ def dashboard(request):
             'initiative_desc_of_s': initiative_desc_of_s,
             'initiative_expected_impact': initiative_expected_impact,
             'initiative_notes':initiative_notes,
+       
+
+            
 
                 
                 }
@@ -236,7 +238,8 @@ def dashboard(request):
 
             
     else: # normal user
-        
+
+
         department_id = request.user.department_id 
         dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
     
@@ -337,6 +340,7 @@ def dashboard(request):
             'initiative_desc_of_s': initiative_desc_of_s,
             'initiative_expected_impact': initiative_expected_impact,
             'initiative_notes':initiative_notes,
+            
                 
                 }
     

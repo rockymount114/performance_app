@@ -45,120 +45,86 @@
 
 
 
-  <section class="mission_statement"> <!--Mission statement & Overview -->
-
+  <section class="mission_statement">
     <div class="missionstatement">
-      <div class="row">
-
-        <!--Create mission start-->
-
-        {% if dept_cmo %} 
-
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Mission Statement </b>  </div>
-              <div class="card-body">
-                <p class="card-text">
-                    {{mission}}   
-                </p>
-              </div>
-            </div>
-        </div>
-
-        {% else %} <!--normal user -->
-       
-        {% if mission %}  
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Mission Statement</b>  </div>
-              <div class="card-body">
-                <p class="card-text">
-                  {{mission}}   
-                </p>
-              </div>
-            </div>
-        </div>
-        
-
-        {% else %}
-
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
+      <div class="row row-cols-1 row-cols-md-2">
+        <!-- Create mission start -->
+        {% if dept_cmo %}
+          <div class="col mb-4">
+            <div class="card text-black mb-1 h-100">
               <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
               <div class="card-body">
-                <p class="card-text">
-
-                  <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission</a> 
-
-                </p>
+                <p class="card-text">{{ mission }}</p>
               </div>
             </div>
-        </div>
-
-        {% endif%}
-
-        {% endif %} <!--end if dept_cmo -->
-
-        <!--Create mission end-->
-
-
-        <!--Create Overview start-->
-
-        {% if dept_cmo %} 
-
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Overview</b>  </div>
-              <div class="card-body">
-                <p class="card-text">
-                  {{overview}}   
-                </p>
-              </div>
-            </div>
-        </div>
-
-        {% else %} <!--normal user -->
-
-        {% if overview %}  
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Overview
-                
-
-              </b>  </div>
-              <div class="card-body">
-
-                <p class="card-text">
-                  {{overview}}   
-                </p>
-              </div>
-            </div>
-        </div>
+          </div>
         {% else %}
-
-        <div class="col">
-          <div class="card text-black  mb-1" style="max-width: 100%;">
-              <div class="card-header bg-info-subtle"><b>Overview
-                {% if dept_cmo %}  
-                
-                {% else %}
-                  {{user.department}}
-                {% endif %}
-
-              </b></div>
-              <div class="card-body">
-                <p class="card-text">
-
-                  <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview</a> 
-
-                </p>
+          <!-- Normal user -->
+          {% if mission %}
+            <div class="col mb-4">
+              <div class="card text-black mb-1 h-100">
+                <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
+                <div class="card-body">
+                  <p class="card-text">{{ mission }}</p>
+                </div>
               </div>
             </div>
-        </div>
-
-        {% endif%}
-        {% endif%}
-
+          {% else %}
+            <div class="col mb-4">
+              <div class="card text-black mb-1 h-100">
+                <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
+                <div class="card-body">
+                  <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}">
+                      <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+        <!-- Create mission end -->
+  
+        <!-- Create overview start -->
+        {% if dept_cmo %}
+          <div class="col mb-4">
+            <div class="card text-black mb-1 h-100">
+              <div class="card-header bg-info-subtle"><b>Overview</b></div>
+              <div class="card-body">
+                <p class="card-text">{{ overview }}</p>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <!-- Normal user -->
+          {% if overview %}
+            <div class="col mb-4">
+              <div class="card text-black mb-1 h-100">
+                <div class="card-header bg-info-subtle"><b>Overview</b></div>
+                <div class="card-body">
+                  <p class="card-text">{{ overview }}</p>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <div class="col mb-4">
+              <div class="card text-black mb-1 h-100">
+                <div class="card-header bg-info-subtle">
+                  <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
+                </div>
+                <div class="card-body">
+                  <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}">
+                      <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+        <!-- Create overview end -->
       </div>
     </div>
   </section>
@@ -403,9 +369,9 @@
               {% for initiative in initiatives %}
               <tr>
       
-                  <td> {{initiative.title}} </td>
-                  <td> {{initiative.description}} </td>
-                  <td> {{initiative.proposed_completion_date}} </td>
+                  <td title="{{initiative.title}}"> {{initiative.title}} </td>
+                  <td title="{{initiative.description}}"> {{initiative.description}} </td>
+                  <td align="center"> {{initiative.proposed_completion_date}} </td>
       
       
                   {% if initiative.id in initiative_status %}
@@ -430,7 +396,7 @@
                   {% endif %}
 
                   {% if initiative.id in initiative_notes %}
-                  <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
+                  <td align="center" title="{{ initiative_notes|get_item:initiative.id }}"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
                   {% else %}
                   <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
                   {% endif %}
