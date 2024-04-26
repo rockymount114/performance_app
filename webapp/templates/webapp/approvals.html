@@ -1,6 +1,7 @@
 {% extends 'webapp/base.html' %}
 {% block title %} Pending Approvals {% endblock title %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
 
 <div class="container my-5">
@@ -48,7 +49,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="objectivesId">
-                                            {% for objective in objectives %}
+                                            <!-- {% for objective in objectives %}
                                             <tr>
                                                 <td class="title_column text-center">{{ objective.fiscal_year }}</td>
                                                 <td class="title_column">{{ objective.created_at }}</td>
@@ -56,18 +57,12 @@
                                                 <td class="title_column">{{ objective.department }}</td>
                                                 <td class="title_column"><a href="{% url 'view-objective-info' objective.id %}" class="text-primary">{{ objective.name }}</a></td>
                                                 <td class="text-center">
-                                                    {% if objective.approved %}
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" checked="checked" value="{{ objective.id }}" name="objective_boxes">
+                                                        <input class="form-check-input" type="checkbox" value="{{ objective.id }}" name="objective_boxes"  {% if objective.id in prechecked_objectives %}checked{% endif %}>
                                                     </div>
-                                                    {% else %}
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="{{ objective.id }}" name="objective_boxes">
-                                                    </div>
-                                                    {% endif %}
                                                 </td>
                                             </tr>
-                                            {% endfor %}
+                                            {% endfor %} -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -96,7 +91,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="measuresId">
-                                            {% for measure in measures %}
+                                            <!-- {% for measure in measures %}
                                             <tr>
                                                 <td class="title_column text-center">{{ measure.fiscal_year }}</td>
                                                 <td class="title_column">{{ measure.created_at }}</td>
@@ -105,18 +100,12 @@
                                                 <td class="title_column">{{ measure.objective }}</td>
                                                 <td class="title_column" title="{{ measure.title }}"><a href="{% url 'view-measure-info' measure.id %}" class="text-primary">{{ measure.title }}</a></td>
                                                 <td class="text-center">
-                                                    {% if measure.approved %}
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" checked="checked" value="{{ measure.id }}" name="measure_boxes">
+                                                        <input class="form-check-input" type="checkbox" value="{{ measure.id }}" name="measure_boxes" {% if measure.id in prechecked_measures %}checked{% endif %}>
                                                     </div>
-                                                    {% else %}
-                                                    <div class="form-check ">
-                                                        <input class="form-check-input" type="checkbox" value="{{ measure.id }}" name="measure_boxes">
-                                                    </div>
-                                                    {% endif %}
                                                 </td>
                                             </tr>
-                                            {% endfor %}
+                                            {% endfor %} -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -140,11 +129,11 @@
                                                 <th class="text-center">Created By</th>
                                                 <th class="text-center">Department</th>
                                                 <th class="text-center">Focus Area</th>
-                                                <th class="text-center" width="15%">Approved?</th>
+                                                <th class="text-center" width="15%">Approve?</th>
                                             </tr>
                                         </thead>
                                         <tbody id="focusAreasId">
-                                            {% for focus_area in focus_areas %}
+                                            <!-- {% for focus_area in focus_areas %}
                                             <tr>
                                                 <td class="title_column text-center">{{ focus_area.fiscal_year }}</td>
                                                 <td class="title_column">{{ focus_area.created_at }}</td>
@@ -152,18 +141,12 @@
                                                 <td class="title_column">{{ focus_area.department }}</td>
                                                 <td class="title_column"><a href="{% url 'view-focus-area-info' focus_area.id %}" class="text-primary">{{ focus_area.name }}</a></td>
                                                 <td class="center">
-                                                    {% if focus_area.approved %}
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" checked="checked" value="{{ focus_area.id }}" name="focus_area_boxes">
+                                                        <input class="form-check-input" type="checkbox" value="{{ focus_area.id }}" name="focus_area_boxes"  {% if focus_area.id in prechecked_focus_areas %}checked{% endif %}>
                                                     </div>
-                                                    {% else %}
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="{{ focus_area.id }}" name="focus_area_boxes">
-                                                    </div>
-                                                    {% endif %}
                                                 </td>
                                             </tr>
-                                            {% endfor %}
+                                            {% endfor %} -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -187,113 +170,14 @@
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    $("#resetFiltersBtn").click(function () {
-        $("#id_departments").val("").change();
-        $("#id_fiscal_year").val("").change();
-        window.location.reload()
-    });
+<!-- <script>
 
-    $("#id_departments").change(function () {
-        updateTableData();
-    });
+    const precheckedObjectives = JSON.parse('{{ prechecked_objectives|safe }}');
+    const precheckedMeasures = JSON.parse('{{ prechecked_measures|safe }}');
+    const precheckedFocusAreas = JSON.parse('{{ prechecked_focus_areas|safe }}');
 
-    $("#id_fiscal_year").change(function () {
-        updateTableData();
-    });
-
-    function updateTableData() {
-        const url = $("#approvalsForm").attr("data-approvals-filter-url");
-        const departmentId = $("#id_departments").val();
-        const fiscalYearId = $("#id_fiscal_year").val();
-
-        $.ajax({
-            url: url,
-            data: {
-                'department_id': departmentId,
-                'fiscal_year_id': fiscalYearId
-            },
-            success: function (data) {
-                console.log(data);
-                let objectivesHtml = "";
-                let focusAreasHtml = "";
-                let measuresHtml = "";
-
-                data.objectives.forEach(function (objective) {
-                    objectivesHtml += `<tr>
-                        <td class="title_column">${objective.fiscal_year__name}</td>
-                        <td class="title_column">${objective.created_at}</td>
-                        <td class="title_column">${objective.created_by}</td>
-                        <td class="title_column">${objective.department__name}</td>
-                        <td class="title_column"><a href="#" onclick="viewObjectiveInfo(${objective.id})">${objective.name}</a></td>
-                        <td class="text-center">
-                            ${objective.approved ? `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked="checked" value="${objective.id}" name="objective_boxes">
-                            </div>` : `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="${objective.id}" name="objective_boxes">
-                            </div>`}
-                        </td>
-                    </tr>`;
-                });
-
-                data.focus_areas.forEach(function (focusArea) {
-                    focusAreasHtml += `<tr>
-                        <td class="title_column">${focusArea.fiscal_year__name}</td>
-                        <td class="title_column">${focusArea.created_at}</td>
-                        <td class="title_column">${focusArea.created_by}</td>
-                        <td class="title_column">${focusArea.department__name}</td>
-                        <td class="title_column"><a href="#" onclick="viewFocusAreaInfo(${focusArea.id})">${focusArea.name}</a></td>
-                        <td class="text-center">
-                            ${focusArea.approved ? `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked="checked" value="${focusArea.id}" name="focus_area_boxes">
-                            </div>` : `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="${focusArea.id}" name="focus_area_boxes">
-                            </div>`}
-                        </td>
-                    </tr>`;
-                });
-
-                data.measures.forEach(function (measure) {
-                    measuresHtml += `<tr>
-                        <td class="title_column">${measure.fiscal_year__name}</td>
-                        <td class="title_column">${measure.created_at}</td>
-                        <td class="title_column">${measure.created_by}</td>
-                        <td class="title_column">${measure.department__name}</td>
-                        <td class="title_column">${measure.objective__name}</td>
-                        <td class="title_column" title="${measure.title}"><a href="#" onclick="viewMeasureInfo(${measure.id})">${measure.title}</a></td>
-                        <td class="text-center">
-                            ${measure.approved ? `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" checked="checked" value="${measure.id}" name="measure_boxes">
-                            </div>` : `
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="${measure.id}" name="measure_boxes">
-                            </div>`}
-                        </td>
-                    </tr>`;
-                });
-
-                $("#objectivesId").html(objectivesHtml);
-                $("#focusAreasId").html(focusAreasHtml);
-                $("#measuresId").html(measuresHtml);
-            }
-        });
-    }
-
-    function viewObjectiveInfo(objectiveId) {
-        window.location.href = `{% url 'view-objective-info' 0 %}`.replace('0', objectiveId);
-    }
-    function viewFocusAreaInfo(focusAreaId) {
-        window.location.href = `{% url 'view-focus-area-info' 0 %}`.replace('0', focusAreaId);
-    }
-    function viewMeasureInfo(measureId) {
-        window.location.href = `{% url 'view-measure-info' 0 %}`.replace('0', measureId);
-    }
-</script>
+</script> -->
+<script src="{% static 'js/approvals.js' %}"></script>
 
 {% endblock %}
 
