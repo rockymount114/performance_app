@@ -20,11 +20,11 @@
         {% elif dept_cmo %}  
         <b>City Manager Office</b>
         <br><br>
-        <form method="GET" action="{% url 'dashboard'%}">
-          <label for="departments">Departments:&nbsp  </label>{{ form.departments}} 
+        <form id="filter_form" method="GET" action="{% url 'dashboard'%}">
+          <label for="departments" id="dept_id">Departments:&nbsp  </label>{{ form.departments}} 
           <label for="fiscal_year">Fiscal Year:&nbsp </label> {{ form.fiscal_year}}        
         
-        <input type="submit" value="Submit" class="btn btn-primary">
+        <input type="submit" value="Submit" class="btn btn-primary" name="submit">
         </form>
   
         {% endif %} 
@@ -32,7 +32,7 @@
     </div>
     <h3>
         {% if dept_cmo %}  
-        {{department.name}}
+        {{department.name}} 
         {% else %}
           {{user.department}}
         {% endif %}
@@ -43,9 +43,7 @@
 
   <!--City office view start-->
 
-  {% if dept_cmo %}  
 
-  {% else %}
 
   <section class="mission_statement"> <!--Mission statement & Overview -->
 
@@ -452,7 +450,6 @@
 </div> <!-- div1 container end-->
 
 
-{% endif %}
-<!--City office view end-->
+
 
 {% endblock %}

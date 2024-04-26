@@ -120,19 +120,18 @@ def dashboard(request):
         
         # those dept id and fiscal year is getting from the filterform
         department_id = request.GET.get('departments') 
-        fiscal_year = request.GET.get('fiscal_year')  
-               
-        
-        
+        fiscal_year_id = request.GET.get('fiscal_year')      
+        submit_clicked = 'submit' in request.GET           
+ 
         department = Department.objects.filter(id=department_id).first()   # for filter mission, overview title
 
         
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
-        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
+        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
         my_measures = Measure.objects.filter(objective_id__in= my_objectives)  
-        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
+        my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
         d_objective_names = {}
         for i in my_objectives:
@@ -195,8 +194,13 @@ def dashboard(request):
             'form': DepartmentFilterForm(
                 initial={
                         'departments': department_id,
-                        'fiscal_year': fiscal_year
+                        'fiscal_year': fiscal_year_id
                         }),
+
+            'fiscal_year_id': fiscal_year_id,
+            
+            'submit_clicked': submit_clicked,
+            
             'mission': my_mission,
             'initiatives': my_initiatives,
             'overview': my_overview, 
@@ -342,7 +346,7 @@ def dashboard(request):
 
 @login_required(login_url='my-login')
 def create_objective(request):   
-    print(request.user.get_full_name())
+    
     department = Department.objects.get(id=request.user.department_id)
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
 
@@ -601,6 +605,7 @@ def handler404(request, exception):
     return response
 
 
+# for normal user to view the pdf
 
 class GeneratePdf(View):
     def get(self, request, *args, **kwargs):
@@ -610,7 +615,7 @@ class GeneratePdf(View):
         else:
             
             department_id = request.user.department_id
-            print(department_id)
+   
             department_name = Department.objects.filter(id=department_id).last()
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
@@ -638,8 +643,8 @@ class GeneratePdf(View):
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-            my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id, approved=True)
+            my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
             d_objective_names = {}
@@ -749,13 +754,14 @@ class GeneratePdf2(View):
     def get(self, request, *args, **kwargs):
         
         if not request.user.is_authenticated and not request.user.is_citymanager_office:
-            # messages.success(request, "Only department head can generate pdf")
             return redirect('my-login')
         else:
             
             department_id = request.GET.get('departments') 
             fiscal_year = request.GET.get('fiscal_year')  
-            print(fiscal_year)
+            
+
+            
             if not department_id or not fiscal_year:
                 return redirect('dashboard')
         
@@ -764,10 +770,16 @@ class GeneratePdf2(View):
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
             
-            first_name = User.objects.get(department_id=department_id, is_dept_head=False).first_name
-            last_name = User.objects.get(department_id=department_id, is_dept_head=False).last_name
-            username = first_name + ' ' + last_name
-            user_email = User.objects.get(department_id=department_id, is_dept_head=False)
+            try:
+                user = User.objects.get(department_id=department_id, is_dept_head=False)
+                username = user.first_name + ' ' + user.last_name
+                user_email = user.email
+                
+            except User.DoesNotExist:
+                username = ""
+                user_email = ""
+            
+            
             
             dept_head_query = {
                 'department_id': department_id,
@@ -790,8 +802,8 @@ class GeneratePdf2(View):
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-            my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id, approved=True)
+            my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
             d_objective_names = {}
@@ -856,6 +868,7 @@ class GeneratePdf2(View):
                 
                 "current_fiscal_year":current_fiscal_year,
                 "prev_fiscal_year":prev_fiscal_year,
+                "fiscal_year": fiscal_year, # fiscal year when cmo click from dashboard form
                 'city_logo': image_path,
                 'css_content': css_content,
                 
