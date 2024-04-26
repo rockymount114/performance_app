@@ -249,7 +249,7 @@ class QuarterlyPerformanceData(TimeStampMixin):
 class StrategicInitiative(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
     title = models.TextField(max_length=255)
-    description = models.TextField(max_length=255, null=True, blank=True)
+    description = models.TextField(max_length=1000, null=True, blank=True)
     proposed_completion_date = models.DateField()
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
     
@@ -278,7 +278,7 @@ class StrategicInitiativeDetail(TimeStampMixin):
         ("Low", "Low"),
         ("Medium", "Medium"),
         ("Moderate", "Moderate"),
-        ("High Impact", "Hign Impact"),
+        ("High Impact", "High Impact"),
     ) 
     expected_impact = models.TextField(max_length=255, choices=IMPACT_CHOICES, null=True, blank=True) # Impact of Initiative 
     

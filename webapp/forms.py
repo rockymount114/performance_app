@@ -147,12 +147,19 @@ class CreateMeasureForm(forms.ModelForm):
 
 class CreateInitiativeForm(forms.ModelForm):
     title = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 200 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 255 characters'}),
         label="Please input Initative here",
-        max_length=200,
-        required=False,
+        max_length=255,
+        required=True,
     )
 
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative description here, max 1000 characters'}),
+        label="Description",
+        max_length=1000,
+        required=True,
+    )
+    
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
         disabled=False,

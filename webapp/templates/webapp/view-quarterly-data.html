@@ -23,7 +23,7 @@
                     {% if q1_data %}
                     {{q1_data.numerator}} / {{q1_data.denominator}}
                     <div class="progress" id="progress-bar-q1">
-                        <div class="progress-bar percentage" role="progressbar"  {{ q1_data.percentage }}%</div>
+                        <div class="progress-bar percentage" role="progressbar">  {{ q1_data.percentage }}% </div>
                     </div>
                     {% else %}
                     -
@@ -33,7 +33,7 @@
                     {% if q2_data %}
                     {{q2_data.numerator}} / {{q2_data.denominator}}
                     <div class="progress" id="progress-bar-q2">
-                        <div class="progress-bar" role="progressbar"   {{ q2_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar">  {{ q2_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -43,7 +43,7 @@
                     {% if q3_data %}
                     {{q3_data.numerator}} / {{q3_data.denominator}}
                     <div class="progress" id="progress-bar-q3">
-                        <div class="progress-bar" role="progressbar"  {{ q3_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar">  {{ q3_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -53,7 +53,7 @@
                     {% if q4_data %}
                     {{q4_data.numerator}} / {{q4_data.denominator}}
                     <div class="progress" id="progress-bar-q4">
-                        <div class="progress-bar" role="progressbar"  {{ q4_data.percentage }}%</div>
+                        <div class="progress-bar" role="progressbar">  {{ q4_data.percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -65,7 +65,7 @@
                     {% comment %} {{annual_numerator}} / {{annual_denominator}} {% endcomment %}
                         &nbsp
                     <div class="progress" id="progress-bar-annual">
-                        <div class="progress-bar" role="progressbar" {{ annual_percentage }}%</div>
+                        <div class="progress-bar" role="progressbar"> {{ annual_percentage }}%</div>
                     </div>
                     {% else %}
                     -
@@ -80,7 +80,7 @@
     </div>
 </div>
 <br>
-<a href="{% url 'dashboard' %}" class="btn btn-secondary"> Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i> </a>
+<a href="javascript:history.go(-1)" class="btn btn-secondary"> Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i> </a>
 
 <script>
     window.addEventListener('DOMContentLoaded', function() {
