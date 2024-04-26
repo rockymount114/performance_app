@@ -2,86 +2,86 @@
 {% load static %}
 {% block title %}Quarterly Data Details{% endblock title %}
 {% block content %}
-<h3>Quarterly Data Details</h3>
-<hr>
-<div class="card">
-    <div class="card-body">
-        <table class="table table-hover table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th scope="col"> Metric </th>
-                    <th scope="col" style="text-align: center;"> Q1 </th>
-                    <th scope="col" style="text-align: center;"> Q2 </th>
-                    <th scope="col" style="text-align: center;"> Q3 </th>
-                    <th scope="col" style="text-align: center;"> Q4 </th>
-                    <th scope="col" style="text-align: center;"> Annual </th>
-                </tr>
-            </thead>
-            <tr>
-                <td> {{ measure.title}} </td>
-                <td style="text-align: center;">
-                    {% if q1_data %}
-                    {{q1_data.numerator}} / {{q1_data.denominator}}
-                    <div class="progress" id="progress-bar-q1">
-                        <div class="progress-bar percentage" role="progressbar">  {{ q1_data.percentage }}% </div>
-                    </div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td style="text-align: center;">
-                    {% if q2_data %}
-                    {{q2_data.numerator}} / {{q2_data.denominator}}
-                    <div class="progress" id="progress-bar-q2">
-                        <div class="progress-bar" role="progressbar">  {{ q2_data.percentage }}%</div>
-                    </div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td style="text-align: center;">
-                    {% if q3_data %}
-                    {{q3_data.numerator}} / {{q3_data.denominator}}
-                    <div class="progress" id="progress-bar-q3">
-                        <div class="progress-bar" role="progressbar">  {{ q3_data.percentage }}%</div>
-                    </div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td style="text-align: center;">
-                    {% if q4_data %}
-                    {{q4_data.numerator}} / {{q4_data.denominator}}
-                    <div class="progress" id="progress-bar-q4">
-                        <div class="progress-bar" role="progressbar">  {{ q4_data.percentage }}%</div>
-                    </div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-
-                <td style="text-align: center;">
-                    {% if annual_percentage %}
-                    {% comment %} {{annual_numerator}} / {{annual_denominator}} {% endcomment %}
-                        &nbsp
-                    <div class="progress" id="progress-bar-annual">
-                        <div class="progress-bar" role="progressbar"> {{ annual_percentage }}%</div>
-                    </div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-
-                
-            </tr>
-            <tbody></tbody>
-        </table>
-        <hr>
+<div class="container">
+    <h3 class="text-center mb-4">Quarterly Data Details</h3>
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" style="min-width: 300px;"> Metric </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: #e6f7ff;"> Q1 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: #e6ffee;"> Q2 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: #fff7e6;"> Q3 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: #ffe6e6;"> Q4 </th>
+                            <th scope="col" class="text-center" style="width: 12%;  background-color: #bbdefb;"> Annual </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-wrap align-middle"> {{ measure.title}} </td>
+                            <td class="text-center align-middle">
+                                {% if q1_data %}
+                                <div>{{q1_data.numerator}} / {{q1_data.denominator}}</div>
+                                <div class="progress mt-2" id="progress-bar-q1">
+                                    <div class="progress-bar bg-info percentage" role="progressbar">  {{ q1_data.percentage }}% </div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-center align-middle">
+                                {% if q2_data %}
+                                <div>{{q2_data.numerator}} / {{q2_data.denominator}}</div>
+                                <div class="progress mt-2" id="progress-bar-q2">
+                                    <div class="progress-bar bg-success" role="progressbar">  {{ q2_data.percentage }}%</div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-center align-middle">
+                                {% if q3_data %}
+                                <div>{{q3_data.numerator}} / {{q3_data.denominator}}</div>
+                                <div class="progress mt-2" id="progress-bar-q3">
+                                    <div class="progress-bar bg-warning" role="progressbar">  {{ q3_data.percentage }}%</div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-center align-middle">
+                                {% if q4_data %}
+                                <div>{{q4_data.numerator}} / {{q4_data.denominator}}</div>
+                                <div class="progress mt-2" id="progress-bar-q4">
+                                    <div class="progress-bar bg-danger" role="progressbar">  {{ q4_data.percentage }}%</div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td class="text-center align-middle">
+                                {% if annual_percentage %}
+                                    &nbsp
+                                <div class="progress mt-2" id="progress-bar-annual">
+                                    <div class="progress-bar bg-primary" role="progressbar"> {{ annual_percentage }}%</div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class=" mt-4">
+        <a href="javascript:history.go(-1)" class="btn btn-outline-secondary"> <i class="fa fa-arrow-left me-2" aria-hidden="true"></i> Return </a>
     </div>
 </div>
-<br>
-<a href="javascript:history.go(-1)" class="btn btn-secondary"> Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i> </a>
-
+<script src="{% static 'js/app.js' %}"></script>
 <script>
     window.addEventListener('DOMContentLoaded', function() {
         {% if q1_data %}
@@ -109,9 +109,8 @@
         {% else %}
         {% endif %}
     });
-  </script>
+</script>
 
-<script src="{% static 'js/app.js' %}"></script>
+
     
-
 {% endblock %}
