@@ -99,6 +99,10 @@ function fadeIn(el, display) {
 };
 
 
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
 function animateProgressBar(progressBarId, currentValue, targetValue, duration) {
     var progressBar = document.querySelector(`#${progressBarId} .progress-bar`);
 

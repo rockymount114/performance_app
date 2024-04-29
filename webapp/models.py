@@ -186,7 +186,17 @@ class Measure(TimeStampMixin):
     frequency = models.CharField(max_length=255, choices= FREQUENCY_CHOICES, default="Quarterly")    
     
     current_year_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
-    target_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
+    
+    NUMBER_CHOICES = (
+        (True, "Number"),
+        (False, "Rate"),
+    ) 
+    
+    is_number = models.BooleanField(default=False, choices= NUMBER_CHOICES)
+    
+    target_number = models.IntegerField(null=True, blank=True, default=0)
+    target_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR, null=True, blank=True)
+    
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
     
     
