@@ -125,7 +125,7 @@
                         <th id="centered-header" >Q2</th>
                         <th id="centered-header" >Q3</th>
                         <th id="centered-header" >Q4</th>
-                        <th id="centered-header" >{{fiscal_year}}</th>
+                        <th id="centered-header" >YA</th>
                     </tr>
                 </thead>
         
@@ -150,7 +150,7 @@
                                   {% if measure.id in d2 %}
                                     <td class="data_col" align="center" width="5%">{{ d2|get_item:measure.id }}</td>
                                   {% else %}
-                                    <td align="center"> - </td>
+                                    <td class="data_col" align="center"> - </td>
                                   {% endif %}
         
                                   {% if measure.id in d3 %}
