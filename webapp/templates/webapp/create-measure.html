@@ -28,7 +28,7 @@
                 <div id="target_number_field" style="display: none;">
                   {{ form.target_number|as_crispy_field }}
                 </div>
-                <div id="target_rate_field" style="display: none;">
+                <div id="target_rate_field" >
                   {{ form.target_rate|as_crispy_field }}
                 </div>
                 
@@ -48,56 +48,25 @@
             </form>
         </div>
         <br>
-
-        <!-- for dropdown list -->
-<!-- 
-        {% comment %} <script src="https://releases.jquery.com/git/jquery-git.js"></script>
-
-        <script>
-            $("#id_site").change(function () {
-                const url = $("#recordForm").attr("data-cities-url");  // get the url of the `load_cities` view
-                const siteId = $(this).val();  
-        
-                $.ajax({                       
-                    url: url,                    // set the url of the request (= /persons/ajax/load-cities/ )
-                    data: {
-                        'site_id': siteId       
-                    },
-                    success: function (data) {   // `data` is the return of the `load_cities` view function
-
-                        $("#id_location").html(data);  // replace the contents of the city input with the data that came from the server
-                       
-                    }
-                });
-        
-            });
-        </script> {% endcomment %} -->
-
         
 
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+
+
     $(document).ready(function() {
-      // Hide the target fields initially
-      $('#target_number_field').hide();
-      $('#target_rate_field').hide();
-    
-      // Listen for changes in the is_number field
+   
       $('#id_is_number').change(function() {
         if ($(this).val() === 'True') {
-          // Show target_number field and hide target_rate field
+          
           $('#target_number_field').show();
           $('#target_rate_field').hide();
-        } else if ($(this).val() === 'False') {
-          // Show target_rate field and hide target_number field
+        } else  {
+         
           $('#target_rate_field').show();
           $('#target_number_field').hide();
-        } else {
-          // Hide both fields if no option is selected
-          $('#target_number_field').hide();
-          $('#target_rate_field').hide();
-        }
+        } 
       });
     });
     </script>
