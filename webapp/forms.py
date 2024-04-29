@@ -136,8 +136,8 @@ class CreateMeasureForm(forms.ModelForm):
 
     class Meta:
         model = Measure
-        fields = ['objective', 'title', 'fiscal_year', 'direction', 'frequency', 'current_year_rate', 'target_rate']
-        exclude = ['department', 'created_by']
+        fields = ['objective', 'title', 'fiscal_year', 'direction', 'frequency', 'is_number', 'target_rate', 'target_number']
+        exclude = ['department', 'created_by', 'current_year_rate']
 
 
 # class CreateQuarterlyMeasureForm(forms.ModelForm):

@@ -26,7 +26,7 @@
           <li class="nav-item">
         {% endif %}
 
-        {% if dept_cmo %}
+        {% if dept_cmo or user.is_superuser %}
         <a class="nav-link" href="{% url 'pdf2' %}?departments={{ department.id }}&fiscal_year={{fiscal_year_id}}" 
             data-toggle="tooltip" data-placement="right"
             {% if not submit_clicked %} 

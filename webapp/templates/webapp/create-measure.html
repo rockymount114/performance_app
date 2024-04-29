@@ -22,8 +22,18 @@
                 {{ form.title|as_crispy_field }}
                 {{ form.direction|as_crispy_field }}
                 {{ form.frequency|as_crispy_field }}
-                {{ form.current_year_rate|as_crispy_field }}
-                {{ form.target_rate|as_crispy_field }}
+                {% comment %} {{ form.current_year_rate|as_crispy_field }} {% endcomment %}
+
+                {{ form.is_number|as_crispy_field }}
+
+                {% comment %} {% if is_number%}
+                    {{ form.targe_number |as_crispy_field }}
+                {% else %}
+                    {{ form.target_rate|as_crispy_field }}
+                    
+                {% endif %} {% endcomment %}
+
+                
 
 
                 <br>
