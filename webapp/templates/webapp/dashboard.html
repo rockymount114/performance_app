@@ -17,6 +17,13 @@
                 {{ user.first_name }} {{ user.last_name }},
                 {{ user.email }}          
         {% endfor %}  
+
+        <form id="fiscalYearId" method="GET" action="{% url 'dashboard'%}">
+          <label for="dept_fiscal_year">Fiscal Year:&nbsp </label> {{form.fiscal_year }}    
+         
+         <input type="submit" value="Submit" class="btn btn-primary" name="submit">
+         </form>
+
         {% elif dept_cmo %}  
         <b>City Manager Office</b>
         <br><br>
@@ -418,8 +425,6 @@
   </section >
 
 </div> <!-- div1 container end-->
-
-
 
 
 {% endblock %}

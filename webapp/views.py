@@ -239,15 +239,21 @@ def dashboard(request):
             
     else: # normal user
 
+        fiscal_year_id = request.GET.get('fiscal_year')      
+        submit_clicked = 'submit' in request.GET 
+        
+        
 
         department_id = request.user.department_id 
         dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
     
         my_mission = Mission.objects.filter(department_id=department_id).last()               #.latest('created_at')
         my_overview = Overview.objects.filter(department_id=department_id).last()
-        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+        
+        
+        my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
   
-        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+        my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
         my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
 
         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
@@ -312,6 +318,8 @@ def dashboard(request):
 
         
         context = {
+            'form': DepartmentFilterForm(),
+            'submit_clicked': submit_clicked,
             'mission': my_mission,
             'initiatives': my_initiatives,
             'overview': my_overview, 

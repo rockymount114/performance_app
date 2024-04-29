@@ -53,16 +53,17 @@
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+
+
     $(document).ready(function() {
-    
-      // Listen for changes in the is_number field
+   
       $('#id_is_number').change(function() {
         if ($(this).val() === 'True') {
-          // Show target_number field and hide target_rate field
+          
           $('#target_number_field').show();
           $('#target_rate_field').hide();
-        } else ($(this).val() === 'False') {
-          // Show target_rate field and hide target_number field
+        } else  {
+         
           $('#target_rate_field').show();
           $('#target_number_field').hide();
         } 
