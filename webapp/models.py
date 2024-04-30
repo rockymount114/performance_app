@@ -9,6 +9,8 @@ from decimal import Decimal
 from django.utils import timezone
 from datetime import datetime
 from .validators import PhoneNumberField  
+from django.core.validators import RegexValidator
+
 
 
 class TimeStampMixin(models.Model):
@@ -302,8 +304,16 @@ class StrategicInitiativeDetail(TimeStampMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
-    image = models.ImageField(default='default.jpg', upload_to = 'profile_pics', null = True, blank = True)
-    work_phone = PhoneNumberField(max_length=14, null=True, blank=True)
-    
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics', null=True, blank=True)
+    work_phone = models.CharField(
+        max_length=12,
+        validators=[RegexValidator(
+            regex=r'^\d{3}-\d{3}-\d{4}$',
+            message='Work phone number must be entered in the format: xxx-xxx-xxxx.'
+        )],
+        blank=True,
+        null=True
+    )
+
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}'s Profile"
