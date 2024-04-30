@@ -302,7 +302,7 @@ class StrategicInitiativeDetail(TimeStampMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
-    image = models.ImageField(default='media/default.jpg', upload_to = 'media', null = True, blank = True)
+    image = models.ImageField(default='default.jpg', upload_to = 'profile_pics', null = True, blank = True)
     work_phone = PhoneNumberField(max_length=14, null=True, blank=True)
     
     def __str__(self):

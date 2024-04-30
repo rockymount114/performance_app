@@ -1310,16 +1310,17 @@ class GeneratePdf2(View):
 
 @login_required(login_url='my-login')
 def profile(request):
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            form.save()
-            first_name = request.user.first_name
-            messages.success(request, f'{first_name}, Your profile is updated.')
-            return redirect('/')
-    else:
-        form = ProfileForm(instance=request.user.profile)
-    context = {'form':form}
+    # if request.method == 'POST':
+    #     form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+    #     if form.is_valid():
+    #         form.save()
+    #         first_name = request.user.first_name
+    #         messages.success(request, f'{first_name}, Your profile is updated.')
+    #         return redirect('/')
+    # else:
+    #     form = ProfileForm(instance=request.user.profile)
+    # context = {'form':form}
+    context = {}
     
     return render(request,'webapp/profile.html', context = context)
         

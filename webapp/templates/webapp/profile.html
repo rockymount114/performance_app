@@ -13,23 +13,21 @@
     <meta charset="UTF-8">
     <title>User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
 </head>
 <body>
     <div class="container my-5">
         <h2 class="text-center mb-4">{{user.first_name}} {{user.last_name}}'s Profile</h2>
 
-        
-
         <div class="row">
             <div class="col-md-4">
+               
 
-                {% if user.userprofile.profile_picture %}
+                {% if user.profile.image %}
                     <img class="profile_pic rounded-circle account-img mb-3" src="{{ user.profile.image.url }}" alt="User Profile Picture">
                 {% else %}
-                    <img class="profile_pic rounded-circle account-img mb-3" src="{% static 'media/default.jpg' %}" alt="Default Profile Picture">
+                    <img class="profile_pic rounded-circle account-img mb-3" src="{{  'default.jpg' }}" alt="Default Profile Picture">
                 {% endif %}
-
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
@@ -38,13 +36,16 @@
                     </div>
                     {% comment %} <button type="submit" class="btn btn-primary">Update Picture</button> {% endcomment %}
                 </form>
+
             </div>
+
+
             <div class="col-md-8">
                 {% if form.errors.work_phone %}
-            <div class="alert alert-danger" role="alert">
-                {{ form.errors.work_phone.0 }}
-            </div>
-        {% endif %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form.errors.work_phone.0 }}
+                </div>
+                {% endif %}
 
                 <form method="post">
                     {% csrf_token %}
