@@ -1,0 +1,314 @@
+{% extends 'webapp/base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+<!-- base_dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %} Base Dashboard {% endblock %}</title>
+    <!-- Include common CSS and JS files -->
+
+
+</head>
+<body>
+    <div class="container-fluid">
+        <section class="department">
+            <!-- Include common header content -->
+            {% block header %}{% endblock %}
+        </section>
+
+        {% block content %}
+        
+        <section>
+
+            <!--Strategic Objectives start-->
+            <div class="objectives mt-1">
+              <div class="row">
+                <div class="col">
+                  <div class="list-group mb-1">
+                    <div class="list-group-item bg-info-subtle d-flex align-items-center">
+                      <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-objective' %}" title="Add a new objective">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                      <b>STRATEGIC OBJECTIVES (This is a purpose statement for an overall vision for your department; must be to City of Rocky Mount Focus Areas)</b>
+                    </div>
+                      
+                        {% if objectives%}
+                          {% for objective in objectives %}
+                            {% if objective.approved %}
+                              <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="objective-text">{{objective.name}}</div>
+                                
+                              </div>
+                            {% else %}
+                              <div class="list-group-item d-flex justify-content-between align-items-center pending-approval">
+                                <div class="objective-text"> <span class="badge bg-warning">P</span> {{objective.name}}</div>
+                              
+                              </div>
+                            {% endif %}
+                          {% endfor %}
+                        {% else %}
+                          <div class="card-body">
+                            <p class="card-text">
+                              <a class="list-group-item text-bg-danger" href="{% url 'create-objective' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step3: Create Strategic Objectives</a> 
+                            </p>
+                          </div>
+        
+                        {% endif %}
+                      
+        
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--Strategic Objectives start-->
+        
+        
+            <!--Focus Area start-->
+        
+            <div class="list-group  mt-3">
+              <div class="list-group-item bg-info-subtle d-flex align-items-center">
+                <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-focus-area' %}" title="Add a new focus area">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </a>
+                <b>FOCUS AREAS IMPACTED (Must align with at least 3)</b>
+              </div>
+        
+                {% if focus_areas%}
+        
+                    {% for focus_area in focus_areas %}
+                    {% if focus_area.approved %}
+                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="objective-text">{{focus_area.name}}</div>
+                        
+                      </div>
+                    {% else %}
+                      <div class="list-group-item d-flex justify-content-between align-items-center pending-approval">
+                        
+                        <div class="objective-text"><span class="badge bg-warning">P</span> {{focus_area.name}}</div>
+                        
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                
+                  {% else %}
+                  
+                  <a class="list-group-item text-bg-danger" href="{% url 'create-focus-area' %}"><i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step4: Create Focus Areas</a> 
+                       
+                    
+        
+                  {% endif %}
+        
+            </div>
+        
+            <!--Focus Area end-->
+        
+          </section>
+        
+          <hr>
+        
+          <section class="Metrc-table">
+            <div>
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new measure  
+              </a>
+           
+            
+                {% if grouped_measures %}
+                {% for objective_id, measures in grouped_measures.items %}
+        
+                <div class="list-group mt-3">
+                  <li class="list-group-item bg-info-subtle">
+                    <b class="objective-name">Objective: {{ d_objective_names|get_item:objective_id }}</b>
+                  </li>
+                </div>
+        
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                          
+                            <th class="title_column" width="50%">Metric</th>
+                            <th id="centered-header" width="5%">Direction</th>
+                            <th id="centered-header" width="5%">Frequency</th>
+                            <th id="centered-header" width="6%">FY24 Actual</th>
+                            <th id="centered-header" width="6%">FY25 Target</th>
+                            <th id="centered-header" width="5%">Q1</th>
+                            <th id="centered-header" width="5%">Q2</th>
+                            <th id="centered-header" width="5%">Q3</th>
+                            <th id="centered-header" width="5%">Q4</th>
+                        </tr>
+                    </thead>
+            
+                       
+                        <tbody>
+                            {% for measure in measures %}
+                                
+                                    {% if measure.approved %}
+                                    <tr>
+                                      <td class="title_column" width="15%" title="{{ measure.title }}"> {{ measure.title }}</td>
+                                      <td align="center">{{ measure.direction }}</td>
+                                      <td align="center">{{ measure.frequency }}</td>
+                                      <td align="center">{{ measure.current_year_rate }}</td>
+                                      <td align="center">{{ measure.target_rate }}</td>         
+                                      {% with measure_id=measure.id %}
+            
+                                        {% if measure.id in d1 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data' measure.id %}">{{ d1|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+              
+                                        {% if measure.id in d2 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d2|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+              
+                                        {% if measure.id in d3 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d3|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+              
+                                        {% if measure.id in d4 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d4|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+                     
+                                      {% endwith %}
+            
+                                   
+                                  </tr>
+        
+                                  {% else %}
+                                    <tr >
+                                      <td class="title_column measure-title" width="15%"  title="{{ measure.title }}"> <span class="badge bg-warning pending-approval-badge">P</span>  {{ measure.title }} </td>
+                                      <td align="center">{{ measure.direction }}</td>
+                                      <td align="center">{{ measure.frequency }}</td>
+                                      <td align="center">{{ measure.current_year_rate }}</td>
+                                      <td align="center">{{ measure.target_rate }}</td>         
+                                      {% with measure_id=measure.id %}
+        
+                                        {% if measure.id in d1 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data' measure.id %}">{{ d1|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q1' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+        
+                                        {% if measure.id in d2 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d2|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q2' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+        
+                                        {% if measure.id in d3 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d3|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q3' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+        
+                                        {% if measure.id in d4 %}
+                                          <td align="center"><a href="{% url 'view-quarterly-data'  measure.id %}">{{ d4|get_item:measure.id }}</a></td>
+                                        {% else %}
+                                          <td align="center"> <a href="{% url 'create-quarterly-data' measure.id 'Q4' %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                                        {% endif %}
+                    
+                                      {% endwith %}
+                                
+                                  </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  
+                  {% endfor %}
+                {% else %}
+                <p class="text-bg-danger">You haven't created any measures yet.</p>
+                  {% endif %}
+            
+            </div>
+          </section >
+        
+        
+        
+          <section class="Iniatives-table">
+            <div>
+              <a class="btn btn-outline-primary btn-sm" href="{% url 'create-initiative' %}">
+                 <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new initative 
+              </a>
+              
+              
+              <table class="table table-hover table-bordered mt-3">
+                  <thead class="table-light">
+                      <tr>
+                        <th scope="col" id="centered-header" width="25%"> Strategic Initiatives </th>
+                        <th scope="col" id="centered-header" width="25%"> Description </th>
+                        <th scope="col" id="centered-header" width="12%"> Proposed Completion Date </th>
+                        <th scope="col" id="centered-header" width="10%"> Status </th>
+                        <th scope="col" id="centered-header" width="10%"> Description of Project Status</th>
+                        <th scope="col" id="centered-header" width="10%"> Expected Impacts </th>
+                        <th scope="col" id="centered-header" width="10%"> Notes </th>      
+                      </tr>
+                  </thead>
+              
+                  <tbody>
+              
+                        <!-- Initiatives -->
+                      
+                      {% for initiative in initiatives %}
+                      <tr>
+              
+                          <td title="{{initiative.title}}"> {{initiative.title}} </td>
+                          <td title="{{initiative.description}}"> {{initiative.description}} </td>
+                          <td align="center"> {{initiative.proposed_completion_date}} </td>
+              
+              
+                          {% if initiative.id in initiative_status %}
+                          <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_status|get_item:initiative.id }}</a></td>
+                          {% else %}
+                          <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                          {% endif %}
+        
+        
+                          {% if initiative.id in initiative_desc_of_s %}
+                          <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_desc_of_s|get_item:initiative.id }}</a></td>
+                          {% else %}
+                          <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                          {% endif %} 
+                       
+        
+        
+                          {% if initiative.id in initiative_expected_impact %}
+                          <td align="center"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_expected_impact|get_item:initiative.id }}</a></td>
+                          {% else %}
+                          <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                          {% endif %}
+        
+                          {% if initiative.id in initiative_notes %}
+                          <td align="center" title="{{ initiative_notes|get_item:initiative.id }}"><a href="{% url 'view-initiative-detail' initiative.id %}">{{ initiative_notes|get_item:initiative.id }}</a></td>
+                          {% else %}
+                          <td align="center"> <a href="{% url 'create-initiative-detail' initiative.id %}" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"> <i class="fa fa-pencil-square-o" aria-hidden="true" ></i> </a> </td>
+                          {% endif %}
+        
+                          
+                          
+                      </tr>
+        
+                      {% endfor %} 
+        
+        
+                  </tbody>
+        
+              </table>
+        
+        
+        
+            </div>
+        </section >
+        
+        {% endblock %}
+    </div>
+</body>
+</html>
