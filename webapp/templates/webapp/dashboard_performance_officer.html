@@ -1,0 +1,52 @@
+{% extends 'webapp/base_dashboard.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}Dashboard - City Manager Supervisor{% endblock %}
+
+{% block content %}
+<div class="header1">
+  <h6>Welcome, {{ user.first_name }} {{ user.last_name }} 👋 {{ user.email }}
+    <b>City Manager Office</b>
+    <br><br>
+    <form id="filter_form" method="GET" action="{% url 'dashboard' %}">
+      <label for="departments" id="dept_id">Departments:&nbsp;</label>{{ form.departments }}
+      <label for="fiscal_year">Fiscal Year:&nbsp;</label>{{ form.fiscal_year }}
+      <input type="submit" value="Submit" class="btn btn-primary" name="submit">
+    </form>
+  </h6>
+</div>
+<h3>{{ department.name }}</h3>
+
+
+
+<section class="mission_statement">
+  <div class="missionstatement">
+    <div class="row row-cols-1 row-cols-md-2">
+      <!-- Create mission start -->
+      <div class="col mb-4">
+        <div class="card text-black mb-1 h-100">
+          <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
+          <div class="card-body">
+            <p class="card-text">{{ mission }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Create mission end -->
+
+      <!-- Create overview start -->
+      <div class="col mb-4">
+        <div class="card text-black mb-1 h-100">
+          <div class="card-header bg-info-subtle"><b>Overview</b></div>
+          <div class="card-body">
+            <p class="card-text">{{ overview }}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Create overview end -->
+    </div>
+  </div>
+</section>
+
+{{ block.super }}
+{% endblock %}
