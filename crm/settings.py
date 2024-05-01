@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'easyaudit',
 
- 
+    'widget_tweaks', # for profile page
    
     
 ]

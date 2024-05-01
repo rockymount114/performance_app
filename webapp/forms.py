@@ -394,7 +394,9 @@ class ProfileUpdateForm(forms.ModelForm):
             message='Work phone number must be entered in the format: xxx-xxx-xxxx.'
         )],
         required=False
+        
     )
+    image = forms.ImageField(label='', required=False)
     
     class Meta:
         model = Profile
