@@ -1305,25 +1305,37 @@ class GeneratePdf2(View):
     
            
 # Create profile view
-
-    
+   
 
 @login_required(login_url='my-login')
 def profile(request):
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            form.save()
-            first_name = request.user.first_name
-            messages.success(request, f'{first_name}, Your profile is updated.')
-            return redirect('/')
+        u_form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            try:
+                u_form.save()
+                p_form.save()
+                messages.success(request, f"Your account has been updated!")
+            except forms.ValidationError as e:
+                for error in e.messages:
+                    messages.error(request, error)
+            return redirect('profile')
+        else:
+            for field, errors in p_form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     else:
-        form = ProfileForm(instance=request.user.profile)
-    context = {'form':form}
-    
-    return render(request,'webapp/profile.html', context = context)
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+    return render(request, 'webapp/profile.html', context=context)
         
-# Create profile view
+
 
 
 @login_required(login_url='my-login')

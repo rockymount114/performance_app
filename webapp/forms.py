@@ -42,7 +42,7 @@ def get_current_fiscal_year():
 class CreateUserForm(UserCreationForm):
     class Meta:
         model = CustomerUser
-        fields = ['email', 'password1', 'password2']
+        fields = ['email', 'password1', 'password2', 'first_name', 'last_name']
 
 
 
@@ -372,11 +372,44 @@ class PhoneNumberField(models.CharField):
             return f"{value[:3]}-{value[3:6]}-{value[6:]}"
         return value
 
-class ProfileForm(ModelForm):
+
+
+class UserUpdateForm(forms.ModelForm):   
+    
+    class Meta:
+        model = CustomerUser
+        fields = ['first_name', 'last_name', 'email', 'department']
+        read_only_fields = ('department', 'email',)
+    
+    def __init__(self, *args, **kwargs):
+        super(UserUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['department'].disabled = True
+        self.fields['email'].disabled = True
+        
+class ProfileUpdateForm(forms.ModelForm):
+    work_phone = forms.CharField(
+        max_length=12,
+        validators=[RegexValidator(
+            regex=r'^\d{3}-\d{3}-\d{4}$',
+            message='Work phone number must be entered in the format: xxx-xxx-xxxx.'
+        )],
+        required=False
+    )
+    
     class Meta:
         model = Profile
-        fields = '__all__'
-        exclude = ['user']
-        widgets = {
-         'profile_img': FileInput(),
-         }
+        fields = ['image', 'work_phone']
+    
+    def clean_work_phone(self):
+        work_phone = self.cleaned_data.get('work_phone')
+        if work_phone:
+            pattern = r'^\d{3}-\d{3}-\d{4}$'
+            import re
+            if not re.match(pattern, work_phone):
+                raise forms.ValidationError('Work phone number must be in the format: xxx-xxx-xxxx.')
+        return work_phone
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        self.clean_work_phone()  # Call the clean_work_phone method here
+        return cleaned_data
