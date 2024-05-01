@@ -8,7 +8,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from django.utils import timezone
 from datetime import datetime
-from .validators import PhoneNumberField  
+# from .validators import PhoneNumberField  
 from django.core.validators import RegexValidator
 
 
