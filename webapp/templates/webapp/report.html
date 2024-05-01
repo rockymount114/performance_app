@@ -125,7 +125,7 @@
                         <th id="centered-header" >Q2</th>
                         <th id="centered-header" >Q3</th>
                         <th id="centered-header" >Q4</th>
-                        <th id="centered-header" >YA</th>
+                        <th id="centered-header" >Yearly</th>
                     </tr>
                 </thead>
         
@@ -164,14 +164,21 @@
                                   {% else %}
                                     <td class="data_col" align="center"> - </td>
                                   {% endif %}
+                                  
+                                  <!--Yearly data calculation-->
+                                  <td class="data_col" align="center" width="5%">
 
-                                  <td class="data_col" align="center" width="5%">{{ measure.target_rate }}</td>
+                                    {{ annual_percentages|get_item:measure.id}}
+
+                                  </td>
                  
-                                {% endwith %}
+                              {% endwith %}
         
                                
                             </tr>
                         {% endfor %}
+
+
                     </tbody>
                 </table>
               
