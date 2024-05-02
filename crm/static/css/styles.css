@@ -177,6 +177,24 @@ td
     text-overflow: ellipsis;
     display: inline-block;
   }
+
+  /* for review password*/
+
+  .password-toggle {
+    position: relative;
+}
+
+.password-toggle input[type="password"] {
+    padding-right: 50px; /* Adjust this value to leave enough space for the icon */
+}
+
+.password-toggle .password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
   
   /* Default max-width for larger screens */
   @media (min-width: 992px) {

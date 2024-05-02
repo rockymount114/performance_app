@@ -1373,7 +1373,12 @@ def profile(request):
     }
     return render(request, 'webapp/profile.html', context=context)
         
+def password_reset(request):
+    
 
+    context = {}
+
+    return render(request, 'webapp/password_reset_form.html', context=context)
 
 
 @login_required(login_url='my-login')

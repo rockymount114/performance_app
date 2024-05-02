@@ -2,6 +2,11 @@
 {% block title %}My Login{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+</head>
     <body>
 
         <div class="container bg-light shadow-md p-5 form-layout">
@@ -12,6 +17,10 @@
 
             <form method="POST" autocomplete="off">
                 {% csrf_token %}
+
+
+                <!-- End of Form -->
+
 
                 {% comment %} {{ form.as_p}} {% endcomment %}
                 {{form.email|as_crispy_field}}
@@ -27,6 +36,9 @@
             <div class="text-center">
                 <p> Don't have an account? </p> <a href="{% url 'register' %}"> Register </a>
             </div>
+
+            <div><a href="{% url 'password_reset' %}" class="small text-right">Lost password?</a></div>
+
         </div>
         <br>
     </body>
