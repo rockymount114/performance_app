@@ -5,6 +5,7 @@ from . import views
 from .views import GeneratePdf, GeneratePdf2
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 
 handler404 = 'webapp.views.handler404'
@@ -16,6 +17,7 @@ urlpatterns = [
     path('my-login', views.my_login, name="my-login"),
     path('approvals',views.approvals, name='approvals'),
     path('profile/',views.profile, name='profile'),
+
 
     # CRUD
     path('dashboard/', views.dashboard, name="dashboard"),
@@ -47,7 +49,17 @@ urlpatterns = [
     # path('pdf2/', views.render_pdf, name="pdf2"),
     # path('pdf_download/', views.render_pdf_view, name='pdf_download'),
     
-    # Profile images    
+    # Password reset
+    
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='webapp/password_reset_form.html'), name='password_reset'),
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='webapp/password_reset_done.html'), name='password_reset_done'),
+    path('password_reset_confirm/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view(template_name='webapp/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='webapp/password_reset_complete.html'), name='password_reset_complete'),   
+    
+    # path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    # path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    # path('password_reset_confirm/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    # path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'), 
     
 ] 
 

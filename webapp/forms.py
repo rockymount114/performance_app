@@ -44,24 +44,33 @@ class CreateUserForm(UserCreationForm):
         model = CustomerUser
         fields = ['email', 'password1', 'password2', 'first_name', 'last_name']
 
-    # def clean_email(self):
-    #     email = self.cleaned_data.get('email')
-    #     if not re.match(r'^[\w\.-]+@rockymountnc\.gov$', email):
-    #         raise ValidationError('Email must end with @rockymountnc.gov')
-    #     return email
-
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     first_name = cleaned_data.get('first_name')
-    #     last_name = cleaned_data.get('last_name')
-    #     if not first_name or not last_name:
-    #         raise ValidationError('First name and last name are required fields')
-    #     return cleaned_data
     
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['first_name'].error_messages['required'] = 'First name is required'
         self.fields['last_name'].error_messages['required'] = 'Last name is required'
+        self.fields['first_name'].help_text = 'Please enter your first name'
+        self.fields['last_name'].help_text = 'Please enter your last name'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+
+        if not first_name:
+            self.add_error('first_name', 'First name is required.')
+
+        if not last_name:
+            self.add_error('last_name', 'Last name is required.')
+
+        return cleaned_data
+    
+    # def clean_email(self):
+    #     email = self.cleaned_data.get('email')
+    #     if not re.match(r'^[\w\.-]+@rockymountnc\.gov$', email):
+    #         raise ValidationError('Email must be ending with @rockymountnc.gov')
+    #     return email
 
 # - Login a user
 
@@ -126,7 +135,7 @@ class CreateMeasureForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
         label="Metric name",
         max_length=255,
-        required=False,
+        required=True,
     )
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),

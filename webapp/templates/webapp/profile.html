@@ -8,7 +8,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>User Profile</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .profile-pic-container {
@@ -34,6 +34,9 @@
     </style>
 </head>
 <body>
+
+    
+
     <div class="container">
         <div class="media">
             <div class="media-body">
@@ -64,6 +67,18 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+    <!-- Notyf -->
+    <script src="{% static 'js/notfy.js' %}"></script>
+    <script type="application/javascript" src="{% static 'js/notify.js' %}"></script>
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                notification['{{ message.tags }}']("<p>" + '{{ message|capfirst }}' + "</p>");
+            {% endfor %}
+        {% endif %}
+    </script>
+
 </body>
 
 {% endblock content %}
