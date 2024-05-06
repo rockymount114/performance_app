@@ -314,6 +314,8 @@ class Profile(models.Model):
         blank=True,
         null=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}'s Profile"
