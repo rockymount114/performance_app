@@ -1,7 +1,7 @@
 from typing import Any, Mapping
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 # from django.contrib.auth.models import User
-
+from django.forms import ClearableFileInput
 from .models import Profile
 from django.forms import ModelForm
 from django.forms.widgets import FileInput
@@ -15,7 +15,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms.widgets import PasswordInput, TextInput
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from crispy_forms.helper import FormHelper
@@ -44,7 +44,33 @@ class CreateUserForm(UserCreationForm):
         model = CustomerUser
         fields = ['email', 'password1', 'password2', 'first_name', 'last_name']
 
+    
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].error_messages['required'] = 'First name is required'
+        self.fields['last_name'].error_messages['required'] = 'Last name is required'
+        self.fields['first_name'].help_text = 'Please enter your first name'
+        self.fields['last_name'].help_text = 'Please enter your last name'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+
+        if not first_name:
+            self.add_error('first_name', 'First name is required.')
+
+        if not last_name:
+            self.add_error('last_name', 'Last name is required.')
+
+        return cleaned_data
+    
+    # def clean_email(self):
+    #     email = self.cleaned_data.get('email')
+    #     if not re.match(r'^[\w\.-]+@rockymountnc\.gov$', email):
+    #         raise ValidationError('Email must be ending with @rockymountnc.gov')
+    #     return email
 
 # - Login a user
 
@@ -109,7 +135,7 @@ class CreateMeasureForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
         label="Metric name",
         max_length=255,
-        required=False,
+        required=True,
     )
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
@@ -385,21 +411,29 @@ class UserUpdateForm(forms.ModelForm):
         super(UserUpdateForm, self).__init__(*args, **kwargs)
         self.fields['department'].disabled = True
         self.fields['email'].disabled = True
-        
+       
 class ProfileUpdateForm(forms.ModelForm):
     work_phone = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder': 'Phone number format as xxx-xxx-xxxx'}),
         max_length=12,
         validators=[RegexValidator(
             regex=r'^\d{3}-\d{3}-\d{4}$',
-            message='Work phone number must be entered in the format: xxx-xxx-xxxx.'
+            message='Work phone number must be entered in this format: xxx-xxx-xxxx.'
         )],
         required=False
+        
     )
+    image = forms.ImageField(label='', required=False)
     
     class Meta:
         model = Profile
         fields = ['image', 'work_phone']
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['image'].label = ''  # Set the label to an empty string
+        self.fields['image'].widget = CustomClearableFileInput()  # Use custom widget
+        
     def clean_work_phone(self):
         work_phone = self.cleaned_data.get('work_phone')
         if work_phone:
@@ -413,3 +447,15 @@ class ProfileUpdateForm(forms.ModelForm):
         cleaned_data = super().clean()
         self.clean_work_phone()  # Call the clean_work_phone method here
         return cleaned_data
+
+# hide image tags    
+class CustomClearableFileInput(ClearableFileInput):
+    def render(self, name, value, attrs=None, renderer=None):
+        html = super().render(name, value, attrs, renderer)
+        html = html.replace('<label', '<label style="display:none;"')
+        html = html.replace('Currently: ', '')
+        html = html.replace('Clear:', '')
+        html = html.replace('Change:', '')
+        html = html.replace('<a href=', '<a style="display:none;" href=')
+        html = html.replace('<input type="checkbox" name="image-clear" id="image-clear_id">', '')
+        return html

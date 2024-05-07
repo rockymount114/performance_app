@@ -25,7 +25,7 @@ body{
 }
 
 th{
-    height:25px;
+    height:30px;
 }
 
 tr{
@@ -35,19 +35,35 @@ tr{
 .data{
     background-color: #f1f1f1;
     margin-left: 5px;
+    
 
 }
 
 .data_col{
     margin-left: 5px;
-    padding-top: 3px;
+    padding-top: 5px;
     white-space: nowrap;
 
 }
+
+th .th_col{
+    margin-left: 5px;
+    padding-top: 5px;
+    white-space: nowrap;
+
+}
+
 /* Logo */
 .header-container {
     margin-bottom: 20px; 
 }
 
+.pdf_title{
+    display: inline-block; 
+    vertical-align: middle; 
+    text-decoration: underline; 
+    text-underline-position: under; 
+    text-underline-offset: 5px;
+}
 
 

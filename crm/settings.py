@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from decouple import config
 
 
 
@@ -16,7 +17,7 @@ SECRET_KEY = 'django-insecure-&1u1@wpg1y8rro8zmgi@%1fg%ju@fu$q^*%3tum&eds6a(!4zf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -31,7 +32,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'easyaudit',
 
- 
+    'widget_tweaks', # for profile page
    
     
 ]
@@ -167,6 +168,7 @@ USE_TZ = False # need to set as False if has setting for Time_ZONE
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = 'static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 # [BASE_DIR / 'static',]
@@ -183,6 +185,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 
 
 

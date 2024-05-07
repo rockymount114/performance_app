@@ -818,7 +818,9 @@ class GeneratePdf(View):
             # messages.success(request, "Only department head can generate pdf")
             return redirect('my-login')
         else:
-            fiscal_year_is = request.GET.get('fiscal_year') # for selection
+            fiscal_year_id = request.GET.get('fiscal_year') # for selection returns FY id
+            # fiscal_year = FiscalYear.objects.get(pk=fiscal_year_id) # format as FY2024
+            print(f"Fiscal Year: {fiscal_year_id}")
             department_id = request.user.department_id   
             department_name = Department.objects.filter(id=department_id).last()
             
@@ -900,7 +902,21 @@ class GeneratePdf(View):
 
             for i in initiative_detail_data:
                 initiative_notes.update({i.strategic_initiative.id:i.notes})
-                
+            
+            # Calculate the percentages for each quarter per measure_id
+            
+           
+            annual_percentages = {}
+            for measure in my_measures:
+                measure_id = measure.id
+                measure_id = measure.id
+                q1_percent = float((d1.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q2_percent = float((d2.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q3_percent = float((d3.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q4_percent = float((d4.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                annual_percent = (q1_percent + q2_percent + q3_percent + q4_percent) / 4
+                annual_percentages[measure_id] = f"{annual_percent:0.0%}"
+                    
             data = {
                 "page_orientation": "landscape",
                 "report_name":"Performance Report",
@@ -933,6 +949,7 @@ class GeneratePdf(View):
                 'd2':d2,
                 'd3':d3,
                 'd4':d4,
+                'annual_percentages': annual_percentages,
                 'd_objective_names':d_objective_names,
 
                 'initiative_status': initiative_status,
@@ -962,9 +979,9 @@ class GeneratePdf2(View):
         else:
             
             department_id = request.GET.get('departments') 
-            fiscal_year = request.GET.get('fiscal_year')  
+            fiscal_year_id = request.GET.get('fiscal_year')  
             
-
+            fiscal_year = FiscalYear.objects.get(pk=fiscal_year_id)
             
             if not department_id or not fiscal_year:
                 return redirect('dashboard')
@@ -975,16 +992,18 @@ class GeneratePdf2(View):
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
             
             try:
-                user = User.objects.get(department_id=department_id, is_dept_head=False)
-                username = user.first_name + ' ' + user.last_name
+                # need to fix if has multiple members in one department, such as 3 or 4 peopele, add is_data_inputor???
+                user = User.objects.get(department_id=department_id, is_dept_head=False, is_staff=True)
+                username = user.get_full_name()
                 user_email = user.email
-                
+
+
             except User.DoesNotExist:
                 username = ""
                 user_email = ""
             
             
-            
+            # to check if set more than 2 dept header in one dept
             dept_head_query = {
                 'department_id': department_id,
                 'is_dept_head': True
@@ -1010,7 +1029,7 @@ class GeneratePdf2(View):
             my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year, approved=True)
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
-
+            
             d_objective_names = {}
             for i in my_objectives:
                 d_objective_names.update({i.id:i.name})
@@ -1060,6 +1079,23 @@ class GeneratePdf2(View):
 
             for i in initiative_detail_data:
                 initiative_notes.update({i.strategic_initiative.id:i.notes})
+             
+            # Calculate the percentages for each quarter per measure_id
+            
+           
+            annual_percentages = {}
+            for measure in my_measures:
+                measure_id = measure.id
+                measure_id = measure.id
+                q1_percent = float((d1.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q2_percent = float((d2.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q3_percent = float((d3.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                q4_percent = float((d4.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+                annual_percent = (q1_percent + q2_percent + q3_percent + q4_percent) / 4
+                annual_percentages[measure_id] = f"{annual_percent:0.0%}"
+
+            
+              
                 
             data = {
                 "page_orientation": "landscape",
@@ -1094,6 +1130,8 @@ class GeneratePdf2(View):
                 'd2':d2,
                 'd3':d3,
                 'd4':d4,
+                'annual_percentages': annual_percentages,
+                
                 'd_objective_names':d_objective_names,
 
                 'initiative_status': initiative_status,
@@ -1371,7 +1409,12 @@ def profile(request):
     }
     return render(request, 'webapp/profile.html', context=context)
         
+def password_reset(request):
+    
 
+    context = {}
+
+    return render(request, 'webapp/password_reset_form.html', context=context)
 
 
 @login_required(login_url='my-login')

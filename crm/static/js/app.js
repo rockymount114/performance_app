@@ -133,6 +133,22 @@ function animateProgressBar(progressBarId, currentValue, targetValue, duration) 
 }
 
 
+// for register password view
+function togglePasswordVisibility(inputId) {
+    const passwordInput = document.getElementById(inputId);
+    const passwordToggleIcon = passwordInput.parentElement.querySelector('.password-toggle-icon i');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggleIcon.classList.remove('fa-eye');
+        passwordToggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        passwordToggleIcon.classList.remove('fa-eye-slash');
+        passwordToggleIcon.classList.add('fa-eye');
+    }
+}
+
 
 
 

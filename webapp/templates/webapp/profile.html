@@ -1,74 +1,82 @@
-
 {% extends 'webapp/base.html' %}
-{% block title %}User Profile{% endblock title %}
 {% load static %}
 {% load custom_tags %}
 {% load crispy_forms_tags %}
+{% load widget_tweaks %}
+{% block title %}{{ user.first_name }} {{ user.last_name }}'s Profile{% endblock title %}
 {% block content %}
 
-
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Profile</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
+    <style>
+        .profile-pic-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-pic-container img {
+            cursor: pointer;
+        }
+
+        .profile-pic-container input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+       
+    </style>
 </head>
 <body>
 
+    
+
     <div class="container">
         <div class="media">
-
-          <div class="media-body">
-            <h2 class="account-heading">{{ user.email }}</h2>
-            <p class="text-secondary">{{ user.email }}</p>
-          </div>
+            <div class="media-body">
+                <h2 class="account-heading">{{ user.first_name }} {{ user.last_name }}'s Profile</h2>
+            </div>
         </div>
         <!-- FORM HERE -->
-
         <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}                   
-           
-            
-        {% if user.profile.image %}
-        <img class="profile_pic rounded-circle account-img mb-3" src="{{ user.profile.image.url }}" alt="User Profile Picture">
-        {% else %}
-            <img class="profile_pic rounded-circle account-img mb-3" src="{{ 'default.jpg' }}" alt="Default Profile Picture">
-        {% endif %}
+            {% csrf_token %}
+            <div class="profile-pic-container">    
 
-
-
-
-            <div class="col-md-8">
-                {% if form.errors.work_phone %}
-            <div class="alert alert-danger" role="alert">
-                {{ form.errors.work_phone.0 }}
-            </div>
-            {% endif %}           
-
+                <img class="profile_pic rounded-circle account-img mb-3" src="
+                {% if user.profile.image %}
+                    {{ user.profile.image.url }}
+                {% else %}
+                    {% static 'img/default.jpg' %}
+                {% endif %}" 
+                alt="User Profile Picture">
                 
+                {{ p_form.image }}
+                <!-- {{ p_form.image.label_tag }} -->
+
+            </div>
+            <div class="col-md-8">
+
                 {{u_form.first_name|as_crispy_field}}
                 {{u_form.last_name|as_crispy_field}}
                 {{u_form.email|as_crispy_field}}
                 {{u_form.department|as_crispy_field}}
                 {{p_form.work_phone|as_crispy_field}}
-                
                 <button type="submit" class="btn btn-primary mt-3">Update Profile</button>
             </div>
-
-
-            
         </form>
-
-
-      </div>
-
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
-</body>
-</html>
 
+    <!-- Notyf -->
+
+
+</body>
 
 {% endblock content %}
-
