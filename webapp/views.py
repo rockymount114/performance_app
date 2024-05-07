@@ -19,6 +19,7 @@ from operator import attrgetter
 from django.views.generic import ListView
 from django.views.generic import View
 from .utils import render_to_pdf
+from django.template.loader import render_to_string
 
 from django.http import JsonResponse
 
@@ -357,9 +358,6 @@ def my_login(request):
        
     
 #         return render(request, template, context=context)
-
-
-
 @login_required(login_url='my-login')
 def dashboard(request):
     CURRENT_YEAR = date.today().year
@@ -368,20 +366,57 @@ def dashboard(request):
 
     if request.user.is_citymanager_office:
         template = 'webapp/dashboard_performance_officer.html'
-        context = get_performance_officer_context(request)
+        context = get_performance_officer_context(request, current_fiscal_year)
     else:
         template = 'webapp/dashboard_regular_user.html'
         context = get_regular_user_context(request, current_fiscal_year)
-
+       
     context['current_year'] = CURRENT_YEAR
     context['target_year'] = TARGET_YEAR
 
-    return render(request, template, context=context)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Render the entire dashboard template with the updated context and return as JSON response
+        content = render_to_string(template, context, request=request)
 
-def get_performance_officer_context(request):
+        # Remove the footer unneeded div and br
+        unneeded_start = ' <div class="container-fluid">'
+        unneeded_end = '<!-- Notification messages -->'
+        content = content.replace(content[content.find(unneeded_start):content.find(unneeded_end) + len(unneeded_end)], '')
+
+        # Remove the navbar section
+        navbar_start = '<nav class="navbar navbar-expand-lg navbar-dark bg-primary justify-content-between">'
+        navbar_end = '</nav>'
+        content = content.replace(content[content.find(navbar_start):content.find(navbar_end) + len(navbar_end)], '')
+
+        # Remove the footer section
+        footer_start = '<footer class="site-footer" bg-primary>'
+        footer_end = '</footer>'
+        content = content.replace(content[content.find(footer_start):content.find(footer_end) + len(footer_end)], '')
+
+        # Remove the footer section 2
+        footer_start = '<footer class="footer mt-3">'
+        footer_end = '</footer>'
+        content = content.replace(content[content.find(footer_start):content.find(footer_end) + len(footer_end)], '')
+
+        return JsonResponse({'content': content})
+    else:
+        # Render the full template for regular requests
+        return render(request, template, context=context)
+        
+
+def get_performance_officer_context(request, current_fiscal_year):
     department_id = request.GET.get('departments')
     fiscal_year_id = request.GET.get('fiscal_year')
-    submit_clicked = 'submit' in request.GET
+
+
+    if not department_id:
+        # Set default department to City Manager Office
+        department = Department.objects.filter(name='City Manager Office').first()
+        department_id = department.id if department else None
+
+    if not fiscal_year_id:
+        # Set default fiscal year to the current fiscal year
+        fiscal_year_id = current_fiscal_year.id
 
     department = Department.objects.filter(id=department_id).first()
 
@@ -401,7 +436,6 @@ def get_performance_officer_context(request):
     context = {
         'form': DepartmentFilterForm(initial={'departments': department_id, 'fiscal_year': fiscal_year_id}),
         'fiscal_year_id': fiscal_year_id,
-        'submit_clicked': submit_clicked,
         'mission': my_mission,
         'initiatives': my_initiatives,
         'overview': my_overview,
@@ -426,7 +460,10 @@ def get_performance_officer_context(request):
 
 def get_regular_user_context(request, current_fiscal_year):
     fiscal_year_id = request.GET.get('fiscal_year')
-    submit_clicked = 'submit' in request.GET
+
+    if not fiscal_year_id:
+        # Set default fiscal year to the current fiscal year
+        fiscal_year_id = current_fiscal_year.id
 
     department_id = request.user.department_id
     dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
@@ -445,8 +482,7 @@ def get_regular_user_context(request, current_fiscal_year):
     initiative_data = get_initiative_data(department_id)
 
     context = {
-        'form': DepartmentFilterForm(),
-        'submit_clicked': submit_clicked,
+        'form': DepartmentFilterForm(initial={'fiscal_year': fiscal_year_id}),
         'mission': my_mission,
         'initiatives': my_initiatives,
         'overview': my_overview,
