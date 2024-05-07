@@ -5,85 +5,117 @@
 {% block title %}Dashboard - Regular User{% endblock %}
 
 {% block content %}
-<div class="header1">
-  <h6>Welcome, {{ user.first_name }} {{ user.last_name }} 👋 {{ user.email }}
-    {% if dept_head %}
-    , <b>Department Head Name & Email:</b>
-    {% for user in dept_head %}
-    {{ user.first_name }} {{ user.last_name }},
-    {{ user.email }}
-    {% endfor %}
-    {% endif %}
-    <form id="fiscalYearId" method="GET" action="{% url 'dashboard'%}">
-      <label for="dept_fiscal_year">Fiscal Year:&nbsp;</label> {{form.fiscal_year }}
-      <input type="submit" value="Submit" class="btn btn-primary" name="submit">
-    </form>
-  </h6>
-</div>
-<h3>{{ user.department }}</h3>
-
-
-
-<section class="mission_statement">
-  <div class="missionstatement">
-    <div class="row row-cols-1 row-cols-md-2">
-      <!-- Normal user -->
-      {% if mission %}
-      <div class="col mb-4">
-        <div class="card text-black mb-1 h-100">
-          <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
-          <div class="card-body">
-            <p class="card-text">{{ mission }}</p>
-          </div>
-        </div>
-      </div>
-      {% else %}
-      <div class="col mb-4">
-        <div class="card text-black mb-1 h-100">
-          <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
-          <div class="card-body">
-            <p class="card-text">
-              <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}">
-                <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
+<div id="dashboard-content">
+  <div class="header1">
+    <h6>Welcome, {{ user.first_name }} {{ user.last_name }} 👋 {{ user.email }}
+      {% if dept_head %}
+      , <b>Department Head Name & Email:</b>
+      {% for user in dept_head %}
+      {{ user.first_name }} {{ user.last_name }},
+      {{ user.email }}
+      {% endfor %}
       {% endif %}
-      <!-- Create mission end -->
-
-      <!-- Create overview start -->
-      <!-- Normal user -->
-      {% if overview %}
-      <div class="col mb-4">
-        <div class="card text-black mb-1 h-100">
-          <div class="card-header bg-info-subtle"><b>Overview</b></div>
-          <div class="card-body">
-            <p class="card-text">{{ overview }}</p>
-          </div>
-        </div>
-      </div>
-      {% else %}
-      <div class="col mb-4">
-        <div class="card text-black mb-1 h-100">
-          <div class="card-header bg-info-subtle">
-            <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
-          </div>
-          <div class="card-body">
-            <p class="card-text">
-              <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}">
-                <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      <!-- Create overview end -->
-    </div>
+      <form id="fiscalYearId" method="GET" action="{% url 'dashboard'%}">
+        <label for="dept_fiscal_year">Fiscal Year:&nbsp;</label> {{form.fiscal_year }}
+        <!-- <input type="submit" value="Submit" class="btn btn-primary" name="submit"> -->
+      </form>
+    </h6>
   </div>
-</section>
+  <h3>{{ user.department }}</h3>
 
-{{ block.super }}
+
+
+  <section class="mission_statement">
+    <div class="missionstatement">
+      <div class="row row-cols-1 row-cols-md-2">
+        <!-- Normal user -->
+        {% if mission %}
+        <div class="col mb-4">
+          <div class="card text-black mb-1 h-100">
+            <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
+            <div class="card-body">
+              <p class="card-text">{{ mission }}</p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="col mb-4">
+          <div class="card text-black mb-1 h-100">
+            <div class="card-header bg-info-subtle"><b>Mission Statement</b></div>
+            <div class="card-body">
+              <p class="card-text">
+                <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}">
+                  <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <!-- Create mission end -->
+
+        <!-- Create overview start -->
+        <!-- Normal user -->
+        {% if overview %}
+        <div class="col mb-4">
+          <div class="card text-black mb-1 h-100">
+            <div class="card-header bg-info-subtle"><b>Overview</b></div>
+            <div class="card-body">
+              <p class="card-text">{{ overview }}</p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="col mb-4">
+          <div class="card text-black mb-1 h-100">
+            <div class="card-header bg-info-subtle">
+              <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}">
+                  <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <!-- Create overview end -->
+      </div>
+    </div>
+  </section>
+
+  {{ block.super }}
+
+</div>
+
+
+<script>
+  $(document).ready(function() {
+
+    // Listen for changes in the fiscal year dropdown
+    $('#id_fiscal_year').change(function() {
+      var fiscalYearId = $(this).val();
+
+      // Send an AJAX request to update the dashboard content
+      $.ajax({
+        url: '{% url "dashboard" %}',
+        data: {
+          'fiscal_year': fiscalYearId
+        },
+        success: function(response) {
+          // Update the dashboard content with the response
+
+          $('#dashboard-content').html(response.content);
+        },
+        error: function(xhr, status, error) {
+          console.log("AJAX request failed");
+          console.log("Status: " + status);
+          console.log("Error: " + error);
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
