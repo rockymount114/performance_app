@@ -1,4 +1,4 @@
-{% extends 'webapp/base_dashboard.html' %}
+{% extends 'webapp/base.html' %}
 {% load static %}
 {% load custom_tags %}
 
@@ -49,11 +49,12 @@
     </div>
   </section>
 
-  {{ block.super }}
+  {% include 'webapp/base_dashboard.html' %}
 </div>
 
 <script>
   $(document).ready(function() {
+    
 
     // Listen for changes in the dropdowns
     $('#id_departments, #id_fiscal_year').change(function() {
@@ -70,7 +71,7 @@
         success: function(response) {
           // Update the dashboard content with the response
           
-          $('#dashboard-content').html(response.content);
+          $('body').html(response.content);
      
         },
         error: function(xhr, status, error) {
@@ -82,4 +83,7 @@
     });
   });
 </script>
+
+
 {% endblock %}
+
