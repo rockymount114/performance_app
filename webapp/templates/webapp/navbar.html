@@ -27,16 +27,9 @@
         {% endif %}
 
         {% if dept_cmo %}
-        <a class="nav-link" href="{% url 'pdf2' %}?departments={{ department.id }}&fiscal_year={{fiscal_year_id}}" 
-            data-toggle="tooltip" data-placement="right"
-            {% if not submit_clicked %} 
-                {% comment %} style="pointer-events: none; cursor: default;"  {% endcomment %}
-                title="Please choose a department and fiscal year first"
-            {% else %} 
-                title="View PDF report"
-            {% endif %}>
-              <i class="fa-regular fa-file-pdf"> </i> &nbsp; PDF
-          </a>
+        <a class="nav-link" href="{% url 'pdf2' %}?departments={{ selected_department_id }}&fiscal_year={{ selected_fiscal_year_id }}">
+          <i class="fa-regular fa-file-pdf"></i> &nbsp; PDF
+        </a>
 
 
         {% else %}
@@ -66,6 +59,8 @@
     </ul>
   </div>
 </nav>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
