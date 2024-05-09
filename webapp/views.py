@@ -449,7 +449,7 @@ def get_regular_user_context(request, current_fiscal_year):
         fiscal_year_id = current_fiscal_year.id
 
     department_id = request.user.department_id
-    dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
+    dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
 
     my_mission = Mission.objects.filter(department_id=department_id).last()
     my_overview = Overview.objects.filter(department_id=department_id).last()
@@ -965,10 +965,6 @@ class GeneratePdf2(View):
             department_id = request.GET.get('departments') 
             fiscal_year_id = request.GET.get('fiscal_year')  
             
-      
-            print(department_id)
-            print(fiscal_year_id)
-            
             fiscal_year = FiscalYear.objects.get(pk=fiscal_year_id)
             
             if not department_id or not fiscal_year:
@@ -985,11 +981,9 @@ class GeneratePdf2(View):
                 username = user.get_full_name()
                 user_email = user.email
 
-
             except User.DoesNotExist:
                 username = ""
-                user_email = ""
-            
+                user_email = ""            
             
             # to check if set more than 2 dept header in one dept
             dept_head_query = {
@@ -1130,7 +1124,7 @@ class GeneratePdf2(View):
             }
             
             pdf = render_to_pdf('webapp/report.html',data)
-            print(department_name)
+
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
                 filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
