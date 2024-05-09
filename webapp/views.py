@@ -804,8 +804,7 @@ class GeneratePdf(View):
             return redirect('my-login')
         else:
             fiscal_year_id = request.GET.get('fiscal_year') # for selection returns FY id
-            # fiscal_year = FiscalYear.objects.get(pk=fiscal_year_id) # format as FY2024
-            print(f"Fiscal Year: {fiscal_year_id}")
+
             department_id = request.user.department_id   
             department_name = Department.objects.filter(id=department_id).last()
             
@@ -833,10 +832,10 @@ class GeneratePdf(View):
 
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
-            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id, approved=True)
+            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year_id)
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id, approved=True)
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
-            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
             d_objective_names = {}
             for i in my_objectives:
@@ -911,7 +910,7 @@ class GeneratePdf(View):
                 "user_email": user_email,
                 "dept_head_name":dept_head_name,
                 "dept_head_email": dept_head_email,
-                
+                "fiscal_year": FiscalYear.objects.get(pk=fiscal_year_id),
                 "current_fiscal_year":current_fiscal_year,
                 "prev_fiscal_year":prev_fiscal_year,
                 'city_logo': image_path,
@@ -982,7 +981,7 @@ class GeneratePdf2(View):
             
             try:
                 # need to fix if has multiple members in one department, such as 3 or 4 peopele, add is_data_inputor???
-                user = User.objects.get(department_id=department_id, is_dept_head=False, is_staff=True)
+                user = User.objects.get(department_id=department_id, is_manager=True)
                 username = user.get_full_name()
                 user_email = user.email
 

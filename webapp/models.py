@@ -67,6 +67,7 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     
+    is_manager = models.BooleanField(default=False) # can input data
     is_dept_head = models.BooleanField(default=False)
     is_citymanager_office = models.BooleanField(default=False)
     
