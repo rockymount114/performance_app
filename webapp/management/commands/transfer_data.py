@@ -53,9 +53,9 @@ class Command(BaseCommand):
 
          for department in departments: 
 
-            prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved = True)
-            prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
-            prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
+            prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved=True)
+            prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
+            prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
             prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id).exclude(status='completed')
 
             current_fiscal_year = FiscalYear.objects.get(name=fiscal_year)
@@ -102,19 +102,47 @@ class Command(BaseCommand):
             carry_next_year_measures = []
 
             for x in prev_year_measures:
+                prev_year_measures_q_data= QuarterlyPerformanceData.objects.filter(measure_id=x.id)
 
-                measure = {
-                    'objective': Measure.objects.get(pk=x.id).objective, 
-                    'title': Measure.objects.get(pk=x.id).title, 
-                    'department':Measure.objects.get(pk=x.id).department,
-                    'direction': Measure.objects.get(pk=x.id).direction, 
-                    'frequency': Measure.objects.get(pk=x.id).frequency,
-                    'current_year_rate': Measure.objects.get(pk=x.id).current_year_rate, 
-                    'target_rate': Measure.objects.get(pk=x.id).target_rate,
-                    'fiscal_year': current_fiscal_year,  
-                    }
-                
-                carry_next_year_measures.append(measure)
+                if x.is_number:
+                    annual_total  = 0
+                    for q in prev_year_measures_q_data:
+                        annual_total += q.numerator
+                        # print(q.numerator)
+                        
+                        measure = {
+                        'objective': Measure.objects.get(pk=x.id).objective, 
+                        'title': Measure.objects.get(pk=x.id).title, 
+                        'department':Measure.objects.get(pk=x.id).department,
+                        'direction': Measure.objects.get(pk=x.id).direction, 
+                        'frequency': Measure.objects.get(pk=x.id).frequency,
+                        'current_year_rate': annual_total, 
+                        'target_rate': Measure.objects.get(pk=x.id).target_rate,
+                        'fiscal_year': current_fiscal_year,  
+                        'is_number': x.is_number,
+                        }
+                    
+                    carry_next_year_measures.append(measure)
+                        
+                else:
+                    annual_rate = 0
+                    for q in prev_year_measures_q_data:
+                        annual_rate += q.get_percentage_int
+                    annual_average = annual_rate / 4
+           
+                    measure = {
+                        'objective': Measure.objects.get(pk=x.id).objective, 
+                        'title': Measure.objects.get(pk=x.id).title, 
+                        'department':Measure.objects.get(pk=x.id).department,
+                        'direction': Measure.objects.get(pk=x.id).direction, 
+                        'frequency': Measure.objects.get(pk=x.id).frequency,
+                        'current_year_rate': annual_average, 
+                        'target_rate': Measure.objects.get(pk=x.id).target_rate,
+                        'fiscal_year': current_fiscal_year,  
+                        'is_number': x.is_number,
+                        }
+                    
+                    carry_next_year_measures.append(measure)
 
             for item in carry_next_year_measures:
                 Measure.objects.create(**item)
