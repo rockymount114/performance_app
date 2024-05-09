@@ -15,7 +15,8 @@
       {{ user.email }}
       {% endfor %}
       {% endif %}
-      <form id="fiscalYearId" method="GET" action="{% url 'dashboard'%}">
+      
+      <form class="mt-3" id="fiscalYearId" method="GET" action="{% url 'dashboard'%}">
         <label for="dept_fiscal_year">Fiscal Year:&nbsp;</label> {{form.fiscal_year }}
         <!-- <input type="submit" value="Submit" class="btn btn-primary" name="submit"> -->
       </form>
@@ -58,7 +59,7 @@
         <!-- Normal user -->
         {% if overview %}
         <div class="col mb-4">
-          <div class="card text-black mb-1 h-100">
+          <div class="card text-black mb-1 h-100 card shadow">
             <div class="card-header bg-info-subtle"><b>Overview</b></div>
             <div class="card-body">
               <p class="card-text">{{ overview }}</p>
@@ -67,7 +68,7 @@
         </div>
         {% else %}
         <div class="col mb-4">
-          <div class="card text-black mb-1 h-100">
+          <div class="card text-black mb-1 h-100 card shadow">
             <div class="card-header bg-info-subtle">
               <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
             </div>

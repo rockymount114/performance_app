@@ -449,7 +449,7 @@ def get_regular_user_context(request, current_fiscal_year):
         fiscal_year_id = current_fiscal_year.id
 
     department_id = request.user.department_id
-    dept_head = User.objects.filter(Q(is_dept_head=True) & Q(department_id=department_id))
+    dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
 
     my_mission = Mission.objects.filter(department_id=department_id).last()
     my_overview = Overview.objects.filter(department_id=department_id).last()
