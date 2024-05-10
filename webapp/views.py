@@ -59,20 +59,45 @@ def get_prev_fiscal_year():
     
     return fiscal_year
 
+# def get_current_quarter():
+#     current_date = date.today()
+#     current_month = current_date.month
+
+#     if current_month in range(4, 7):
+#         quarter = 'Q4'
+#     elif current_month in range(7, 10):
+#         quarter = 'Q1'
+#     elif current_month in range(10, 13):
+#         quarter = 'Q2'
+#     else:
+#         quarter = 'Q3'
+
+#     return quarter
+
 def get_current_quarter():
+    '''show pencil icon or not'''
     current_date = date.today()
     current_month = current_date.month
+    current_quarter = None
 
     if current_month in range(4, 7):
-        quarter = 'Q4'
+        current_quarter = 'Q4'
     elif current_month in range(7, 10):
-        quarter = 'Q1'
+        current_quarter = 'Q1'
     elif current_month in range(10, 13):
-        quarter = 'Q2'
+        current_quarter = 'Q2'
     else:
-        quarter = 'Q3'
+        current_quarter = 'Q3'
+        
+    quarter_start_date = date(current_date.year, (current_month - 1) // 3 * 3 + 1, 1)
 
-    return quarter
+    days_into_quarter = (current_date - quarter_start_date).days + 1
+    
+    if days_into_quarter <= 40:
+        return current_quarter
+    else:
+        return None
+    
 
 # - Register a user
 def register(request):
@@ -360,9 +385,11 @@ def my_login(request):
 #         return render(request, template, context=context)
 @login_required(login_url='my-login')
 def dashboard(request):
+    
     CURRENT_YEAR = date.today().year
     TARGET_YEAR = date.today().year + 1
     current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+    
 
     if request.user.is_citymanager_office:
         template = 'webapp/dashboard_performance_officer.html'
@@ -387,7 +414,7 @@ def dashboard(request):
 def get_performance_officer_context(request, current_fiscal_year):
     department_id = request.GET.get('departments')
     fiscal_year_id = request.GET.get('fiscal_year')
-
+    current_quarter = get_current_quarter()
 
     if not department_id:
         # Set default department to City Manager Office
@@ -416,6 +443,7 @@ def get_performance_officer_context(request, current_fiscal_year):
     context = {
         'form': DepartmentFilterForm(initial={'departments': department_id, 'fiscal_year': fiscal_year_id}),
         'fiscal_year_id': fiscal_year_id,
+        'current_quarter': current_quarter,
         'mission': my_mission,
         'initiatives': my_initiatives,
         'overview': my_overview,
@@ -443,6 +471,13 @@ def get_performance_officer_context(request, current_fiscal_year):
 
 def get_regular_user_context(request, current_fiscal_year):
     fiscal_year_id = request.GET.get('fiscal_year')
+    current_quarter = get_current_quarter()
+
+    if current_quarter:
+        show_pencil_icon = True
+    else:
+        show_pencil_icon = False
+        
 
     if not fiscal_year_id:
         # Set default fiscal year to the current fiscal year
@@ -466,6 +501,9 @@ def get_regular_user_context(request, current_fiscal_year):
 
     context = {
         'form': DepartmentFilterForm(initial={'fiscal_year': fiscal_year_id}),
+        'current_quarter': current_quarter,
+        'show_pencil_icon': show_pencil_icon,
+        
         'mission': my_mission,
         'initiatives': my_initiatives,
         'overview': my_overview,
