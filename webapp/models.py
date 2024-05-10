@@ -249,6 +249,12 @@ class QuarterlyPerformanceData(TimeStampMixin):
         percentage = f"{int((self.numerator / self.denominator) * 100)} % "
         return percentage
     
+    @property        
+    def get_percentage_int(self):
+        
+        
+        percentage = int((self.numerator / self.denominator) * 100)
+        return percentage
     @property
     def get_annual_percentage(self):
         quarter = self.quarter
