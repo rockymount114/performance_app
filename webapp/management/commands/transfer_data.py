@@ -53,10 +53,12 @@ class Command(BaseCommand):
 
          for department in departments: 
 
-            # prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved = True)
-            # prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id)
-            prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id, approved=True)
-            # prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id).exclude(status='completed')
+
+            prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved=True)
+            prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
+            prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
+            prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id).exclude(status='completed')
+
 
             # current_fiscal_year = FiscalYear.objects.get(name=fiscal_year)
           
@@ -102,14 +104,10 @@ class Command(BaseCommand):
             carry_next_year_measures = []
 
             for x in prev_year_measures:
-                # print(f"x: {x.id} - {x}")
+
                 prev_year_measures_q_data= QuarterlyPerformanceData.objects.filter(measure_id=x.id)
-                
-                # annual_total = 0
-                # for q in prev_year_measures_q_data:
-                #     annual_total += q.numerator
-                # print(f'Measure:{x.id}, value:{test}')
-                
+
+
                 if x.is_number:
                     annual_total  = 0
                     for q in prev_year_measures_q_data:
@@ -124,7 +122,9 @@ class Command(BaseCommand):
                         'frequency': Measure.objects.get(pk=x.id).frequency,
                         'current_year_rate': annual_total, 
                         'target_rate': Measure.objects.get(pk=x.id).target_rate,
-                        'fiscal_year': 'FY2025',  
+
+                        'fiscal_year': current_fiscal_year,  
+
                         'is_number': x.is_number,
                         }
                     
@@ -144,30 +144,32 @@ class Command(BaseCommand):
                         'frequency': Measure.objects.get(pk=x.id).frequency,
                         'current_year_rate': annual_average, 
                         'target_rate': Measure.objects.get(pk=x.id).target_rate,
-                        'fiscal_year': 'FY2025',  
+
+                        'fiscal_year': current_fiscal_year,  
+
                         'is_number': x.is_number,
                         }
                     
                     carry_next_year_measures.append(measure)
-                    
-            print(carry_next_year_measures)
-            # for item in carry_next_year_measures:
-            #     print(item)
-                # Measure.objects.create(**item)
 
 
-            # # Create Initiative that need to be carried out the next fiscal year
+            for item in carry_next_year_measures:
+                Measure.objects.create(**item)
 
 
-            # carry_next_year_initiatives = []
+            # Create Initiative that need to be carried out the next fiscal year
 
-            # for x in prev_year_initiatives:
 
-            #     initiative = {
-            #         'department':StrategicInitiative.objects.get(pk=x.id).department,
-            #         'title':StrategicInitiative.objects.get(pk=x.id).title,
-            #         'fiscal_year': current_fiscal_year,
-            #         }
+            carry_next_year_initiatives = []
+
+            for x in prev_year_initiatives:
+
+                initiative = {
+                    'department':StrategicInitiative.objects.get(pk=x.id).department,
+                    'title':StrategicInitiative.objects.get(pk=x.id).title,
+                    'fiscal_year': current_fiscal_year,
+                    }
+
                 
             #     carry_next_year_initiatives.append(initiative)
 
