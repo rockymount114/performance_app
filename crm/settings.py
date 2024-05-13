@@ -126,6 +126,7 @@ DATABASES = {
 
 
 
+
 AUTH_USER_MODEL = 'webapp.CustomerUser'
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
