@@ -836,6 +836,7 @@ def handler404(request, exception):
 # for normal user to view the pdf
 
 class GeneratePdf(View):
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             # messages.success(request, "Only department head can generate pdf")
@@ -846,7 +847,8 @@ class GeneratePdf(View):
             department_id = request.user.department_id   
             department_name = Department.objects.filter(id=department_id).last()
             
-            current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
+            current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())    
+                            
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
             user_email = User.objects.get(department_id=department_id, pk=request.user.id)
             
@@ -949,8 +951,8 @@ class GeneratePdf(View):
                 "dept_head_name":dept_head_name,
                 "dept_head_email": dept_head_email,
                 "fiscal_year": FiscalYear.objects.get(pk=fiscal_year_id),
-                "current_fiscal_year":current_fiscal_year,
-                "prev_fiscal_year":prev_fiscal_year,
+                "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
+                "prev_fiscal_year":str(prev_fiscal_year)[:2] + str(prev_fiscal_year)[-2:],
                 'city_logo': image_path,
                 'css_content': css_content,
                 
