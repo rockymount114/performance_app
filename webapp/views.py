@@ -93,7 +93,7 @@ def get_current_quarter():
 
     days_into_quarter = (current_date - quarter_start_date).days + 1
     
-    if days_into_quarter <= 40:
+    if days_into_quarter <= 100:
         return current_quarter
     else:
         return None
