@@ -601,6 +601,7 @@ def create_objective(request):
             objective.fiscal_year = fiscal_year
             objective.created_by = request.user.get_full_name()
             objective.save() 
+            form.save_m2m() # Save many to many field
             messages.success(request, "Your objective was created and pending to review!")
             return redirect("dashboard")
 
