@@ -1,3 +1,5 @@
+<!--This template is for without quarter data-->
+
 {% block title %}PDF{% endblock title %}
 {% load static %}
 
@@ -111,11 +113,12 @@
                         <th id="centered-header">Frequency</th>
                         <th id="centered-header" >{{prev_fiscal_year}} Actual</th>
                         <th id="centered-header" >{{current_fiscal_year}} Target</th>
-                        <th id="centered-header" >Q1</th>
+
+                        {% comment %} <th id="centered-header" >Q1</th>
                         <th id="centered-header" >Q2</th>
                         <th id="centered-header" >Q3</th>
                         <th id="centered-header" >Q4</th>
-                        <th id="centered-header" >Yearly</th>
+                        <th id="centered-header" >Yearly</th> {% endcomment %}
                     </tr>
                 </thead>
         
@@ -128,7 +131,9 @@
                                 <td  class="data_col" align="center" width="11%">{{ measure.direction }}</td>
                                 <td class="data_col" align="center" width="11%">{{ measure.frequency }}</td>
                                 <td class="data_col" align="center" width="11%">{{ measure.current_year_rate }}</td>
-                                <td class="data_col" align="center" width="11%">{{ measure.target_rate }}</td>         
+                                <td class="data_col" align="center" width="11%">{{ measure.target_rate }}</td>     
+                                
+{% comment %}                                 
                                 {% with measure_id=measure.id %}
         
                                   {% if measure.id in d1 %}
@@ -154,15 +159,14 @@
                                   {% else %}
                                     <td class="data_col" align="center"> - </td>
                                   {% endif %}
-                                  
-                                  <!--Yearly data calculation-->
+
                                   <td class="data_col" align="center" width="5%">
 
                                     {{ annual_percentages|get_item:measure.id}}
 
                                   </td>
                  
-                              {% endwith %}
+                              {% endwith %} {% endcomment %}
         
                                
                             </tr>

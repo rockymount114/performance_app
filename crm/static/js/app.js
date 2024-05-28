@@ -76,7 +76,12 @@ document.addEventListener('DOMContentLoaded', event => {
 })
 
 function fadeOut(el) {
-    el.style.opacity = 1;
+    if (!el || !(el instanceof Element)) {
+        // console.error('Invalid DOM element provided.');
+        return;
+      }
+
+    el.style.setProperty('opacity', 1);
     (function fade() {
         if ((el.style.opacity -= .1) < 0) {
             el.style.display = "none";
@@ -87,10 +92,15 @@ function fadeOut(el) {
 };
 
 function fadeIn(el, display) {
-    el.style.opacity = 0;
+
+    if (!el || !(el instanceof Element)) {
+        // console.error('Invalid DOM element provided.');
+        return;
+      }
+    el.style.setProperty('opacity','0');
     el.style.display = display || "block";
     (function fade() {
-        var val = parseFloat(el.style.opacity);
+        var val = parseFloat(el.style.opacity) || 0;
         if (!((val += .1) > 1)) {
             el.style.opacity = val;
             requestAnimationFrame(fade);

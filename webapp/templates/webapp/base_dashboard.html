@@ -8,7 +8,7 @@
       <div class="row">
         <div class="col ">
           <div class="list-group mb-1">
-            <div class="list-group-item bg-info-subtle d-flex align-items-center">
+            <div class="list-group-item card-header d-flex align-items-center">
               {% if not dept_cmo %}
               <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-objective' %}" title="Add a new objective">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i>
@@ -52,7 +52,7 @@
     <!--Focus Area start-->
   <div class="card shadow mt-3">
     <div class="list-group  mt-3">
-      <div class="list-group-item bg-info-subtle d-flex align-items-center">
+      <div class="list-group-item card-header d-flex align-items-center">
         {% if not dept_cmo %}
         <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-focus-area' %}" title="Add a new focus area">
           <i class="fa fa-plus-circle" aria-hidden="true"></i>
@@ -108,7 +108,7 @@
         {% for objective_id, measures in grouped_measures.items %}
 
         <div class="list-group mt-3">
-          <li class="list-group-item bg-info-subtle">
+          <li class="list-group-item card-header">
             <b class="objective-name">Objective: {{ d_objective_names|get_item:objective_id }}</b>
           </li>
         </div>
@@ -120,8 +120,8 @@
                     <th class="title_column" width="50%">Metric</th>
                     <th id="centered-header" width="5%">Direction</th>
                     <th id="centered-header" width="5%">Frequency</th>
-                    <th id="centered-header" width="6%">FY24 Actual</th>
-                    <th id="centered-header" width="6%">FY25 Target</th>
+                    <th id="centered-header" width="6%">{{prev_fiscal_year}} Actual</th>
+                    <th id="centered-header" width="6%">{{current_fiscal_year}} Target</th>
                     <th id="centered-header" width="5%">Q1</th>
                     <th id="centered-header" width="5%">Q2</th>
                     <th id="centered-header" width="5%">Q3</th>
@@ -247,15 +247,15 @@
       
     <div class="card shadow mt-3">  
       <table class="table table-hover table-bordered mt-3">
-          <thead class="table-light">
+          <thead class="table-light ">
               <tr>
-                <th scope="col" id="centered-header" width="25%"> Strategic Initiatives </th>
-                <th scope="col" id="centered-header" width="25%"> Description </th>
-                <th scope="col" id="centered-header" width="12%"> Proposed Completion Date </th>
-                <th scope="col" id="centered-header" width="10%"> Status </th>
-                <th scope="col" id="centered-header" width="10%"> Description of Project Status</th>
-                <th scope="col" id="centered-header" width="10%"> Expected Impacts </th>
-                <th scope="col" id="centered-header" width="10%"> Notes </th>      
+                <th scope="col" id="centered-header" width="25%" class="card-header"> Strategic Initiatives </th>
+                <th scope="col" id="centered-header" width="25%" class="card-header"> Description </th>
+                <th scope="col" id="centered-header" width="12%" class="card-header"> Proposed Completion Date </th>
+                <th scope="col" id="centered-header" width="10%" class="card-header"> Status </th>
+                <th scope="col" id="centered-header" width="10%" class="card-header"> Description of Project Status</th>
+                <th scope="col" id="centered-header" width="10%" class="card-header"> Expected Impacts </th>
+                <th scope="col" id="centered-header" width="10%" class="card-header"> Notes </th>      
               </tr>
           </thead>
       
