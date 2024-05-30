@@ -7,7 +7,7 @@ from . models import *
 
 # admin.site.register(CustomerUser) # no longer need it as it's already had a customer_user_admin.py
 
-SITE_TITLE = "City of Rocky Mount Performance Measurement Admin"
+SITE_TITLE = "City of Rocky Mount Performance Management Tracker Admin"
 admin.site.site_header = SITE_TITLE
 admin.site.site_title = SITE_TITLE
 
@@ -74,6 +74,8 @@ class FocusAreaAdmin(admin.ModelAdmin):
         'name',
         'department',
     ) 
+    
+    
 admin.site.register(FocusArea, FocusAreaAdmin)
 
 class MeasureAdmin(admin.ModelAdmin):

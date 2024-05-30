@@ -57,7 +57,13 @@ body{
 
 .card .card-header{
     font-size: 16px;
+    color:#ffffff;
     text-transform: uppercase;
+    background-color: #2c3e50;
+}
+
+.card .card-header i {
+  color: #ffffff; /* Change the color of the <i> tag to white */
 }
 
 table {
@@ -195,6 +201,8 @@ td
     transform: translateY(-50%);
     cursor: pointer;
 }
+
+
   
   /* Default max-width for larger screens */
   @media (min-width: 992px) {

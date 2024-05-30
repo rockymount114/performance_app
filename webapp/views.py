@@ -59,6 +59,14 @@ def get_prev_fiscal_year():
     
     return fiscal_year
 
+def get_current_fiscal_year_id():
+    try:
+        fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+        fiscal_year_id = fiscal_year.id
+        return fiscal_year_id
+    
+    except FiscalYear.DoesNotExist:
+        print(f"Fiscal year do not exist")
 # def get_current_quarter():
 #     current_date = date.today()
 #     current_month = current_date.month
@@ -93,7 +101,7 @@ def get_current_quarter():
 
     days_into_quarter = (current_date - quarter_start_date).days + 1
     
-    if days_into_quarter <= 40:
+    if days_into_quarter <= 360:
         return current_quarter
     else:
         return None
@@ -389,7 +397,7 @@ def dashboard(request):
     CURRENT_YEAR = date.today().year
     TARGET_YEAR = date.today().year + 1
     current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-    
+
 
     if request.user.is_citymanager_office:
         template = 'webapp/dashboard_performance_officer.html'
@@ -482,6 +490,8 @@ def get_regular_user_context(request, current_fiscal_year):
     if not fiscal_year_id:
         # Set default fiscal year to the current fiscal year
         fiscal_year_id = current_fiscal_year.id
+        
+    prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
 
     department_id = request.user.department_id
     dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
@@ -522,6 +532,10 @@ def get_regular_user_context(request, current_fiscal_year):
         'd4': quarterly_data['d4'],
     
         'selected_fiscal_year_id': fiscal_year_id,
+        
+        "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
+        "prev_fiscal_year":str(prev_fiscal_year)[:2] + str(prev_fiscal_year)[-2:],
+                
         **initiative_data
     }
 
@@ -593,6 +607,7 @@ def create_objective(request):
             objective.fiscal_year = fiscal_year
             objective.created_by = request.user.get_full_name()
             objective.save() 
+            form.save_m2m() # Save many to many field
             messages.success(request, "Your objective was created and pending to review!")
             return redirect("dashboard")
 
@@ -838,16 +853,23 @@ def handler404(request, exception):
 class GeneratePdf(View):
 
     def get(self, request, *args, **kwargs):
+        
         if not request.user.is_authenticated:
             # messages.success(request, "Only department head can generate pdf")
             return redirect('my-login')
         else:
             fiscal_year_id = request.GET.get('fiscal_year') # for selection returns FY id
-
+            
             department_id = request.user.department_id   
             department_name = Department.objects.filter(id=department_id).last()
             
-            current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())    
+            current_fiscal_year = get_current_fiscal_year()
+            
+            current_quarter = get_current_quarter()
+            print(current_quarter)
+
+            if not fiscal_year_id:
+                fiscal_year_id = FiscalYear.objects.get(name=current_fiscal_year).id
                             
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
             user_email = User.objects.get(department_id=department_id, pk=request.user.id)
@@ -982,8 +1004,11 @@ class GeneratePdf(View):
                 'initiative_notes':initiative_notes,
         
             }
-        
-            pdf = render_to_pdf('webapp/report.html',data)
+            
+            if current_quarter == "Q4":
+                pdf = render_to_pdf('webapp/report.html', data)                
+            else:
+                pdf = render_to_pdf('webapp/report1.html',data)
         
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
@@ -1116,7 +1141,6 @@ class GeneratePdf2(View):
                 annual_percent = (q1_percent + q2_percent + q3_percent + q4_percent) / 4
                 annual_percentages[measure_id] = f"{annual_percent:0.0%}"
 
-            print(department_name)
            
                 
             data = {
@@ -1576,7 +1600,7 @@ def approvals(request):
     approve_focus_area = request.GET.get('approve_focus_area')
     # print(approve_objective)
     prechecked_objectives = request.session.get('prechecked_objectives', [])
-    print(prechecked_objectives)
+
 
     # approve
     if approve_objective:
@@ -1595,7 +1619,7 @@ def approvals(request):
         
         # update the db objectives
         for id in objectives_id_list:
-            print(id)
+
             Objective.objects.filter(pk=int(id)).update(approved=True)
             
 

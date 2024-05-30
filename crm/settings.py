@@ -125,6 +125,20 @@ DATABASES = {
 }
 
 
+# SQL database aws
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "mssql",
+#         "NAME": "dbperformance",
+#         "USER": "SSRS",
+#         "PASSWORD": "Ts4test@",
+#         "HOST": "dbperformance.cdqmkemw64lh.us-east-1.rds.amazonaws.com",
+#         "PORT": "1433",
+#         "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server",
+#                     },
+#     },
+# }
 
 
 AUTH_USER_MODEL = 'webapp.CustomerUser'

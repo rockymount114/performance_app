@@ -145,6 +145,7 @@ class Objective(TimeStampMixin):
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)  
     created_by = models.CharField(max_length=50, null=True)
     modified_by = models.CharField(max_length=50, null=True)
+    focus_area = models.ManyToManyField("FocusArea")
 
     def __str__(self) -> str:
         return self.name 

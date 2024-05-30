@@ -246,23 +246,32 @@ class CreateObjectiveForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 300 characters'}),
         label='Objective title',
         max_length=300,
-        required=False,
+        required=True,
 
     )
 
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
         disabled=True,
-        required=False,
+        required=True,
     
     )
+    
+    focus_area = forms.ModelMultipleChoiceField(
+        queryset=FocusArea.objects.all(),
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+    
+    )
+    
+    
 
     class Meta:
         model = Objective    
 
         # fields= "__all__"
 
-        fields = ['name', 'fiscal_year' ]  
+        fields = ['name', 'fiscal_year', "focus_area"]  
         exclude = ['department', 'approved', 'created_by', 'modified_by']
          
     def __init__(self, *args, **kwargs):
