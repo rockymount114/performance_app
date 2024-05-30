@@ -490,6 +490,8 @@ def get_regular_user_context(request, current_fiscal_year):
     if not fiscal_year_id:
         # Set default fiscal year to the current fiscal year
         fiscal_year_id = current_fiscal_year.id
+        
+    prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
 
     department_id = request.user.department_id
     dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
@@ -530,6 +532,10 @@ def get_regular_user_context(request, current_fiscal_year):
         'd4': quarterly_data['d4'],
     
         'selected_fiscal_year_id': fiscal_year_id,
+        
+        "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
+        "prev_fiscal_year":str(prev_fiscal_year)[:2] + str(prev_fiscal_year)[-2:],
+                
         **initiative_data
     }
 
@@ -601,6 +607,7 @@ def create_objective(request):
             objective.fiscal_year = fiscal_year
             objective.created_by = request.user.get_full_name()
             objective.save() 
+            form.save_m2m() # Save many to many field
             messages.success(request, "Your objective was created and pending to review!")
             return redirect("dashboard")
 
@@ -858,6 +865,8 @@ class GeneratePdf(View):
             
             current_fiscal_year = get_current_fiscal_year()
             
+            current_quarter = get_current_quarter()
+            print(current_quarter)
 
             if not fiscal_year_id:
                 fiscal_year_id = FiscalYear.objects.get(name=current_fiscal_year).id
@@ -995,8 +1004,11 @@ class GeneratePdf(View):
                 'initiative_notes':initiative_notes,
         
             }
-        
-            pdf = render_to_pdf('webapp/report.html',data)
+            
+            if current_quarter == "Q4":
+                pdf = render_to_pdf('webapp/report.html', data)                
+            else:
+                pdf = render_to_pdf('webapp/report1.html',data)
         
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
