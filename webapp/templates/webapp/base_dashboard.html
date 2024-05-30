@@ -268,7 +268,7 @@
       
                   <td title="{{initiative.title}}"> {{initiative.title}} </td>
                   <td title="{{initiative.description}}"> {{initiative.description}} </td>
-                  <td align="center"> {{initiative.proposed_completion_date}} </td>
+                  <td align="center"> {{initiative.proposed_completion_date |date:"m/d/Y"}} </td>
       
       
                   {% if initiative.id in initiative_status %}
