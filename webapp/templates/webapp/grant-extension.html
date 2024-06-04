@@ -1,0 +1,63 @@
+{% extends 'webapp/base.html' %}
+{% block title %} Grant data submission extension to Departments{% endblock title %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Grant Data Submission Extension</h1>
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Departments</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light ">
+                                <tr>
+                                    <th>Department</th>
+                                    <th class="text-center">Grant Extension?</th>
+                                    <th class="text-center">Deadline</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for department in department_list %}
+                                    <tr>
+                                        <td>{{ department.name }}</td>
+                                        <td class="text-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" {% if department.grant_ext %}checked{% endif %} value="{{ department.id }}" name="boxes">
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                          
+                                            {% if department.grant_ext %}
+                                               {{ department.extension_granted_at|date:"F j, Y, g:i a" }}
+                                            {% else %}
+                                                None
+                                            {% endif %} 
+                                   
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="javascript:history.go(-1)" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i> Return
+                    </a>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-check mr-2"></i> Submit Extension
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

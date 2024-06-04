@@ -55,7 +55,7 @@ class Command(BaseCommand):
 
 
             prev_year_objectives = Objective.objects.filter(department_id=department.id, fiscal_year=prev_fiscal_year_id, approved=True)
-            prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
+            # prev_year_focus_areas = FocusArea.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
             prev_year_measures = Measure.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id,approved=True)
             prev_year_initiatives = StrategicInitiative.objects.filter(department_id=department.id,fiscal_year=prev_fiscal_year_id).exclude(status='completed')
 
@@ -83,21 +83,21 @@ class Command(BaseCommand):
                 Objective.objects.create(**item)
 
 
-            # Create focus areas that need to be carried out the next fiscal year
+            # # Create focus areas that need to be carried out the next fiscal year
 
-            carry_next_year_focusareas = []
+            # carry_next_year_focusareas = []
 
-            for x in prev_year_focus_areas:
+            # for x in prev_year_focus_areas:
 
-                focus_area = {'name': FocusArea.objects.get(pk=x.id).name, 
-                    'department':FocusArea.objects.get(pk=x.id).department,
-                    'fiscal_year': current_fiscal_year,
-                    }
+            #     focus_area = {'name': FocusArea.objects.get(pk=x.id).name, 
+            #         'department':FocusArea.objects.get(pk=x.id).department,
+            #         'fiscal_year': current_fiscal_year,
+            #         }
                 
-                carry_next_year_focusareas.append(focus_area)
+            #     carry_next_year_focusareas.append(focus_area)
 
-            for item in carry_next_year_focusareas:
-                FocusArea.objects.create(**item)
+            # for item in carry_next_year_focusareas:
+            #     FocusArea.objects.create(**item)
 
             # Create measure that need to be carried out the next fiscal year
 

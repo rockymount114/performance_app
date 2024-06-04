@@ -1,5 +1,5 @@
 {% extends 'webapp/base.html' %}
-{% block title %}Create Focus Areas{% endblock title %}
+{% block title %}Create Measure{% endblock title %}
 {% load crispy_forms_tags %}
 {% block content %}
 
@@ -7,23 +7,24 @@
 
         <div class="container bg-light shadow-md p-5 form-layout">
 
-            <h3> Create a Focus Area </h3>
-            <h6> Start adding in the required details for your focus area. </h6>
+            <h3> Update Objective </h3>
+            <h6> Review, and modify objective details as needed.</h6>
             <hr>
 
             <form method="POST" autocomplete="off" >
 
                 {% csrf_token %}  
-            
+
+                {{ form.fiscal_year|as_crispy_field }}
                 {{ form.name|as_crispy_field }}
-                {{ form.description|as_crispy_field }}
+                {{ form.focus_area|as_crispy_field }}
 
 
 
 
                 <br>
                 <button type="submit" class="btn btn-primary">                     
-                    Create a Focus Area &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+                    Update Objective &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
                 </button>
                 &nbsp;
                 <a href="javascript:history.go(-1)" class="btn btn-secondary"> 

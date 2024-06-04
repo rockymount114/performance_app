@@ -14,13 +14,7 @@
                         <li><strong>Department:</strong> {{ objective.department }}</li>
                         <li><strong>Objective:</strong> {{ objective.name }}</li>
                         <li><strong>Fiscal Year:</strong> {{ objective.fiscal_year }}</li>
-                        <li><strong>Approval Status:</strong>
-                            {% if objective.approved %}
-                                <span class="text-success">Approved</span>
-                            {% else %}
-                                <span class="text-warning">Pending</span>
-                            {% endif %}
-                        </li>
+                        <li><strong>Approval Status:</strong> {% if objective.approved %}<span class="text-success">Approved</span>{% else %}<span class="text-warning">Pending</span>{% endif %}</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
@@ -33,18 +27,25 @@
                     </ul>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="mb-3">Focus Areas Impacted</h5>
+                    <ul class="list-group">
+                        {% for focus_area in objective.focus_area.all %}
+                            <li class="list-group-item">{{ focus_area.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
         <div class="card-footer">
             <div class="d-flex justify-content-between">
                 <a href="javascript:history.go(-1)" class="btn btn-secondary">
                     <i class="fa fa-arrow-left mr-2"></i> Return
                 </a>
-                <form method="GET" action="{% url 'approvals' %}">
-                    <input type="hidden" name="approve_objective" value="{{ objective.id }}">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa fa-check mr-2"></i> Approve
-                    </button>
-                </form>
+                <a href="{% url 'update-objective' objective.id %}" class="btn btn-info">
+                    <i class="fa fa-edit mr-2"></i> Update
+                </a>
             </div>
         </div>
     </div>

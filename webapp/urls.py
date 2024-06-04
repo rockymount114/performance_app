@@ -37,8 +37,20 @@ urlpatterns = [
     path('view-objective-info/<int:pk>/', views.view_objective_info, name="view-objective-info"),
     path('view-measure-info/<int:pk>/', views.view_measure_info, name="view-measure-info"),
     path('view-focus-area-info/<int:pk>/', views.view_focus_area_info, name="view-focus-area-info"),
-    path('update-session/', views.update_session, name='update_session'),
+    path('update-session/', views.update_session, name='update-session'),
     
+    # View and update records --> regular  
+    path('update-objective/<int:pk>/', views.update_objective, name="update-objective"),
+    path('view-objective-info-regular/<int:pk>/', views.view_objective_info_regular, name="view-objective-info-regular"),
+
+    path('update-measure/<int:pk>/', views.update_measure, name="update-measure"),
+    path('view-measure-info-regular/<int:pk>/', views.view_measure_info_regular, name="view-measure-info-regular"),
+
+
+    # Grant extension:
+    path('grant-extension/', views.grant_extension, name='grant-extension'),
+
+
 
 
     path('user-logout/', views.user_logout, name="user-logout"),

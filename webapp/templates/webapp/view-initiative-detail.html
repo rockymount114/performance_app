@@ -4,19 +4,23 @@
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-lg-13">
-      <h3 class="mb-4">Initiative Detail Data</h3>
+      <h3 class="mb-4 text-center">Initiative Detail Data</h3>
       <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">{{strategic_initiative.title}}</h5>
+        </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
-              <p><strong>Initiative:</strong> {{strategic_initiative.title}}</p>
-              <p><strong>Description:</strong> {{strategic_initiative.description}}</p>
+              <h6 class="mb-3"><strong>Description:</strong></h6>
+              <p>{{strategic_initiative.description}}</p>
             </div>
             <div class="col-md-6">
-              <p><strong>Proposed Completion Date:</strong> {{strategic_initiative.proposed_completion_date}}</p>
+              <h6 class="mb-3"><strong>Proposed Completion Date:</strong></h6>
+              <p>{{strategic_initiative.proposed_completion_date}}</p>
             </div>
           </div>
-          <table class="table table-hover table-bordered ">
+          <table class="table table-hover">
             <thead class="table-light">
               <tr>
                 <th class="text-center">Status</th>
@@ -39,22 +43,22 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="6" class="text-center">No details available</td>
+                <td colspan="6" class="text-center text-muted">No details available</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
-          <div class="text-right">
+        </div>
+        <div class="card-footer">
+          <div class="d-flex justify-content-between">
+            <a href="javascript:history.go(-1)" class="btn btn-secondary">
+              <i class="fas fa-arrow-left mr-1"></i> Return
+            </a>
             <a class="btn btn-primary" href="{% url 'create-initiative-detail' strategic_initiative.id %}">
               <i class="fas fa-plus-circle mr-1"></i> Add New Detail
             </a>
           </div>
         </div>
-      </div>
-      <div class="mt-4">
-        <a href="javascript:history.go(-1)" class="btn btn-secondary">
-          <i class="fas fa-arrow-left mr-1"></i> Return
-        </a>
       </div>
     </div>
   </div>

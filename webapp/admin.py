@@ -13,11 +13,13 @@ admin.site.site_title = SITE_TITLE
 
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description', 'created_at',)
+    list_display = ('id', 'name', 'description', 'created_at','grant_ext','extension_granted_at' )
     fields = (
         # 'id',
         'name',
         'description',
+        'grant_ext',
+        'extension_granted_at',
     )    
 admin.site.register(Department, DepartmentAdmin)
 
@@ -67,12 +69,12 @@ class ObjectiveAdmin(admin.ModelAdmin):
 admin.site.register(Objective, ObjectiveAdmin)
 
 class FocusAreaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'name', 'created_at',)
+    list_display = ('id', 'name', 'created_at',)
     fields = (
-        # 'id',
-        'fiscal_year',
+ 
         'name',
-        'department',
+        'description',
+     
     ) 
     
     
