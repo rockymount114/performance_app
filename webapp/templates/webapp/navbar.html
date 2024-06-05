@@ -19,7 +19,7 @@
       
 
 
-        {% if dept_cmo or user.is_superuser %}
+        {% if dept_cmo or user.is_superuser or user.is_citymanager_office %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'approvals' %}"> <i class="fa fa-check" aria-hidden="true"></i> &nbsp; Approvals </a>
           </li>
