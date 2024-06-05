@@ -46,7 +46,7 @@
                     {% if not objective.approved %}<span class="badge bg-warning">P</span>{% endif %}
                     <a href="{% url 'view-objective-info-regular' objective.id %}" class="hover-link">{{ objective.name }}</a>
                     {% for focus_area in objective.focus_area.all %}
-                      <a href="#" class="focus-area-tag" data-description="{{ focus_area.description }}">{{ focus_area.name }}</a>
+                      <a href="#" class="focus-area-tag" data-toggle="tooltip" title="{{ focus_area.description }}">{{ focus_area.name }}</a>
                     {% endfor %}
                   </div>
                 </div>

@@ -910,7 +910,7 @@ class GeneratePdf(View):
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year_id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id, approved=True)
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
