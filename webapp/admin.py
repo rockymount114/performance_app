@@ -13,12 +13,12 @@ admin.site.site_title = SITE_TITLE
 
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description', 'created_at','grant_ext','extension_granted_at' )
+    list_display = ('id', 'name', 'description', 'created_at','extension_granted_at' )
     fields = (
         # 'id',
         'name',
         'description',
-        'grant_ext',
+
         'extension_granted_at',
     )    
 admin.site.register(Department, DepartmentAdmin)

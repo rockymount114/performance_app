@@ -48,7 +48,6 @@ class Department(TimeStampMixin):
     
     name = models.CharField(max_length=100)   
     description = models.CharField(max_length=100, null=True, blank=True)    
-    grant_ext = models.BooleanField(default=False)
     extension_granted_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         ordering = ["name"]        

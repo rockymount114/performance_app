@@ -26,7 +26,7 @@ from django.http import JsonResponse
 from io import BytesIO
 import os
 from xhtml2pdf import pisa
-
+from datetime import timedelta
 
 from django.template.loader import get_template
 from django.contrib.staticfiles import finders
@@ -49,6 +49,18 @@ def get_current_fiscal_year():
         fiscal_year = f'FY{date.today().year}'     
     
     return fiscal_year  
+
+def is_within_10_minutes(timestamp):
+    current_time = timezone.now()
+    if timestamp == None:
+        return False
+    else:
+        time_difference = current_time - timestamp
+        
+        if time_difference > timedelta(minutes=10):
+            return False
+        else:
+            return True
 
 def get_prev_fiscal_year():                
     current_month = date.today().month        
@@ -496,8 +508,14 @@ def get_regular_user_context(request, current_fiscal_year):
     prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
 
     department_id = request.user.department_id
-    grant_extension_to_department = Department.objects.get(pk=department_id).grant_ext
-    print(grant_extension_to_department)
+    extension_granted_at = Department.objects.get(pk=department_id).extension_granted_at
+    if is_within_10_minutes(extension_granted_at) == False:
+        grant_extension_to_department = False
+    else:
+        grant_extension_to_department = True
+   
+
+
     dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
 
 
@@ -2076,6 +2094,7 @@ def update_measure(request,pk):
     return render(request, 'webapp/update-measure.html', context=context)
 
 
+                    
 # Create grant extension page
 @login_required(login_url='my-login')
 def grant_extension(request):
@@ -2088,15 +2107,28 @@ def grant_extension(request):
             for x in id_list:
                 department = Department.objects.filter(pk=int(x)).first()
                 if department:
-                    department.grant_ext = True
                     department.extension_granted_at = timezone.now()
                     department.save()
-
+           
             messages.success(request, ("The extension was successfully granted, and will expire in 48 hours."))
             return redirect("dashboard")
 
         else:
-            context = {'department_list': department_list}
+            
+            d_ext= {}
+            for i in department_list:
+                d_ext.update({i.id:is_within_10_minutes(i.extension_granted_at)})
+
+
+            for i in department_list:
+                if is_within_10_minutes(i.extension_granted_at) == False:
+                    i.extension_granted_at = None
+                    i.save()
+
+            context = {
+                'department_list': department_list,
+                'd_ext':d_ext,
+                       }
             return render(request,'webapp/grant-extension.html',context)
   
     else:
@@ -2105,7 +2137,7 @@ def grant_extension(request):
 
 
 
-    return render(request,'webapp/grant-extension.html')
+    # return render(request,'webapp/grant-extension.html')
 
 
 # - User logout
