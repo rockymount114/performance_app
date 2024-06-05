@@ -31,6 +31,7 @@ from datetime import timedelta
 from django.template.loader import get_template
 from django.contrib.staticfiles import finders
 import json
+from django.db.models import Prefetch
 
 
 User = get_user_model()
@@ -881,7 +882,7 @@ class GeneratePdf(View):
             current_fiscal_year = get_current_fiscal_year()
             
             current_quarter = get_current_quarter()
-            print(current_quarter)
+
 
             if not fiscal_year_id:
                 fiscal_year_id = FiscalYear.objects.get(name=current_fiscal_year).id
@@ -910,7 +911,21 @@ class GeneratePdf(View):
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year_id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
+
+            objectives = Objective.objects.filter(
+            department_id=department_id,
+            fiscal_year_id=fiscal_year_id).prefetch_related(Prefetch('focus_area', queryset=FocusArea.objects.all()))
+
+            my_focus_area = []
+            for objective in objectives:
+                my_focus_area.extend(objective.focus_area.all())
+
+            # Remove duplicate focus areas 
+            my_focus_area = list(set(my_focus_area))
+            # Order focus areas alphabetically by name
+            my_focus_area = sorted(my_focus_area, key=lambda x: x.name) 
+
+
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
@@ -1088,7 +1103,21 @@ class GeneratePdf2(View):
             my_overview = Overview.objects.filter(department_id=department_id).last()
             
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year, approved=True)
+            
+            objectives = Objective.objects.filter(
+            department_id=department_id,
+            fiscal_year_id=fiscal_year_id).prefetch_related(Prefetch('focus_area', queryset=FocusArea.objects.all()))
+
+            my_focus_area = []
+            for objective in objectives:
+                my_focus_area.extend(objective.focus_area.all())
+
+            # Remove duplicate focus areas 
+            my_focus_area = list(set(my_focus_area))
+            # Order focus areas alphabetically by name
+            my_focus_area = sorted(my_focus_area, key=lambda x: x.name) 
+
+
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
             
@@ -1609,6 +1638,10 @@ def password_reset(request):
 
 @login_required(login_url='my-login')
 def approvals(request):
+    if request.user.is_citymanager_office:
+        dept_cmo = True
+    else:
+        dept_cmo = False
     # Initialize session variables if they don't exist
     if 'prechecked_objectives' not in request.session:
         request.session['prechecked_objectives'] = []
@@ -1659,13 +1692,13 @@ def approvals(request):
         fiscal_year_id_fetched = request.GET.get('fiscal_year_id')
         
         objectives_pending_approval, measures_pending_approval = get_pending_approvals(department_id_fetched, fiscal_year_id_fetched)
-       
+    
         context = {
             'objectives': objectives_pending_approval,
             'measures': measures_pending_approval,
             'prechecked_objectives_json': json.dumps(request.session.get('prechecked_objectives', [])),
             'prechecked_measures_json': json.dumps(request.session.get('prechecked_measures', [])),
-
+            'dept_cmo':dept_cmo,
             
         }
         
@@ -2114,7 +2147,6 @@ def grant_extension(request):
             return redirect("dashboard")
 
         else:
-            
             d_ext= {}
             for i in department_list:
                 d_ext.update({i.id:is_within_10_minutes(i.extension_granted_at)})
