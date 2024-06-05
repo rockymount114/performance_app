@@ -59,27 +59,23 @@ $(document).ready(function() {
             success: function (data) {
                 console.log(data);
                 let objectivesHtml = "";
-                let focusAreasHtml = "";
                 let measuresHtml = "";
 
                 const precheckedObjectives = JSON.parse(data.prechecked_objectives_json);
                 const precheckedMeasures = JSON.parse(data.prechecked_measures_json);
-                const precheckedFocusAreas = JSON.parse(data.prechecked_focus_areas_json);
+             
 
                 data.objectives.forEach(function (objective) {
                     objectivesHtml += getObjectiveRowHtml(objective, precheckedObjectives);
                 });
 
-                data.focus_areas.forEach(function (focusArea) {
-                    focusAreasHtml += getFocusAreaRowHtml(focusArea, precheckedFocusAreas);
-                });
 
                 data.measures.forEach(function (measure) {
                     measuresHtml += getMeasureRowHtml(measure, precheckedMeasures);
                 });
 
+
                 $("#objectivesId").html(objectivesHtml);
-                $("#focusAreasId").html(focusAreasHtml);
                 $("#measuresId").html(measuresHtml);
             }
         });
@@ -102,22 +98,7 @@ $(document).ready(function() {
         `;
     }
 
-    function getFocusAreaRowHtml(focusArea, precheckedFocusAreas) {
-        return `
-            <tr>
-                <td class="title_column text-center">${focusArea.fiscal_year__name}</td>
-                <td class="title_column" title="${formatDateTime(focusArea.created_at)}">${formatDateTime(focusArea.created_at)}</td>
-                <td class="title_column">${focusArea.created_by}</td>
-                <td class="title_column text-center">${focusArea.department__name}</td>
-                <td class="title_column" title="${focusArea.name}"><a href="/view-focus-area-info/${focusArea.id}/" class="text-primary">${focusArea.name}</a></td>
-                <td class="text-center">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="${focusArea.id}" name="focus_area_boxes" ${precheckedFocusAreas.includes(focusArea.id) ? 'checked' : ''}>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
+
 
     function getMeasureRowHtml(measure, precheckedMeasures) {
         return `

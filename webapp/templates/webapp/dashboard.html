@@ -43,6 +43,7 @@
         {% else %}
           {{user.department}}
         {% endif %}
+      
      
     </h3>
 
@@ -185,10 +186,8 @@
 
     <div class="list-group">
       <div class="list-group-item bg-info-subtle d-flex align-items-center">
-        <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'create-focus-area' %}" title="Add a new focus area">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i>
-        </a>
-        <b>FOCUS AREAS IMPACTED (Must align with at least 3)</b>
+
+        <b>FOCUS AREAS  (Must align with at least 3)</b>
       </div>
 
         {% if focus_areas%}

@@ -1,0 +1,80 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Measure{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <body>
+
+        <div class="container bg-light shadow-md p-5 form-layout">
+
+            <h3> Update a Measure </h3>
+            <h6> Review, and modify measure details as needed. </h6>
+            <hr>
+
+            <form method="POST" autocomplete="off" >
+
+                {% csrf_token %}  
+
+                {{ form.department|as_crispy_field }}
+                {{ form.fiscal_year|as_crispy_field }}
+                {{ form.objective|as_crispy_field }}
+                {{ form.title|as_crispy_field }}
+                {{ form.direction|as_crispy_field }}
+                {{ form.frequency|as_crispy_field }}
+                
+            
+                {{ form.is_number|as_crispy_field }}
+                <div id="target_number_field" style="display: none;">
+                  {{ form.target_number|as_crispy_field }}
+                </div>
+                <div id="target_rate_field" >
+                  {{ form.target_rate|as_crispy_field }}
+                </div>
+                
+
+
+                
+
+
+                <br>
+                <button type="submit" class="btn btn-primary">                     
+                    Update measure &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                &nbsp;
+                <a href="javascript:history.go(-1)" class="btn btn-secondary"> 
+                    Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </form>
+        </div>
+        <br>
+        
+
+    </body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+
+    $(document).ready(function() {
+   
+      $('#id_is_number').change(function() {
+        if ($(this).val() === 'True') {
+          
+          $('#target_number_field').show();
+          $('#target_rate_field').hide();
+        } else  {
+         
+          $('#target_rate_field').show();
+          $('#target_number_field').hide();
+        } 
+      });
+    });
+    </script>
+
+
+
+
+{% endblock %}
+
+
+
+

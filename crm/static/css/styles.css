@@ -66,7 +66,7 @@ body{
   color: #ffffff; /* Change the color of the <i> tag to white */
 }
 
-table {
+/* table {
   width: 100%;}
 
 th{
@@ -80,6 +80,59 @@ td
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+} */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+
+}
+
+th {
+  vertical-align: middle;
+}
+
+td {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid #dee2e6;
+}
+
+table thead th {
+  border-top: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+}
+
+table thead th:first-child {
+  border-top-left-radius: 10px;
+}
+
+table thead th:last-child {
+  border-top-right-radius: 10px;
+}
+
+table tbody tr:last-child td {
+  border-bottom: 1px solid #dee2e6;
+}
+
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+table tbody tr td:first-child {
+  border-left: 1px solid #dee2e6;
+}
+
+table tbody tr td:last-child {
+  border-right: 1px solid #dee2e6;
 }
 
 .profile_pic{
@@ -161,8 +214,8 @@ td
   .pending-approval::before {
     content: "Pending approval";
     position: absolute;
-    top: -20px;
-    left: 50%;
+    top: 7px;
+    left: 85%;
     transform: translateX(-50%);
     background-color: #333;
     color: #fff;
@@ -232,5 +285,52 @@ td
     }
   }
 
+  /* CSS for dynamic tags like Stack OverFlow Start */
+  .focus-area-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    background-color: #E1ECF4;
+    color: #39739D;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .focus-area-tag:hover {
+    background-color: #D0E3F1;
+  }
+  
+
+  /* CSS for dynamic tags like Stack OverFlow End */
+
+  .hover-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .hover-link:hover {
+    text-decoration: underline;
+    color: lightseagreen;
+  }
 
 
+
+
+  .tooltip-inner {
+    max-width: 400px;
+    width: auto;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: left;
+  }
+
+  .expandable-text {
+    max-height: 100px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }

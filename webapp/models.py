@@ -48,7 +48,7 @@ class Department(TimeStampMixin):
     
     name = models.CharField(max_length=100)   
     description = models.CharField(max_length=100, null=True, blank=True)    
-    
+    extension_granted_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         ordering = ["name"]        
     def __str__(self) -> str:
@@ -152,10 +152,10 @@ class Objective(TimeStampMixin):
 
 class FocusArea(TimeStampMixin):
     name = models.TextField(max_length=255)
-    department = models.ForeignKey("Department", on_delete=models.CASCADE) 
-    approved = models.BooleanField('Approved',default=False)
-    fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
-
+    # department = models.ForeignKey("Department", on_delete=models.CASCADE) 
+    # approved = models.BooleanField('Approved',default=False)
+    # fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
+    description = models.TextField(max_length=300, null=True, blank=True)
     created_by = models.CharField(max_length=50, null=True)
     modified_by = models.CharField(max_length=50, null=True)
 
