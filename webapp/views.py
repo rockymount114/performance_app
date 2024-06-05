@@ -26,7 +26,7 @@ from django.http import JsonResponse
 from io import BytesIO
 import os
 from xhtml2pdf import pisa
-
+from datetime import timedelta
 
 from django.template.loader import get_template
 from django.contrib.staticfiles import finders
@@ -49,6 +49,18 @@ def get_current_fiscal_year():
         fiscal_year = f'FY{date.today().year}'     
     
     return fiscal_year  
+
+def is_within_10_minutes(timestamp):
+    current_time = timezone.now()
+    if timestamp == None:
+        return False
+    else:
+        time_difference = current_time - timestamp
+        
+        if time_difference > timedelta(minutes=10):
+            return False
+        else:
+            return True
 
 def get_prev_fiscal_year():                
     current_month = date.today().month        
@@ -438,7 +450,8 @@ def get_performance_officer_context(request, current_fiscal_year):
     my_mission = Mission.objects.filter(department_id=department_id).last()
     my_overview = Overview.objects.filter(department_id=department_id).last()
     my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
-    my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
+    # my_focus_area = FocusArea.objects.all()
+    my_focus_area = FocusArea.objects.annotate(objective_count=Count('objective', filter=Q(objective__department_id=department_id, objective__fiscal_year=fiscal_year_id)))
     my_measures = Measure.objects.filter(objective_id__in=my_objectives)
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
@@ -486,6 +499,7 @@ def get_regular_user_context(request, current_fiscal_year):
     else:
         show_pencil_icon = False
         
+    
 
     if not fiscal_year_id:
         # Set default fiscal year to the current fiscal year
@@ -494,12 +508,22 @@ def get_regular_user_context(request, current_fiscal_year):
     prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
 
     department_id = request.user.department_id
+    extension_granted_at = Department.objects.get(pk=department_id).extension_granted_at
+    if is_within_10_minutes(extension_granted_at) == False:
+        grant_extension_to_department = False
+    else:
+        grant_extension_to_department = True
+   
+
+
     dept_head = User.objects.filter(is_dept_head=True, department_id=department_id)
+
 
     my_mission = Mission.objects.filter(department_id=department_id).last()
     my_overview = Overview.objects.filter(department_id=department_id).last()
     my_objectives = Objective.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
-    my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
+    # my_focus_area = FocusArea.objects.all()
+    my_focus_area = FocusArea.objects.annotate(objective_count=Count('objective', filter=Q(objective__department_id=department_id, objective__fiscal_year=fiscal_year_id)))
     my_measures = Measure.objects.filter(objective_id__in=my_objectives)
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
@@ -535,7 +559,8 @@ def get_regular_user_context(request, current_fiscal_year):
         
         "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
         "prev_fiscal_year":str(prev_fiscal_year)[:2] + str(prev_fiscal_year)[-2:],
-                
+        "grant_extension_to_department":grant_extension_to_department,
+
         **initiative_data
     }
 
@@ -588,19 +613,14 @@ def get_initiative_data(department_id):
 
 @login_required(login_url='my-login')
 def create_objective(request):   
-    
     department = Department.objects.get(id=request.user.department_id)
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
 
-    form = CreateObjectiveForm(initial={
+    if request.method == "POST":
+        form = CreateObjectiveForm(request.POST, initial={
                                         'department': department,
                                         'fiscal_year': fiscal_year,
-                                        
-                                        })  
-
-    
-    if request.method == "POST":
-        form = CreateObjectiveForm(request.POST)
+                                    })
         if form.is_valid():   
             objective = form.save(commit=False)
             objective.department = department
@@ -610,30 +630,25 @@ def create_objective(request):
             form.save_m2m() # Save many to many field
             messages.success(request, "Your objective was created and pending to review!")
             return redirect("dashboard")
+    else:
+        form = CreateObjectiveForm(initial={
+                                        'department': department,
+                                        'fiscal_year': fiscal_year,
+                                    })  
 
-            
     context = {'form': form}
-   
-    
     return render(request, 'webapp/create-objective.html', context=context)
 
 # Create focus area
 
 @login_required(login_url='my-login')
 def create_focus_area(request):
-    department = Department.objects.get(id=request.user.department_id)
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
     
-    form = CreateFocusAreaForm(initial={
-                                        'department': department,
-                                        'fiscal_year': fiscal_year,                                        
-                                        }) 
+    form = CreateFocusAreaForm() 
     if request.method == "POST":
         form = CreateFocusAreaForm(request.POST)
         if form.is_valid():   
             objective = form.save(commit=False)
-            objective.department = department
-            objective.fiscal_year = fiscal_year
             objective.created_by = request.user.get_full_name()
             objective.save() 
             messages.success(request, "Your Focus Aread was created!")
@@ -895,7 +910,7 @@ class GeneratePdf(View):
             my_mission = Mission.objects.filter(department_id=department_id).last()              
             my_overview = Overview.objects.filter(department_id=department_id).last()
             my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year_id)
-            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id, approved=True)
+            my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
@@ -1594,11 +1609,17 @@ def password_reset(request):
 
 @login_required(login_url='my-login')
 def approvals(request):
-     # Check if any record needs to be approved
+    # Initialize session variables if they don't exist
+    if 'prechecked_objectives' not in request.session:
+        request.session['prechecked_objectives'] = []
+    if 'prechecked_measures' not in request.session:
+        request.session['prechecked_measures'] = []
+
+    # Check if any record needs to be approved
     approve_objective = request.GET.get('approve_objective')
     approve_measure = request.GET.get('approve_measure')
-    approve_focus_area = request.GET.get('approve_focus_area')
-    # print(approve_objective)
+
+    print(approve_objective)
     prechecked_objectives = request.session.get('prechecked_objectives', [])
 
 
@@ -1608,14 +1629,12 @@ def approvals(request):
 
     if approve_measure:
         Measure.objects.filter(pk=int(approve_measure)).update(approved=True)
-        
-    if approve_focus_area:
-        FocusArea.objects.filter(pk=int(approve_focus_area)).update(approved=True)
+
  
     if request.method == "POST":
         objectives_id_list = request.POST.getlist('objective_boxes')
         measures_id_list = request.POST.getlist('measure_boxes')
-        focus_areas_id_list = request.POST.getlist('focus_area_boxes')
+      
         
         # update the db objectives
         for id in objectives_id_list:
@@ -1627,17 +1646,11 @@ def approvals(request):
         for id in measures_id_list:
             Measure.objects.filter(pk=int(id)).update(approved=True)
         
-        # update the db focusareas
-        for id in focus_areas_id_list:
-            FocusArea.objects.filter(pk=int(id)).update(approved=True)
+
 
         # Clear session variables
-        if 'prechecked_objectives' in request.session:
-            del request.session['prechecked_objectives']
-        if 'prechecked_measures' in request.session:
-            del request.session['prechecked_measures']
-        if 'prechecked_focus_areas' in request.session:
-            del request.session['prechecked_focus_areas']
+        request.session['prechecked_objectives'] = []
+        request.session['prechecked_measures'] = []
 
         messages.success(request,("Your approvals were successfully submitted!"))
 
@@ -1645,15 +1658,14 @@ def approvals(request):
         department_id_fetched = request.GET.get('department_id')
         fiscal_year_id_fetched = request.GET.get('fiscal_year_id')
         
-        objectives_pending_approval, focus_areas_pending_approval, measures_pending_approval = get_pending_approvals(department_id_fetched, fiscal_year_id_fetched)
-        
+        objectives_pending_approval, measures_pending_approval = get_pending_approvals(department_id_fetched, fiscal_year_id_fetched)
+       
         context = {
             'objectives': objectives_pending_approval,
-            'focus_areas': focus_areas_pending_approval,
             'measures': measures_pending_approval,
             'prechecked_objectives_json': json.dumps(request.session.get('prechecked_objectives', [])),
             'prechecked_measures_json': json.dumps(request.session.get('prechecked_measures', [])),
-            'prechecked_focus_areas_json': json.dumps(request.session.get('prechecked_focus_areas', [])),
+
             
         }
         
@@ -1670,22 +1682,21 @@ def approvals(request):
 def get_pending_approvals(department_id, fiscal_year_id):
     if department_id and fiscal_year_id:
         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id, fiscal_year_id=fiscal_year_id).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+    
     elif department_id:
         objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
         measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
+    
     elif fiscal_year_id:
         objectives_pending_approval = list(Objective.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
         measures_pending_approval = list(Measure.objects.filter(approved=False, fiscal_year_id=fiscal_year_id).values('id', 'title', 'fiscal_year__name', 'objective__name', 'department__name', 'created_at', 'created_by'))
+    
     else:
         objectives_pending_approval = list(Objective.objects.filter(approved=False).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
-        focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False).values('id', 'name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
         measures_pending_approval = list(Measure.objects.filter(approved=False).values('id', 'title', 'objective__name', 'fiscal_year__name', 'department__name', 'created_at', 'created_by'))
     
-    return objectives_pending_approval, focus_areas_pending_approval, measures_pending_approval
+    return objectives_pending_approval, measures_pending_approval
 
     
 # @login_required(login_url='my-login')
@@ -1882,13 +1893,6 @@ def update_session(request):
             else:
                 prechecked_measures.remove(item_id)
             session_data['prechecked_measures'] = prechecked_measures
-        elif item_type == 'focus':
-            prechecked_focus_areas = session_data.get('prechecked_focus_areas', [])
-            if is_checked:
-                prechecked_focus_areas.append(item_id)
-            else:
-                prechecked_focus_areas.remove(item_id)
-            session_data['prechecked_focus_areas'] = prechecked_focus_areas
 
         # Manually save the session data
         request.session.modified = True
@@ -1976,13 +1980,13 @@ def view_objective_info(request,pk):
     
      return render(request, 'webapp/view-objective-info.html', context=context)
 
-# View Objective Info
+# View Measure Info
 @login_required(login_url='my-login')
 def view_measure_info(request,pk):
         
     #  department = Department.objects.get(id=request.user.department_id)
      measure = Measure.objects.get(id=pk)
-  
+     
      context = {
         # 'department':department,
         'measure':measure,
@@ -1992,7 +1996,7 @@ def view_measure_info(request,pk):
      return render(request, 'webapp/view-measure-info.html', context=context)
 
 
-# View Objective Info
+# View Focus Area Info
 @login_required(login_url='my-login')
 def view_focus_area_info(request,pk):
         
@@ -2008,7 +2012,132 @@ def view_focus_area_info(request,pk):
      return render(request, 'webapp/view-focus-area-info.html', context=context)
 
 
+# View Objective Info Regular 
+@login_required(login_url='my-login')
+def view_objective_info_regular(request,pk):
+        
 
+     objective = Objective.objects.get(id=pk)
+  
+     context = {
+      
+        'objective':objective,
+        
+    } 
+    
+     return render(request, 'webapp/view-objective-info-regular.html', context=context)
+
+
+# View Objective Info Regular 
+@login_required(login_url='my-login')
+def view_measure_info_regular(request,pk):
+        
+
+     measure = Measure.objects.get(id=pk)
+     objective = Objective.objects.get(pk=measure.objective.id)
+
+     context = {
+   
+        'measure':measure,
+        'objective':objective,
+    } 
+    
+     return render(request, 'webapp/view-measure-info-regular.html', context=context)
+
+
+
+# UPDATE FORM VIEWS
+
+
+# - Update an objective
+
+@login_required(login_url='my-login')
+def update_objective(request, pk):     
+    objective = Objective.objects.get(id=pk)
+
+    form = UpdateObjectiveForm(instance=objective)
+
+    if request.method == "POST":
+        form = UpdateObjectiveForm(request.POST, instance=objective)
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.modified_by = request.user.get_full_name()
+            instance.approved = False
+            instance.save()
+            form.save_m2m() # Save many to many field
+            messages.success(request, "Your objective was updated and is now pending approval!")
+            return redirect("dashboard")
+
+    context = {'form': form}
+    return render(request, 'webapp/update-objective.html', context=context)
+
+
+# - Update a measure
+@login_required(login_url='my-login')
+def update_measure(request,pk):
+    measure = Measure.objects.get(id=pk)
+
+    form = UpdateMeasureForm(instance=measure)
+
+    if request.method == "POST":
+        form = UpdateMeasureForm(request.POST, instance=measure,user=request.user)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.approved = False
+            instance.modified_by = request.user.get_full_name()
+            instance.save()
+            messages.success(request, "Your measure was updated and is now pending approval!")
+            return redirect("dashboard")
+
+    context = {'form': form}
+    return render(request, 'webapp/update-measure.html', context=context)
+
+
+                    
+# Create grant extension page
+@login_required(login_url='my-login')
+def grant_extension(request):
+    department_list = Department.objects.all().order_by('name')
+    if request.user.is_citymanager_office or request.user.is_superuser:
+        if request.method=="POST":
+            id_list = request.POST.getlist('boxes')
+
+            # Update the db
+            for x in id_list:
+                department = Department.objects.filter(pk=int(x)).first()
+                if department:
+                    department.extension_granted_at = timezone.now()
+                    department.save()
+           
+            messages.success(request, ("The extension was successfully granted, and will expire in 48 hours."))
+            return redirect("dashboard")
+
+        else:
+            
+            d_ext= {}
+            for i in department_list:
+                d_ext.update({i.id:is_within_10_minutes(i.extension_granted_at)})
+
+
+            for i in department_list:
+                if is_within_10_minutes(i.extension_granted_at) == False:
+                    i.extension_granted_at = None
+                    i.save()
+
+            context = {
+                'department_list': department_list,
+                'd_ext':d_ext,
+                       }
+            return render(request,'webapp/grant-extension.html',context)
+  
+    else:
+        messages.success(request,("You are not authorized to visit this page!"))
+        return redirect("dashboard")
+
+
+
+    # return render(request,'webapp/grant-extension.html')
 
 
 # - User logout

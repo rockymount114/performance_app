@@ -264,8 +264,6 @@ class CreateObjectiveForm(forms.ModelForm):
     
     )
     
-    
-
     class Meta:
         model = Objective    
 
@@ -274,9 +272,9 @@ class CreateObjectiveForm(forms.ModelForm):
         fields = ['name', 'fiscal_year', "focus_area"]  
         exclude = ['department', 'approved', 'created_by', 'modified_by']
          
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fiscal_year'].queryset = FiscalYear.objects.order_by('name')   
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['fiscal_year'].queryset = FiscalYear.objects.get(name=get_current_fiscal_year()) 
  
 class CreateFocusAreaForm(forms.ModelForm):
     name = forms.CharField(
@@ -285,19 +283,10 @@ class CreateFocusAreaForm(forms.ModelForm):
         max_length=300,
         required=False,
     )
-    fiscal_year = forms.ModelChoiceField(
-        queryset=FiscalYear.objects.all(),
-        disabled=True,
-        required=False,    
-    )
+
     class Meta:
         model = FocusArea  
-        fields = ['name', 'fiscal_year' ]  
-        exclude = ['department']
-         
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['fiscal_year'].queryset = FiscalYear.objects.order_by('name') 
+        fields = ['name', 'description']
                    
 class CreateQuarterlyPerformanceDataForm(forms.ModelForm):
 
@@ -384,6 +373,74 @@ class StrategicInitiativeDetailForm(forms.ModelForm):
         exclude = ['department','strategic_initiative']
 
 
+# UPDATE FORMS
+
+#  - Update Measures
+class UpdateMeasureForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
+        label="Metric name",
+        max_length=255,
+        required=True,
+    )
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,
+    )
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            department_id = user.department_id
+            current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+            self.fields['objective'].queryset = Objective.objects.filter(
+                department_id=department_id,
+                fiscal_year=current_fiscal_year,
+                approved=True
+            )
+
+    class Meta:
+        model = Measure
+        fields = ['department','objective', 'title', 'fiscal_year', 'direction', 'frequency', 'is_number', 'target_rate', 'target_number']
+        exclude = [ 'created_by', 'current_year_rate']
+
+# -Update Objectives
+class UpdateObjectiveForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 300 characters'}),
+        label='Objective title',
+        max_length=300,
+        required=True,
+
+    )
+
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=True,
+    
+    )
+    
+    focus_area = forms.ModelMultipleChoiceField(
+        queryset=FocusArea.objects.all(),
+        required=True,
+        widget=forms.CheckboxSelectMultiple,
+    
+    )
+    
+    class Meta:
+        model = Objective    
+
+
+        fields = ['name', 'fiscal_year', "focus_area"]  
+        exclude = ['department', 'approved', 'created_by']
 
 
 

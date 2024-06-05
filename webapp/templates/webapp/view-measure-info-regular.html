@@ -12,24 +12,24 @@
                     <h5 class="mb-3">Basic Information</h5>
                     <ul class="list-unstyled">
                         <li><strong>Department:</strong> {{ measure.department }}</li>
-                        <li><strong>Objective:</strong> {{ measure.title }}</li>
+                        {% if objective.approved %}
+                            <li><strong>Objective:</strong> {{ measure.title }}</li>
+                        {% else %}
+                            <li><strong>Objective:</strong> <span style="color: red;">{{ measure.title }}</span></li>
+                        {% endif %}
                         <li><strong>Fiscal Year:</strong> {{ measure.fiscal_year }}</li>
                         <li><strong>Direction:</strong> {{ measure.direction }}</li>
                         <li><strong>Frequency:</strong> {{ measure.frequency }}</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
-                    <h5 class="mb-3">Performance Metrics</h5>
+                    <h5 class="mb-3">Additional Details</h5>
                     <ul class="list-unstyled">
                         <li><strong>Last Year Average:</strong> {{ measure.current_year_rate }}</li>
                         <li><strong>Target Rate:</strong> {{ measure.target_rate }}</li>
-                        <li><strong>Approval Status:</strong>
-                            {% if measure.approved %}
-                                <span class="text-success">Approved</span>
-                            {% else %}
-                                <span class="text-warning">Pending</span>
-                            {% endif %}
-                        </li>
+                        <li><strong>Approval Status:</strong> {% if measure.approved %}<span class="text-success">Approved</span>{% else %}<span class="text-warning">Pending</span>{% endif %}</li>
+                        <li><strong>Created By:</strong> {{ measure.created_by }}</li>
+                        <li><strong>Modified By:</strong> {{ measure.modified_by }}</li>
                     </ul>
                 </div>
             </div>
@@ -41,13 +41,6 @@
                         <li><strong>Last Updated:</strong> {{ measure.updated_at }}</li>
                     </ul>
                 </div>
-                <div class="col-md-6">
-                    <h5 class="mb-3">Ownership</h5>
-                    <ul class="list-unstyled">
-                        <li><strong>Created By:</strong> {{ measure.created_by }}</li>
-                        <li><strong>Modified By:</strong> {{ measure.modified_by }}</li>
-                    </ul>
-                </div>
             </div>
         </div>
         <div class="card-footer">
@@ -55,14 +48,27 @@
                 <a href="javascript:history.go(-1)" class="btn btn-secondary">
                     <i class="fa fa-arrow-left mr-2"></i> Return
                 </a>
-                <form method="GET" action="{% url 'approvals' %}">
-                    <input type="hidden" name="approve_measure" value="{{ measure.id }}">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa fa-check mr-2"></i> Approve
-                    </button>
-                </form>
+                {% if objective.approved %}
+                <a href="{% url 'update-measure' measure.id %}" class="btn btn-info">
+                    <i class="fa fa-edit mr-2"></i> Update
+                </a>
+                {% else %}
+                <a href="#" class="btn btn-info disabled-link" aria-disabled="true" data-toggle="tooltip" data-placement="top" title="Cannot update this measure until related objective is approved">
+                    <i class="fa fa-edit mr-2"></i> Update
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+
+<style>
+    .disabled-link {
+      /* pointer-events: none; */
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+</style>
+  
 {% endblock %}
