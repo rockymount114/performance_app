@@ -46,7 +46,7 @@
                                         <td class="text-center">
                                           
                                             {% if department.extension_granted_at %}
-                                               {{ department.extension_granted_at|date:"F j, Y, g:i a" }}
+                                               {{ d_deadline|get_item:department.id|date:"F j, Y, g:i a" }}
                                             {% else %}
                                                 None
                                             {% endif %} 

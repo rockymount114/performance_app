@@ -350,3 +350,21 @@ table tbody tr td:last-child {
     overflow: hidden;
     transition: max-height 0.3s ease;
   }
+
+  .container-fluid {
+    min-height: calc(100vh - (header_height + footer_height));
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .container-fluid {
+    flex: 1;
+  }
+  
+  .footer {
+    margin-top: auto;
+  }
