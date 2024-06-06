@@ -9,18 +9,26 @@
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-light">
-                        <tr>
-                            <!-- <th scope="col" style="min-width: 300px;"> Metric </th>
+                        <!-- <tr>
+                            <th scope="col" style="min-width: 300px;"> Metric </th>
                             <th scope="col" class="text-center" style="width: 12%; background-color: #e6f7ff;"> Q1 </th>
                             <th scope="col" class="text-center" style="width: 12%; background-color: #e6ffee;"> Q2 </th>
                             <th scope="col" class="text-center" style="width: 12%; background-color: #fff7e6;"> Q3 </th>
                             <th scope="col" class="text-center" style="width: 12%; background-color: #ffe6e6;"> Q4 </th>
                             <th scope="col" class="text-center" style="width: 12%; background-color: #bbdefb;"> Annual </th> -->
+                            <tr>
+                                <!-- <th scope="col" style="min-width: 300px;"> Metric </th>
+                                <th scope="col" class="text-center" style="width: 12%;"> Q1 </th>
+                                <th scope="col" class="text-center" style="width: 12%;"> Q2 </th>
+                                <th scope="col" class="text-center" style="width: 12%;"> Q3 </th>
+                                <th scope="col" class="text-center" style="width: 12%;">Q4 </th>
+                                <th scope="col" class="text-center" style="width: 12%;"> Annual </th>
+                            </tr> -->
                             <th scope="col" style="min-width: 300px;"> Metric </th>
-                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q1_data.percentage <= 25 %}#ffe6e6;{% elif q1_data.percentage <= 50 %}#fff7e6;{% elif q1_data.percentage <= 75 %} #e6ffee;{% else %}#e6f7ff;{% endif %}"> Q1 </th>
-                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q2_data.percentage <= 25 %}#ffe6e6;{% elif q2_data.percentage <= 50 %}#fff7e6;{% elif q2_data.percentage <= 75 %} #e6ffee;{% else %}#e6f7ff;{% endif %}"> Q2 </th>
-                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q3_data.percentage <= 25 %}#ffe6e6;{% elif q3_data.percentage <= 50 %}#fff7e6;{% elif q3_data.percentage <= 75 %} #e6ffee;{% else %}#e6f7ff;{% endif %}"> Q3 </th>
-                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q4_data.percentage <= 25 %}#ffe6e6;{% elif q4_data.percentage <= 50 %}#fff7e6;{% elif q4_data.percentage <= 75 %} #e6ffee;{% else %}#e6f7ff;{% endif %}"> Q4 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q1_data.percentage <= 25 %}#ffe6e6;{% elif q1_data.percentage <= 50 %}#fff7e6;{% elif q1_data.percentage <= 75 %} #e6f7ff;{% elif q1_data.percentage <= 100 %}#e6ffee;{% endif %}"> Q1 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q2_data.percentage <= 25 %}#ffe6e6;{% elif q2_data.percentage <= 50 %}#fff7e6;{% elif q2_data.percentage <= 75 %} #e6f7ff;{% elif q2_data.percentage <= 100 %}#e6ffee;{% endif %}"> Q2 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q3_data.percentage <= 25 %}#ffe6e6;{% elif q3_data.percentage <= 50 %}#fff7e6;{% elif q3_data.percentage <= 75 %} #e6f7ff;{% elif q3_data.percentage <= 100 %}#e6ffee;{% endif %}"> Q3 </th>
+                            <th scope="col" class="text-center" style="width: 12%; background-color: {% if q4_data.percentage <= 25 %}#ffe6e6;{% elif q4_data.percentage <= 50 %}#fff7e6;{% elif q4_data.percentage <= 75 %} #e6f7ff;{% elif q4_data.percentage <= 100 %}#e6ffee;{% endif %}"> Q4 </th>
                             <th scope="col" class="text-center" style="width: 12%; "> Annual </th>
                         </tr>
                     </thead>
@@ -31,7 +39,7 @@
                                 {% if q1_data %}
                                 <div>{{q1_data.numerator}} / {{q1_data.denominator}}</div>
                                 <div class="progress mt-2" id="progress-bar-q1">
-                                    <div class="progress-bar {% if q1_data.percentage <= 25 %}bg-danger{% elif q1_data.percentage <= 50 %}bg-warning{% elif q1_data.percentage <= 75 %}bg-success{% else %}bg-info{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}e" role="progressbar">  {{ q1_data.percentage }}% </div>
+                                    <div class="progress-bar {% if q1_data.percentage <= 25 %}bg-danger{% elif q1_data.percentage <= 50 %}bg-warning{% elif q1_data.percentage <= 75 %}bg-info{% else %}bg-success{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}e" role="progressbar">  {{ q1_data.percentage }}% </div>
                                 </div>
                                 {% else %}
                                 -
@@ -41,7 +49,7 @@
                                 {% if q2_data %}
                                 <div>{{q2_data.numerator}} / {{q2_data.denominator}}</div>
                                 <div class="progress mt-2" id="progress-bar-q2">
-                                    <div class="progress-bar {% if q2_data.percentage <= 25 %}bg-danger{% elif q2_data.percentage <= 50 %}bg-warning{% elif q2_data.percentage <= 75 %}bg-success{% else %}bg-info{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q2_data.percentage }}%</div>
+                                    <div class="progress-bar {% if q2_data.percentage <= 25 %}bg-danger{% elif q2_data.percentage <= 50 %}bg-warning{% elif q2_data.percentage <= 75 %}bg-info{% else %}bg-success{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q2_data.percentage }}%</div>
                                 </div>
                                 {% else %}
                                 -
@@ -51,7 +59,7 @@
                                 {% if q3_data %}
                                 <div>{{q3_data.numerator}} / {{q3_data.denominator}}</div>
                                 <div class="progress mt-2" id="progress-bar-q3">
-                                    <div class="progress-bar {% if q3_data.percentage <= 25 %}bg-danger{% elif q3_data.percentage <= 50 %}bg-warning{% elif q3_data.percentage <= 75 %}bg-success{% else %}bg-info{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q3_data.percentage }}%</div>
+                                    <div class="progress-bar {% if q3_data.percentage <= 25 %}bg-danger{% elif q3_data.percentage <= 50 %}bg-warning{% elif q3_data.percentage <= 75 %}bg-info{% else %}bg-success{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q3_data.percentage }}%</div>
                                 </div>
                                 {% else %}
                                 -
@@ -61,7 +69,7 @@
                                 {% if q4_data %}
                                 <div>{{q4_data.numerator}} / {{q4_data.denominator}}</div>
                                 <div class="progress mt-2" id="progress-bar-q4">
-                                    <div class="progress-bar {% if q4_data.percentage <= 25 %}bg-danger{% elif q4_data.percentage <= 50 %}bg-warning{% elif q4_data.percentage <= 75 %}bg-success{% else %}bg-info{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q4_data.percentage }}%</div>
+                                    <div class="progress-bar {% if q4_data.percentage <= 25 %}bg-danger{% elif q4_data.percentage <= 50 %}bg-warning{% elif q4_data.percentage <= 75 %}bg-info{% else %}bg-success{% endif %} percentage" role="progressbar">  {{ q1_data.percentage }}" role="progressbar">  {{ q4_data.percentage }}%</div>
                                 </div>
                                 {% else %}
                                 -

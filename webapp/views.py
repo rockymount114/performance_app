@@ -2151,6 +2151,11 @@ def grant_extension(request):
             for i in department_list:
                 d_ext.update({i.id:is_within_10_minutes(i.extension_granted_at)})
 
+            d_deadline={}
+            for i in department_list:
+                if is_within_10_minutes(i.extension_granted_at):
+                    d_deadline.update({i.id:i.extension_granted_at + timedelta(minutes=10)})
+
 
             for i in department_list:
                 if is_within_10_minutes(i.extension_granted_at) == False:
@@ -2160,6 +2165,7 @@ def grant_extension(request):
             context = {
                 'department_list': department_list,
                 'd_ext':d_ext,
+                'd_deadline':d_deadline
                        }
             return render(request,'webapp/grant-extension.html',context)
   

@@ -40,12 +40,12 @@
                                     <table class="table table-hover table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th class="text-center ">Fiscal Year</th>
-                                                <th class="text-center ">Submitted On</th>
-                                                <th class="text-center ">Created By</th>
-                                                <th class="text-center ">Department</th>
-                                                <th class="text-center ">Objective</th>
-                                                <th class="text-center " width="15%">Approve?</th>
+                                                <th class="text-center "width="8%">Fiscal Year</th>
+                                                <th class="text-center "width="8%">Submitted On</th>
+                                                <th class="text-center "width="10%">Created By</th>
+                                                <th class="text-center "width="10%">Department</th>
+                                                <th class="text-center "width="20%">Objective</th>
+                                                <th class="text-center " width="4%">Approve?</th>
                                             </tr>
                                         </thead>
                                         <tbody id="objectivesId">
@@ -81,13 +81,13 @@
                                     <table class="table table-hover table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">Fiscal Year</th>
-                                                <th class="text-center">Submitted On</th>
-                                                <th class="text-center">Created By</th>
-                                                <th class="text-center">Department</th>
-                                                <th class="text-center">Objective</th>
-                                                <th class="text-center">Measure</th>
-                                                <th class="text-center" width="15%">Approve?</th>
+                                                <th class="text-center" width="8%">Fiscal Year</th>
+                                                <th class="text-center" width="5%">Submitted On</th>
+                                                <th class="text-center" width="8%">Created By</th>
+                                                <th class="text-center" width="8%">Department</th>
+                                                <th class="text-center" width="8%">Objective</th>
+                                                <th class="text-center" width="12%">Measure</th>
+                                                <th class="text-center" width="4%">Approve?</th>
                                             </tr>
                                         </thead>
                                         <tbody id="measuresId">
@@ -128,14 +128,7 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script>
-
-    const precheckedObjectives = JSON.parse('{{ prechecked_objectives|safe }}');
-    const precheckedMeasures = JSON.parse('{{ prechecked_measures|safe }}');
-
-
-</script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
 <script src="{% static 'js/approvals.js' %}"></script>
 
 {% endblock %}
