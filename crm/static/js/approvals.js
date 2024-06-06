@@ -41,6 +41,11 @@ $(document).ready(function() {
         return new Date(dateTimeString).toLocaleDateString(undefined, options);
     }
 
+    function formatDateTime2(dateTimeString) {
+        const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
+        return new Date(dateTimeString).toLocaleString(undefined, options);
+    }
+
     // Fetch initial table data on page load
     updateTableData();
 
@@ -77,6 +82,9 @@ $(document).ready(function() {
 
                 $("#objectivesId").html(objectivesHtml);
                 $("#measuresId").html(measuresHtml);
+
+                // Initialize tooltips on the newly added elements
+                $('[data-toggle="tooltip"]').tooltip();
             }
         });
     }
@@ -85,12 +93,12 @@ $(document).ready(function() {
         return `
             <tr>
                 <td class="title_column text-center">${objective.fiscal_year__name}</td>
-                <td class="title_column" title="${formatDateTime(objective.created_at)}">${formatDateTime(objective.created_at)}</td>
+                <td class="text-center" data-toggle="tooltip" title="${formatDateTime(objective.created_at)}">${formatDateTime2(objective.created_at)}</td>
                 <td class="title_column">${objective.created_by}</td>
                 <td class="title_column text-center">${objective.department__name}</td>
-                <td class="title_column" title="${objective.name}"><a href="/view-objective-info/${objective.id}/" class="text-primary">${objective.name}</a></td>
+                <td class="title_column"  data-toggle="tooltip" title="${objective.name}"><a href="/view-objective-info/${objective.id}/" class="text-primary">${objective.name}</a></td>
                 <td class="text-center">
-                    <div class="form-check">
+                    <div class="form-check d-flex justify-content-center">
                         <input class="form-check-input" type="checkbox" value="${objective.id}" name="objective_boxes" ${precheckedObjectives.includes(objective.id) ? 'checked' : ''}>
                     </div>
                 </td>
@@ -104,21 +112,25 @@ $(document).ready(function() {
         return `
             <tr>
                 <td class="title_column text-center">${measure.fiscal_year__name}</td>
-                <td class="title_column" title="${formatDateTime(measure.created_at)}">${formatDateTime(measure.created_at)}</td>
+                <td class="title_column text-center" data-toggle="tooltip" title="${formatDateTime(measure.created_at)}">${formatDateTime2(measure.created_at)}</td>
                 <td class="title_column">${measure.created_by}</td>
                 <td class="title_column text-center">${measure.department__name}</td>
-                <td class="title_column">${measure.objective__name}</td>
-                <td class="title_column" title="${measure.title}"><a href="/view-measure-info/${measure.id}/" class="text-primary">${measure.title}</a></td>
+                <td  data-toggle="tooltip" title="${measure.objective__name}" >${measure.objective__name}</td>
+                <td  data-toggle="tooltip" title="${measure.title}"><a href="/view-measure-info/${measure.id}/" class="text-primary">${measure.title}</a></td>
                 <td class="text-center">
-                    <div class="form-check">
+                    <div class="form-check d-flex justify-content-center">
                         <input class="form-check-input" type="checkbox" value="${measure.id}" name="measure_boxes" ${precheckedMeasures.includes(measure.id) ? 'checked' : ''}>
                     </div>
                 </td>
             </tr>
         `;
     }
+    
 
 });
+
+
+
 
 // CSRF token retrieval function
 function getCookie(name) {
@@ -135,3 +147,4 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
