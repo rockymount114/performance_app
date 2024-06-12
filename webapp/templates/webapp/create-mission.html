@@ -10,26 +10,23 @@
 
         <h4> Create your Dept Mission Statement for  </h4>
 
-        <h6> Department of {{user.department}} </h6>
+        <h6> Department of {{department}} </h6>
 
         <hr>
 
-        <form method="POST" id="missionForm"  autocomplete="off" action="{% url 'create-mission' %}">
-
+        <form method="POST" id="missionForm" autocomplete="off" action="{% url 'create-mission' %}?department_id={{ department.id }}">
             {% csrf_token %}
             {{ form.fiscal_year | as_crispy_field }}
-            {{ form.name | as_crispy_field }}        
-             
-
-
-            <br>              
-           
-            <button type="submit" class="btn btn-primary">                     
+            {{ form.name | as_crispy_field }}
+        
+            <br>
+        
+            <button type="submit" class="btn btn-primary">
                 Submit &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
             </button>
-
+        
             &nbsp;
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <a href="javascript:history.go(-1)" class="btn btn-secondary">Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
             </a>
         </form>
     </div>

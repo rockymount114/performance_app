@@ -26,7 +26,7 @@
                     <h5 class="mb-3">Additional Details</h5>
                     <ul class="list-unstyled">
                         <li><strong>Last Year Average:</strong> {{ measure.current_year_rate }}</li>
-                        <li><strong>Target Rate:</strong> {{ measure.target_rate }}</li>
+                        <li><strong>Target {% if not measure.is_number %} Rate {% else %} Number {% endif %}:</strong> {{target_rate_number}} {% if not measure.is_number %} % {% endif %}</li>
                         <li><strong>Approval Status:</strong> {% if measure.approved %}<span class="text-success">Approved</span>{% else %}<span class="text-warning">Pending</span>{% endif %}</li>
                         <li><strong>Created By:</strong> {{ measure.created_by }}</li>
                         <li><strong>Modified By:</strong> {{ measure.modified_by }}</li>

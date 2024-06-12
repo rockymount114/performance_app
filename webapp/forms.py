@@ -150,12 +150,19 @@ class CreateMeasureForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        department_id = kwargs.pop('department_id', None)
         super().__init__(*args, **kwargs)
         if user:
-            department_id = user.department_id
+            if department_id:
+                # Department ID passed from dropdown (chief performance officer)
+                self.fields['department'].initial = department_id
+            else:
+                # Regular user, set department based on user's department
+                self.fields['department'].initial = user.department_id
+
             current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
             self.fields['objective'].queryset = Objective.objects.filter(
-                department_id=department_id,
+                department_id=self.fields['department'].initial,
                 fiscal_year=current_fiscal_year,
                 approved=True
             )
@@ -211,15 +218,14 @@ class CreateMissionForm(forms.ModelForm):
 
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
 
     class Meta:
-        model = Mission    
-        # fields = "__all__"
-        fields = ['name']  
-        exclude = ['department']  
+        model = Mission
+        fields = ['name', 'fiscal_year']
+      
 
 class CreateOverviewForm(forms.ModelForm):
     name = forms.CharField(
@@ -231,7 +237,7 @@ class CreateOverviewForm(forms.ModelForm):
 
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
 

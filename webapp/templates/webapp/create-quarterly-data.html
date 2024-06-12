@@ -15,7 +15,7 @@
 
 <div class="container bg-light shadow-md p-5 form-layout">
 
-    <form method="POST">
+    <form method="POST" autocomplete="off"  action="">
         {% csrf_token %}
 
         {{ form.objective|as_crispy_field }}
