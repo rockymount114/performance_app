@@ -1,0 +1,60 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Model Instances{% endblock title %}
+{% load crispy_forms_tags %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+<body>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Select Model</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for model_name in model_names_path %}
+                                <li class="list-group-item">
+                                    <a href="?model={{model_name}}" class="text-decoration-none"> {{ d_names|get_item:model_name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                {% if selected_model_name %}
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0">Create {{ d_names|get_item:selected_model_name }} Instance</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" class="my-4">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <input type="hidden" name="selected_model" value="{{ selected_model_name|unslugify }}">
+                                <br>
+                                <div class="d-flex justify-content-between">
+                                    <a href="javascript:history.go(-1)" class="btn btn-secondary">
+                                        <i class="fa fa-arrow-left mr-2" aria-hidden="true"></i> Return
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-check mr-2" aria-hidden="true"></i> Create
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">Please select a model from the list to create an instance.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}

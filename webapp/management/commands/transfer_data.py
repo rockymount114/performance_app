@@ -121,6 +121,7 @@ class Command(BaseCommand):
                         'direction': Measure.objects.get(pk=x.id).direction, 
                         'frequency': Measure.objects.get(pk=x.id).frequency,
                         'current_year_rate': annual_total, 
+                        'target_number': Measure.objects.get(pk=x.id).target_number,
                         'target_rate': Measure.objects.get(pk=x.id).target_rate,
 
                         'fiscal_year': current_fiscal_year,  
@@ -143,6 +144,7 @@ class Command(BaseCommand):
                         'direction': Measure.objects.get(pk=x.id).direction, 
                         'frequency': Measure.objects.get(pk=x.id).frequency,
                         'current_year_rate': annual_average, 
+                        'target_number': Measure.objects.get(pk=x.id).target_number,
                         'target_rate': Measure.objects.get(pk=x.id).target_rate,
 
                         'fiscal_year': current_fiscal_year,  

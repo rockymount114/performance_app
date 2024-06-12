@@ -11,10 +11,9 @@
             <h6> Start adding in the required details for your objective. </h6>
             <hr>
 
-            <form method="POST" autocomplete="off" >
+            <form method="POST" autocomplete="off" action="{% url 'create-objective' %}?department_id={{ department.id }}" >
 
                 {% csrf_token %}  
-                {% comment %} {{form.as_p}} {% endcomment %}
 
                 {{ form.fiscal_year|as_crispy_field }}
                 {{ form.name|as_crispy_field }}
