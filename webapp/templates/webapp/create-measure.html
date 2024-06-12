@@ -11,7 +11,7 @@
             <h6> Start adding in the required details for your measure. </h6>
             <hr>
 
-            <form method="POST" autocomplete="off" >
+            <form method="POST" autocomplete="off"  action="{% url 'create-measure' %}?department_id={{  department.id  }}">
 
                 {% csrf_token %}  
                 {% comment %} {{form.as_p}} {% endcomment %}

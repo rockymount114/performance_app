@@ -38,9 +38,9 @@ class MissionAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
         # 'id',
-        'fiscal_year',
-        'name',
         'department',
+        'name',
+      
         
     ) 
 admin.site.register(Mission, MissionAdmin)
@@ -48,20 +48,21 @@ admin.site.register(Mission, MissionAdmin)
 class OverviewAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at',)
     fields = (
-        # 'id',
-        'fiscal_year',
-        'name',
+     
         'department',
+        'name',
+        
     ) 
 admin.site.register(Overview, OverviewAdmin)
 
 class ObjectiveAdmin(admin.ModelAdmin):
     list_display = ('id', 'department', 'name', 'created_at', 'approved','fiscal_year',)
     fields = (
-        # 'id',
+       
         'fiscal_year',
-        'name',
         'department',
+        'name',
+        'focus_area',
         'approved'
 
     ) 
@@ -81,29 +82,38 @@ class FocusAreaAdmin(admin.ModelAdmin):
 admin.site.register(FocusArea, FocusAreaAdmin)
 
 class MeasureAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'objective_id', 'title', 'direction', 'frequency', 'current_year_rate','target_rate','created_at',)
+    list_display = ('id', 'department', 'objective', 'title', 'direction', 'frequency', 'current_year_rate','target_rate','created_at',)
     fields = (
-        # 'id',
+        
         'fiscal_year',
-        'title',
         'department',
+        'objective',
+        'title',
+        'direction',
+        'frequency',
+        'is_number',
+        'target_number',
+        'target_rate',
+       
     ) 
 admin.site.register(Measure, MeasureAdmin)
 
 
 class StrategicInitiativeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'title',  'proposed_completion_date',  'created_at',)
+    list_display = ('id', 'department', 'title',  'description','proposed_completion_date',  'created_at',)
     fields = (
         # 'id',
         'fiscal_year',
-        'title',
         'department',
+        'title',
+        'description',
+        'proposed_completion_date',
 
     ) 
 admin.site.register(StrategicInitiative, StrategicInitiativeAdmin)
 
 admin.site.register(QuarterlyPerformanceData)
-
+admin.site.register(StrategicInitiativeDetail)
 
 admin.site.register(Profile)
 
