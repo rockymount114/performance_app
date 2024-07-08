@@ -31,21 +31,33 @@
           </li>
         {% endif %}
 
-        {% if dept_cmo %}
-        <a class="nav-link" href="{% url 'pdf2' %}?departments={{ selected_department_id }}&fiscal_year={{ selected_fiscal_year_id }}">
-          <i class="fa-regular fa-file-pdf"></i> &nbsp; PDF
-        </a>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="shareDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-share-alt" aria-hidden="true"></i> &nbsp; Share
+          </a>
+          <div class="dropdown-menu" aria-labelledby="shareDropdown">
+            {% if dept_cmo %}
+            <a class="dropdown-item" href="{% url 'pdf2' %}?departments={{ selected_department_id }}&fiscal_year={{ selected_fiscal_year_id }}" target="_blank">
+              <i class="fa-regular fa-file-pdf"></i> &nbsp; Performance Report
+            </a>
+            {% else %}
+            <a class="dropdown-item" href="{% url 'pdf' %}?fiscal_year={{ selected_fiscal_year_id }}" target="_blank">
+              <i class="fa-regular fa-file-pdf"></i> &nbsp; Performance Report
+            </a>
+            {% endif %}
+            <a class="dropdown-item" href="{% url 'pdf3' %}?departments={{ selected_department_id }}&fiscal_year={{ selected_fiscal_year_id }}" target="_blank">
+              <i class="fa-regular fa-file-pdf"></i> &nbsp; Approved Plan
+            </a>
+          </div>
+        </li>
 
-
-        {% else %}
-        <a class="nav-link" href="{% url 'pdf' %}?fiscal_year={{ selected_fiscal_year_id }}"><i class="fa-regular fa-file-pdf"></i> &nbsp; PDF </a>
-        {% endif %}
-
-        {% if user.is_superuser %}
+        <!-- {% if user.is_superuser %}
         <li class="nav-item">
           <a class="nav-link"  href="{% url 'create-focus-area' %}"> <i class="fa fa-plus-circle" aria-hidden="true"></i>  &nbsp; Add Focus Area</a>
         </li>
-       {% endif %}
+       {% endif %} -->
+
+  
         
       </li>
       {% else %}

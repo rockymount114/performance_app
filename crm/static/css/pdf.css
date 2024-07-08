@@ -68,5 +68,18 @@ th .th_col{
 
 
 
+.full-width {
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+.full-width th, .full-width td {
+word-wrap: break-word;
+overflow-wrap: break-word;
+}
+
+.data_col {
+padding: 5px;
+}
 
 
