@@ -33,6 +33,9 @@ from django.contrib.staticfiles import finders
 import json
 from django.db.models import Prefetch
 
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import admin
+from django.utils.text import capfirst
 
 User = get_user_model()
 
@@ -44,7 +47,7 @@ def home(request):
 
 def get_current_fiscal_year():                
     current_month = date.today().month        
-    if current_month > 7:
+    if current_month >= 7:
         fiscal_year = f'FY{date.today().year + 1}'
     else:
         fiscal_year = f'FY{date.today().year}'     
@@ -402,6 +405,7 @@ def my_login(request):
 #                 }
         
        
+       
     
 #         return render(request, template, context=context)
 @login_required(login_url='my-login')
@@ -411,24 +415,28 @@ def dashboard(request):
     TARGET_YEAR = date.today().year + 1
     current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
 
-
     if request.user.is_citymanager_office:
         template = 'webapp/dashboard_performance_officer.html'
         context = get_performance_officer_context(request, current_fiscal_year)
     else:
         template = 'webapp/dashboard_regular_user.html'
         context = get_regular_user_context(request, current_fiscal_year)
-       
+    
     context['current_year'] = CURRENT_YEAR
     context['target_year'] = TARGET_YEAR
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Render the entire dashboard template with the updated context and return as JSON response
-        content = render_to_string(template, context, request=request)
-
-        return JsonResponse({'content': content})
+        if request.user.is_citymanager_office:
+            dashboard_content = render_to_string('webapp/performance_officer_dashboard_content.html', context, request=request)
+        else:
+            dashboard_content = render_to_string('webapp/regular_user_dashboard_content.html', context, request=request)
+        
+        return JsonResponse({
+            'dashboard_content': dashboard_content,
+            'selected_department_id': context['selected_department_id'],
+            'selected_fiscal_year_id': context['selected_fiscal_year_id']
+        })
     else:
-        # Render the full template for regular requests
         return render(request, template, context=context)
         
 
@@ -446,6 +454,18 @@ def get_performance_officer_context(request, current_fiscal_year):
         # Set default fiscal year to the current fiscal year
         fiscal_year_id = current_fiscal_year.id
 
+    try:
+        fiscal_year_id = int(fiscal_year_id) if fiscal_year_id is not None else None
+    except ValueError:
+        fiscal_year_id = None
+
+     # show add button only is current fiscal year
+    if fiscal_year_id == current_fiscal_year.id:
+        show_add_button = True
+    else:
+        show_add_button = False
+        
+
     department = Department.objects.filter(id=department_id).first()
 
     my_mission = Mission.objects.filter(department_id=department_id).last()
@@ -454,6 +474,12 @@ def get_performance_officer_context(request, current_fiscal_year):
     # my_focus_area = FocusArea.objects.all()
     my_focus_area = FocusArea.objects.annotate(objective_count=Count('objective', filter=Q(objective__department_id=department_id, objective__fiscal_year=fiscal_year_id)))
     my_measures = Measure.objects.filter(objective_id__in=my_objectives)
+
+    target_rate_number = {
+        m.id: m.target_number if m.is_number else m.target_rate
+        for m in my_measures
+    }
+
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
     d_objective_names = {i.id: i.name for i in my_objectives}
@@ -472,6 +498,7 @@ def get_performance_officer_context(request, current_fiscal_year):
         'objectives': my_objectives,
         'focus_areas': my_focus_area,
         'grouped_measures': grouped_measures,
+        'target_rate_number':target_rate_number,
         'd_objective_names': d_objective_names,
         'dept_cmo': request.user.id,
         'department': department,
@@ -485,6 +512,9 @@ def get_performance_officer_context(request, current_fiscal_year):
         'd4': quarterly_data['d4'],
         'selected_department_id': department_id,
         'selected_fiscal_year_id': fiscal_year_id,
+        'show_pencil_icon': True,
+        "grant_extension_to_department":True,
+        'show_add_button':show_add_button,
 
         **initiative_data
     }
@@ -493,6 +523,16 @@ def get_performance_officer_context(request, current_fiscal_year):
 
 def get_regular_user_context(request, current_fiscal_year):
     fiscal_year_id = request.GET.get('fiscal_year')
+
+    if not fiscal_year_id:
+        # Set default fiscal year to the current fiscal year
+        fiscal_year_id = current_fiscal_year.id
+
+    try:
+        fiscal_year_id = int(fiscal_year_id) if fiscal_year_id is not None else None
+    except ValueError:
+        fiscal_year_id = None
+
     current_quarter = get_current_quarter()
 
     if current_quarter:
@@ -500,11 +540,13 @@ def get_regular_user_context(request, current_fiscal_year):
     else:
         show_pencil_icon = False
         
-    
+    # show add button only is current fiscal year
+    if fiscal_year_id == current_fiscal_year.id:
+        show_add_button = True
+    else:
+        show_add_button = False
 
-    if not fiscal_year_id:
-        # Set default fiscal year to the current fiscal year
-        fiscal_year_id = current_fiscal_year.id
+
         
     prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
 
@@ -526,6 +568,14 @@ def get_regular_user_context(request, current_fiscal_year):
     # my_focus_area = FocusArea.objects.all()
     my_focus_area = FocusArea.objects.annotate(objective_count=Count('objective', filter=Q(objective__department_id=department_id, objective__fiscal_year=fiscal_year_id)))
     my_measures = Measure.objects.filter(objective_id__in=my_objectives)
+
+    target_rate_number = {
+        m.id: m.target_number if m.is_number else m.target_rate
+        for m in my_measures
+    }
+
+        
+
     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
 
     d_objective_names = {i.id: i.name for i in my_objectives}
@@ -538,6 +588,7 @@ def get_regular_user_context(request, current_fiscal_year):
         'form': DepartmentFilterForm(initial={'fiscal_year': fiscal_year_id}),
         'current_quarter': current_quarter,
         'show_pencil_icon': show_pencil_icon,
+        'show_add_button':show_add_button,
         
         'mission': my_mission,
         'initiatives': my_initiatives,
@@ -545,6 +596,7 @@ def get_regular_user_context(request, current_fiscal_year):
         'objectives': my_objectives,
         'focus_areas': my_focus_area,
         'grouped_measures': grouped_measures,
+        'target_rate_number':target_rate_number,
         'd_objective_names': d_objective_names,
         'dept_head': dept_head,
         'quarterly_data_q1': quarterly_data['quarterly_data_q1'],
@@ -555,7 +607,7 @@ def get_regular_user_context(request, current_fiscal_year):
         'd2': quarterly_data['d2'],
         'd3': quarterly_data['d3'],
         'd4': quarterly_data['d4'],
-    
+        'selected_department_id': department_id,  
         'selected_fiscal_year_id': fiscal_year_id,
         
         "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
@@ -614,14 +666,23 @@ def get_initiative_data(department_id):
 
 @login_required(login_url='my-login')
 def create_objective(request):   
-    department = Department.objects.get(id=request.user.department_id)
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
+    department_id = request.GET.get('department_id')
 
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
+
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
+    print(get_current_fiscal_year())
     if request.method == "POST":
+
         form = CreateObjectiveForm(request.POST, initial={
-                                        'department': department,
+                             
                                         'fiscal_year': fiscal_year,
                                     })
+        
         if form.is_valid():   
             objective = form.save(commit=False)
             objective.department = department
@@ -633,11 +694,12 @@ def create_objective(request):
             return redirect("dashboard")
     else:
         form = CreateObjectiveForm(initial={
-                                        'department': department,
+                                 
                                         'fiscal_year': fiscal_year,
                                     })  
 
-    context = {'form': form}
+    context = {'form': form,
+               'department':department,}
     return render(request, 'webapp/create-objective.html', context=context)
 
 # Create focus area
@@ -663,11 +725,18 @@ def create_focus_area(request):
 
 @login_required(login_url='my-login')
 def create_measure(request):
-    department = Department.objects.get(id=request.user.department_id)
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+    department_id = request.GET.get('department_id')
+
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
+
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
 
     if request.method == "POST":
-        form = CreateMeasureForm(request.POST, user=request.user)
+        form = CreateMeasureForm(request.POST, user=request.user, department_id=department_id)
         if form.is_valid():
             measure = form.save(commit=False)
             measure.department = department
@@ -677,9 +746,10 @@ def create_measure(request):
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
     else:
-        form = CreateMeasureForm(initial={'department': department, 'fiscal_year': fiscal_year}, user=request.user)
+        form = CreateMeasureForm(initial={'department': department, 'fiscal_year': fiscal_year}, user=request.user, department_id=department_id)
 
-    context = {'form': form}
+    context = {'form': form,
+               'department':department,}
     return render(request, 'webapp/create-measure.html', context=context)
 
 
@@ -688,7 +758,12 @@ def create_measure(request):
 @login_required(login_url='my-login')
 def create_initiative(request):
     
-    department = Department.objects.get(id=request.user.department_id)
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
     fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
     
 
@@ -719,30 +794,50 @@ def create_initiative(request):
 # Create Mission statement
 
 @login_required(login_url='my-login')
-def create_mission(request):    
-    department = Department.objects.get(id=request.user.department_id)    
+def create_mission(request):
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
 
-    if request.method=="POST":
-        form=CreateMissionForm(request.POST)
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+
+    if request.method == "POST":
+
+        form = CreateMissionForm(request.POST, initial={
+                                        'fiscal_year': fiscal_year,
+                                    })
         if form.is_valid():
             mission = form.save(commit=False)
+            mission.fiscal_year = fiscal_year
             mission.department = department
             mission.save()
-            messages.success(request, "Your mission was created sucessfully")
+            messages.success(request, "Your mission was created successfully")
             return redirect("dashboard")
     else:
-        form = CreateMissionForm()
-        
-    context = {'form': form}    
-    return render(request, 'webapp/create-mission.html', context=context)
+        form = CreateMissionForm(initial={'fiscal_year': fiscal_year})
 
+    context = {
+        'form': form,
+        'department': department,
+    }
+    return render(request, 'webapp/create-mission.html', context=context)
 # Create Mission statement
 
 @login_required(login_url='my-login')
 def create_overview(request):    
-    department = Department.objects.get(id=request.user.department_id)
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
+    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
     if request.method=="POST":
-        form=CreateOverviewForm(request.POST)
+        form=CreateOverviewForm(request.POST, initial={
+                                        'fiscal_year': fiscal_year,
+                                    })
         if form.is_valid():
             overview = form.save(commit=False)
             overview.department = department
@@ -750,24 +845,31 @@ def create_overview(request):
             messages.success(request, "Your overview was created sucessfully")
             return redirect("dashboard")
     else:
-        form = CreateOverviewForm()
+        form = CreateOverviewForm(initial={'fiscal_year': fiscal_year})
         
-    context = {'form': form}    
+    context = {'form': form,
+               'department': department,}    
     return render(request, 'webapp/create-overview.html', context=context)
 
 # Create quaterly data for depterment and objectives
 
 @login_required(login_url='my-login')
 def create_quarterly_data(request,pk,quarter):
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
 
     initial_data = {
         'objective':Measure.objects.get(id=pk).objective,
-        'department':request.user.department_id,
+        'department':department,
         'measure':Measure.objects.get(id=pk),
         'quarter':quarter,
     }
     
-    department_id = Department.objects.get(id = request.user.department_id)
+
     objective_id = Measure.objects.get(id=pk).objective
     measure = Measure.objects.get(id=pk)
     quarter = quarter
@@ -779,7 +881,7 @@ def create_quarterly_data(request,pk,quarter):
         form=CreateQuarterlyPerformanceDataForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.department = department_id
+            instance.department = department
             instance.objective = objective_id
             instance.measure = measure
             instance.quarter = quarter
@@ -1242,359 +1344,203 @@ class GeneratePdf2(View):
        
 
         return HttpResponse("Page Not Found")
-
-
-# class GeneratePdf2(View):
-#     @login_required
-#     def get(self, request, *args, **kwargs):
-#         if not request.user.is_citymanager_office:
-#             return redirect('my-login')
-
-#         department_id = request.GET.get('departments')
-#         fiscal_year_id = request.GET.get('fiscal_year')
-
-#         if not department_id or not fiscal_year_id:
-#             return redirect('dashboard')
-
-#         department = get_object_or_404(Department, id=department_id)
-#         fiscal_year = get_object_or_404(FiscalYear, pk=fiscal_year_id)
-
-#         current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-#         prev_fiscal_year = FiscalYear.objects.get(name=get_prev_fiscal_year())
-
-#         user = User.objects.filter(department_id=department_id, is_dept_head=False, is_staff=True).first()
-#         username = user.get_full_name() if user else ""
-#         user_email = user.email if user else ""
-
-#         dept_head = User.objects.filter(department_id=department_id, is_dept_head=True).first()
-#         dept_head_name = f"{dept_head.first_name} {dept_head.last_name}" if dept_head else ''
-#         dept_head_email = dept_head.email if dept_head else ''
-
-#         image_path = finders.find('./img/city_logo.png')
-#         css_path = os.path.join(settings.BASE_DIR, 'static', 'css', 'pdf.css')
-#         with open(css_path, 'r', encoding='utf-8') as css_file:
-#             css_content = css_file.read()
-
-#         my_mission = Mission.objects.filter(department_id=department_id).last()
-#         my_overview = Overview.objects.filter(department_id=department_id).last()
-
-#         my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
-#         my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=fiscal_year, approved=True)
-#         my_measures = Measure.objects.filter(objective_id__in=my_objectives, approved=True, fiscal_year=fiscal_year)
-#         my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
-
-#         d_objective_names = {obj.id: obj.name for obj in my_objectives}
-
-#         grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
-#         grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-
-#         quarterly_data = {
-#             "Q1": QuarterlyPerformanceData.objects.filter(department_id=department_id, quarter="Q1"),
-#             "Q2": QuarterlyPerformanceData.objects.filter(department_id=department_id, quarter="Q2"),
-#             "Q3": QuarterlyPerformanceData.objects.filter(department_id=department_id, quarter="Q3"),
-#             "Q4": QuarterlyPerformanceData.objects.filter(department_id=department_id, quarter="Q4"),
-#         }
-
-#         quarterly_percentages = {}
-#         for quarter, data in quarterly_data.items():
-#             quarterly_percentages[quarter] = {
-#                 item.measure_id: item.get_percentage for item in data
-#             }
-
-#         annual_percentages = {}
-#         for measure in my_measures:
-#             measure_id = measure.id
-#             q1_percent = float(quarterly_percentages["Q1"].get(measure_id, '0').replace(' % ', '')) / 100
-#             q2_percent = float(quarterly_percentages["Q2"].get(measure_id, '0').replace(' % ', '')) / 100
-#             q3_percent = float(quarterly_percentages["Q3"].get(measure_id, '0').replace(' % ', '')) / 100
-#             q4_percent = float(quarterly_percentages["Q4"].get(measure_id, '0').replace(' % ', '')) / 100
-#             annual_percent = (q1_percent + q2_percent + q3_percent + q4_percent) / 4
-#             annual_percentages[measure_id] = f"{annual_percent:0.0%}"
-
-#         initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id=department_id)
-
-#         initiative_status = {
-#             data.strategic_initiative.id: data.status for data in initiative_detail_data
-#         }
-
-#         initiative_desc_of_s = {
-#             data.strategic_initiative.id: data.description_project_status for data in initiative_detail_data
-#         }
-
-#         initiative_expected_impact = {
-#             data.strategic_initiative.id: data.expected_impact for data in initiative_detail_data
-#         }
-
-#         initiative_notes = {
-#             data.strategic_initiative.id: data.notes for data in initiative_detail_data
-#         }
-
-#         data = {
-#             "page_orientation": "landscape",
-#             "report_name": "Performance Report",
-#             "name": "City of Rocky Mount",
-#             "department_name": department,
-#             "username": username,
-#             "user_email": user_email,
-#             "dept_head_name": dept_head_name,
-#             "dept_head_email": dept_head_email,
-#             "current_fiscal_year": current_fiscal_year,
-#             "prev_fiscal_year": prev_fiscal_year,
-#             "fiscal_year": fiscal_year,
-#             'city_logo': image_path,
-#             'css_content': css_content,
-#             "missions": my_mission,
-#             "overviews": my_overview,
-#             "objectives": my_objectives,
-#             "focus_areas": my_focus_area,
-#             "measures": my_measures,
-#             "initiatives": my_initiatives,
-#             'grouped_measures': grouped_measures,
-#             'quarterly_data': quarterly_data,
-#             'quarterly_percentages': quarterly_percentages,
-#             'd_objective_names': d_objective_names,
-#             'annual_percentages': annual_percentages,
-#             'initiative_status': initiative_status,
-#             'initiative_desc_of_s': initiative_desc_of_s,
-#             'initiative_expected_impact': initiative_expected_impact,
-#             'initiative_notes': initiative_notes,
-#         }
-
-#         pdf = render_to_pdf('webapp/report.html', data)
-#         if pdf:
-#             response = HttpResponse(pdf, content_type='application/pdf')
-#             filename = f"{data['department_name']} - Performance Report {data['current_fiscal_year']}.pdf"
-#             content = f"inline; filename={filename}"
-#             response['Content-Disposition'] = content
-#             return response
-
-#         return HttpResponse("Page Not Found")
-
-### Render html for downloading pdf
-
-# def render_pdf(request):
-#     template_path = 'webapp/report.html'
     
-#     department_id = request.user.department_id
-#     department = Department.objects.filter(id=department_id).first()
-#     current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
 
-#     user_email = User.objects.get(department_id=department_id)
-#     dept_head = User.objects.get(department_id=department_id, is_dept_head=True)        
-#     dept_head_name = f"{dept_head.first_name} {dept_head.last_name}"
-#     dept_head_email = User.objects.get(department_id=department_id, is_dept_head=True)        
 
-#     my_mission = Mission.objects.filter(department_id=department_id).last()              
-#     my_overview = Overview.objects.filter(department_id=department_id).last()
-#     my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-#     my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-#     my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
-#     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-
-#     d_objective_names = {}
-#     for i in my_objectives:
-#         d_objective_names.update({i.id:i.name})
+# Approved Plan
+class GeneratePdf3(View):
+    def get(self, request, *args, **kwargs):
         
-#     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
-#     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-    
-#     quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
-#     quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
-#     quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
-#     quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
-    
-#     d1 = {}
-#     for i in quarterly_data_q1:
-#         d1.update({i.measure_id:i.get_percentage})
-
-#     d2 = {}
-#     for i in quarterly_data_q2:
-#         d2.update({i.measure_id:i.get_percentage})
-        
-#     d3 = {}
-#     for i in quarterly_data_q3:
-#         d3.update({i.measure_id:i.get_percentage})
-        
-#     d4 = {}
-#     for i in quarterly_data_q4:
-#         d4.update({i.measure_id:i.get_percentage})
-
-#     initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id = department_id)
-
-#     initiative_status = {}
-
-#     for i in initiative_detail_data:
-#         initiative_status.update({i.strategic_initiative.id:i.status})
-
-#     initiative_desc_of_s = {}
-
-#     for i in initiative_detail_data:
-#         initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
-
-#     initiative_expected_impact = {}
-
-#     for i in initiative_detail_data:
-#         initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
-
-#     initiative_notes = {}
-
-#     for i in initiative_detail_data:
-#         initiative_notes.update({i.strategic_initiative.id:i.notes})
+        if not request.user.is_authenticated and not request.user.is_citymanager_office:
+            return redirect('my-login')
+        else:
             
-#     context = {
-        
-#                 "report_name":"Performance Report",
-#                 "name": department,
-#                 'department': department,
-#                 "department_name": department,
-#                 "username": request.user.first_name + " " + request.user.last_name,
-#                 "user_email": user_email,
-#                 "dept_head_name":dept_head_name,
-#                 "dept_head_email":dept_head_email,
-                
-                
-#                 "missions": my_mission,
-#                 "overviews": my_overview,
-#                 "objectives": my_objectives,
-#                 "focus_areas": my_focus_area,
-#                 "measures": my_measures,
-#                 "initiatives": my_initiatives,
-                
-#                 'grouped_measures': grouped_measures,
-#                 'quarterly_data_q1':quarterly_data_q1,
-#                 'quarterly_data_q2':quarterly_data_q2,
-#                 'quarterly_data_q3':quarterly_data_q3,
-#                 'quarterly_data_q4':quarterly_data_q4,
-#                 'd1':d1,
-#                 'd2':d2,
-#                 'd3':d3,
-#                 'd4':d4,
-#                 'd_objective_names':d_objective_names,
-
-#                 'initiative_status': initiative_status,
-#                 'initiative_desc_of_s': initiative_desc_of_s,
-#                 'initiative_expected_impact': initiative_expected_impact,
-#                 'initiative_notes':initiative_notes,
-#     }
-
-#     return render(request,'webapp/report.html', context = context)
-
-
-# For download pdf automaticlly
-
-# @login_required(login_url='my-login')
-# def render_pdf_view(request):
-#     template_path = 'webapp/report.html'
-#     department_id = request.user.department_id
-#     department = Department.objects.filter(id=department_id).first()
-#     current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
-
-#     user_email = User.objects.get(department_id=department_id)
-#     dept_head = User.objects.get(Q(is_dept_head=True) & Q(department_id=department_id))        
-
-#     my_mission = Mission.objects.filter(department_id=department_id).last()              
-#     my_overview = Overview.objects.filter(department_id=department_id).last()
-#     my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=current_fiscal_year.id)
-#     my_focus_area = FocusArea.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-#     my_measures = Measure.objects.filter(objective_id__in= my_objectives) 
-#     my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
-
-#     d_objective_names = {}
-#     for i in my_objectives:
-#         d_objective_names.update({i.id:i.name})
-        
-#     grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
-#     grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
-    
-#     quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
-#     quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
-#     quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
-#     quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
-    
-#     d1 = {}
-#     for i in quarterly_data_q1:
-#         d1.update({i.measure_id:i.get_percentage})
-
-#     d2 = {}
-#     for i in quarterly_data_q2:
-#         d2.update({i.measure_id:i.get_percentage})
-        
-#     d3 = {}
-#     for i in quarterly_data_q3:
-#         d3.update({i.measure_id:i.get_percentage})
-        
-#     d4 = {}
-#     for i in quarterly_data_q4:
-#         d4.update({i.measure_id:i.get_percentage})
-
-#     initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id = department_id)
-
-#     initiative_status = {}
-
-#     for i in initiative_detail_data:
-#         initiative_status.update({i.strategic_initiative.id:i.status})
-
-#     initiative_desc_of_s = {}
-
-#     for i in initiative_detail_data:
-#         initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
-
-#     initiative_expected_impact = {}
-
-#     for i in initiative_detail_data:
-#         initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
-
-#     initiative_notes = {}
-
-#     for i in initiative_detail_data:
-#         initiative_notes.update({i.strategic_initiative.id:i.notes})
+            department_id = request.GET.get('departments') 
+            fiscal_year_id = request.GET.get('fiscal_year')  
             
-#     context = {
+            fiscal_year = FiscalYear.objects.get(pk=fiscal_year_id)
+            
+            if not department_id:
+                department_id = request.user.department_id   
         
-#                 "report_name":"Performance Report",
-#                 "name": department,
-#                 'department': department,
-#                 "department_name": department,
-#                 "username": request.user.first_name + " " + request.user.last_name,
-#                 "user_email": user_email,
-#                 "dept_head":User.get_head_name,
+            department_name = Department.objects.filter(id=department_id).last()
+            
+            current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
+            prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
+            
+            try:
+                # need to fix if has multiple members in one department, such as 3 or 4 peopele, add is_data_inputor???
+                user = User.objects.get(department_id=department_id, is_manager=True)
+                username = user.get_full_name()
+                user_email = user.email
+
+            except User.DoesNotExist:
+                username = ""
+                user_email = ""            
+            
+            # to check if set more than 2 dept header in one dept
+            dept_head_query = {
+                'department_id': department_id,
+                'is_dept_head': True
+            }
+            
+            try:
+                dept_head = User.objects.get(**dept_head_query)
+                dept_head_name = f"{dept_head.first_name} {dept_head.last_name}"
+                dept_head_email = dept_head.email
+            except User.DoesNotExist:
+                dept_head_name = ''
+                dept_head_email = ''
+            
+            image_path = finders.find('./img/city_logo.png')      
+            css_path = os.path.join(settings.BASE_DIR, 'static', 'css', 'pdf.css')
+            with open(css_path, 'r', encoding='utf-8') as css_file:
+                css_content = css_file.read()
+
+            my_mission = Mission.objects.filter(department_id=department_id).last()              
+            my_overview = Overview.objects.filter(department_id=department_id).last()
+            
+            my_objectives = Objective.objects.filter(department_id=department_id, approved=True, fiscal_year=fiscal_year)
+            
+            objectives = Objective.objects.filter(
+            department_id=department_id,
+            fiscal_year_id=fiscal_year_id).prefetch_related(Prefetch('focus_area', queryset=FocusArea.objects.all()))
+
+            my_focus_area = []
+            for objective in objectives:
+                my_focus_area.extend(objective.focus_area.all())
+
+            # Remove duplicate focus areas 
+            my_focus_area = list(set(my_focus_area))
+            # Order focus areas alphabetically by name
+            my_focus_area = sorted(my_focus_area, key=lambda x: x.name) 
+
+
+            my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
+            my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
+            print(my_measures)
+            
+            d_objective_names = {}
+            for i in my_objectives:
+                d_objective_names.update({i.id:i.name})
+                
+            grouped_measures = sorted(my_measures, key=attrgetter('objective_id'))
+            grouped_measures = {objective_id: list(measures) for objective_id, measures in groupby(grouped_measures, key=attrgetter('objective_id'))}
+            
+            # quarterly_data_q1 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q1")
+            # quarterly_data_q2 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q2")
+            # quarterly_data_q3 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q3")
+            # quarterly_data_q4 = QuarterlyPerformanceData.objects.filter(department_id=department_id,quarter="Q4")
+            
+            # d1 = {}
+            # for i in quarterly_data_q1:
+            #     d1.update({i.measure_id:i.get_percentage})
+
+            # d2 = {}
+            # for i in quarterly_data_q2:
+            #     d2.update({i.measure_id:i.get_percentage})
+                
+            # d3 = {}
+            # for i in quarterly_data_q3:
+            #     d3.update({i.measure_id:i.get_percentage})
+                
+            # d4 = {}
+            # for i in quarterly_data_q4:
+            #     d4.update({i.measure_id:i.get_percentage})
+
+            initiative_detail_data = StrategicInitiativeDetail.objects.filter(department_id = department_id)
+
+            initiative_status = {}
+
+            for i in initiative_detail_data:
+                initiative_status.update({i.strategic_initiative.id:i.status})
+
+            initiative_desc_of_s = {}
+
+            for i in initiative_detail_data:
+                initiative_desc_of_s.update({i.strategic_initiative.id:i.description_project_status})
+
+            initiative_expected_impact = {}
+
+            for i in initiative_detail_data:
+                initiative_expected_impact.update({i.strategic_initiative.id:i.expected_impact})
+
+            initiative_notes = {}
+
+            for i in initiative_detail_data:
+                initiative_notes.update({i.strategic_initiative.id:i.notes})
+             
+            # Calculate the percentages for each quarter per measure_id
+            
+           
+            # annual_percentages = {}
+            # for measure in my_measures:
+            #     measure_id = measure.id
+            #     measure_id = measure.id
+            #     q1_percent = float((d1.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+            #     q2_percent = float((d2.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+            #     q3_percent = float((d3.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+            #     q4_percent = float((d4.get(measure_id, '0') or '0').replace(' % ', '')) / 100
+            #     annual_percent = (q1_percent + q2_percent + q3_percent + q4_percent) / 4
+            #     annual_percentages[measure_id] = f"{annual_percent:0.0%}"
+
+           
+                
+            data = {
+                "page_orientation": "landscape",
+                "report_name":"Performance Report",
+                "name": "City of Rocky Mount", 
+                "department_name": department_name,
+                "username": username,
+                "user_email": user_email,
+                "dept_head_name":dept_head_name,
+                "dept_head_email": dept_head_email,
+                
+                "current_fiscal_year":current_fiscal_year,
+                "prev_fiscal_year":prev_fiscal_year,
+                "fiscal_year": fiscal_year, # fiscal year when cmo click from dashboard form
+                'city_logo': image_path,
+                'css_content': css_content,
                 
                 
-#                 "missions": my_mission,
-#                 "overviews": my_overview,
-#                 "objectives": my_objectives,
-#                 "focus_areas": my_focus_area,
-#                 "measures": my_measures,
-#                 "initiatives": my_initiatives,
+                "missions": my_mission,
+                "overviews": my_overview,
+                "objectives": my_objectives,
+                "focus_areas": my_focus_area,
+                "measures": my_measures,
+                "initiatives": my_initiatives,
                 
-#                 'grouped_measures': grouped_measures,
-#                 'quarterly_data_q1':quarterly_data_q1,
-#                 'quarterly_data_q2':quarterly_data_q2,
-#                 'quarterly_data_q3':quarterly_data_q3,
-#                 'quarterly_data_q4':quarterly_data_q4,
-#                 'd1':d1,
-#                 'd2':d2,
-#                 'd3':d3,
-#                 'd4':d4,
-#                 'd_objective_names':d_objective_names,
+                'grouped_measures': grouped_measures,
+                # 'quarterly_data_q1':quarterly_data_q1,
+                # 'quarterly_data_q2':quarterly_data_q2,
+                # 'quarterly_data_q3':quarterly_data_q3,
+                # 'quarterly_data_q4':quarterly_data_q4,
+                # 'd1':d1,
+                # 'd2':d2,
+                # 'd3':d3,
+                # 'd4':d4,
+                # 'annual_percentages': annual_percentages,
+                
+                'd_objective_names':d_objective_names,
 
-#                 'initiative_status': initiative_status,
-#                 'initiative_desc_of_s': initiative_desc_of_s,
-#                 'initiative_expected_impact': initiative_expected_impact,
-#                 'initiative_notes':initiative_notes,
-#     }
+                'initiative_status': initiative_status,
+                'initiative_desc_of_s': initiative_desc_of_s,
+                'initiative_expected_impact': initiative_expected_impact,
+                'initiative_notes':initiative_notes,
+        
+            }
+            
+            pdf = render_to_pdf('webapp/report3.html',data)
 
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+            if pdf:
+                response=HttpResponse(pdf,content_type='application/pdf')
+                filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                content = "inline; filename= %s" %(filename)
+                response['Content-Disposition']=content
+                return response
+       
 
-#     template = get_template(template_path)
-#     html = template.render(context)
-
-#     pisa_status = pisa.CreatePDF(
-#     html, dest=response)
-
-#     if pisa_status.err:
-#         return HttpResponse('We had some errors <pre>' + html + '</pre>')
+        return HttpResponse("Page Not Found")
     
            
 # Create profile view
@@ -1732,173 +1678,6 @@ def get_pending_approvals(department_id, fiscal_year_id):
     return objectives_pending_approval, measures_pending_approval
 
     
-# @login_required(login_url='my-login')
-# def approvals(request):
-#     department_id_fetched = request.GET.get('department_id')
-#     fiscal_year_id_fetched =  request.GET.get('fiscal_year_id')
-
-    # # Check if any record needs to be approved
-    # approve_objective = request.GET.get('approve_objective')
-    # approve_measure = request.GET.get('approve_measure')
-    # approve_focus_area = request.GET.get('approve_focus_area')
-    # print(approve_objective)
-    
-
-    # # approve
-    # if approve_objective:
-    #     Objective.objects.filter(pk=int(approve_objective)).update(approved=True)
-
-    # if approve_measure:
-    #     Measure.objects.filter(pk=int(approve_measure)).update(approved=True)
-        
-    # if approve_focus_area:
-    #     FocusArea.objects.filter(pk=int(approve_focus_area)).update(approved=True)
-
-    # # Pass Pre-checked records
-    # prechecked_objectives = request.session.get('prechecked_objectives', [])
-    # prechecked_measures = request.session.get('prechecked_measures', [])
-    # prechecked_focus_areas = request.session.get('prechecked_focus_areas', [])
-
- 
-    # if request.method == "POST":
-    #     objectives_id_list = request.POST.getlist('objective_boxes')
-    #     measures_id_list = request.POST.getlist('measure_boxes')
-    #     focus_areas_id_list = request.POST.getlist('focus_area_boxes')
-        
-    #     # update the db objectives
-    #     for id in objectives_id_list:
-    #         print(id)
-    #         Objective.objects.filter(pk=int(id)).update(approved=True)
-            
-
-    #     # update the db measures 
-    #     for id in measures_id_list:
-    #         Measure.objects.filter(pk=int(id)).update(approved=True)
-        
-    #     # update the db focusareas
-    #     for id in focus_areas_id_list:
-    #         FocusArea.objects.filter(pk=int(id)).update(approved=True)
-
-    #     # Clear session variables
-    #     if 'prechecked_objectives' in request.session:
-    #         del request.session['prechecked_objectives']
-    #     if 'prechecked_measures' in request.session:
-    #         del request.session['prechecked_measures']
-    #     if 'prechecked_focus_areas' in request.session:
-    #         del request.session['prechecked_focus_areas']
-
-    #     messages.success(request,("Your approvals were successfully submitted!"))
-
-#     if department_id_fetched and fiscal_year_id_fetched:
-#         objectives_pending_approval = Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
-#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
-#         measures_pending_approval = Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched)
-#     elif department_id_fetched:
-#         # print(department_id_fetched)
-#         objectives_pending_approval = Objective.objects.filter(approved=False, department_id=department_id_fetched)
-#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, department_id=department_id_fetched)
-#         measures_pending_approval = Measure.objects.filter(approved=False, department_id=department_id_fetched)
-#     elif fiscal_year_id_fetched:
-#         # print(fiscal_year_id_fetched)
-#         objectives_pending_approval = Objective.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
-#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
-#         measures_pending_approval = Measure.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched)
-#     else:
-#         objectives_pending_approval = Objective.objects.filter(approved=False)
-#         focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
-#         measures_pending_approval = Measure.objects.filter(approved=False)
-
-#     context = {
-#         'form1': ApprovalsFilterForm(),
-#         'objectives': objectives_pending_approval,
-#         'focus_areas': focus_areas_pending_approval,
-#         'measures': measures_pending_approval,
-#         'prechecked_data': json.dumps({
-#             'prechecked_objectives': prechecked_objectives,
-#             'prechecked_measures': prechecked_measures,
-#             'prechecked_focus_areas': prechecked_focus_areas,
-#         })
-#     }
-
-#     return render(request, 'webapp/approvals.html', context=context)
-    
-    # if department_id_fetched and fiscal_year_id_fetched:
-    #     objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name', 'department__name','created_at','created_by'))
-    #     focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-    #     measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched, fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
-        
-    #     context = {
-      
-    #         'objectives':objectives_pending_approval,
-    #         'focus_areas':focus_areas_pending_approval,
-    #         'measures':measures_pending_approval,
-    #         'prechecked_data':json.dumps({
-    #         'prechecked_objectives': prechecked_objectives,
-    #         'prechecked_measures': prechecked_measures,
-    #         'prechecked_focus_areas': prechecked_focus_areas,
-    #         })
-
-    #     }
-    #     return JsonResponse(context)
-    
-    # elif department_id_fetched:
-    #      objectives_pending_approval = list(Objective.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-    #      focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-    #      measures_pending_approval = list(Measure.objects.filter(approved=False, department_id=department_id_fetched).values('id', 'title', 'objective__name', 'fiscal_year__name','department__name','created_at','created_by'))
-
-    #      context = {
-      
-    #         'objectives':objectives_pending_approval,
-    #         'focus_areas':focus_areas_pending_approval,
-    #         'measures':measures_pending_approval,
-    #         'prechecked_data':json.dumps({
-    #         'prechecked_objectives': prechecked_objectives,
-    #         'prechecked_measures': prechecked_measures,
-    #         'prechecked_focus_areas': prechecked_focus_areas,
-    #         })
-
-    #     }
-    #      return JsonResponse(context)
-    # elif fiscal_year_id_fetched:
-    #      objectives_pending_approval = list(Objective.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-    #      focus_areas_pending_approval = list(FocusArea.objects.filter(approved=False, fiscal_year_id=fiscal_year_id_fetched).values('id', 'name', 'fiscal_year__name','department__name','created_at','created_by'))
-    #      measures_pending_approval = list(Measure.objects.filter(approved=False,  fiscal_year_id=fiscal_year_id_fetched).values('id', 'title', 'fiscal_year__name','objective__name', 'department__name','created_at','created_by'))
-      
-
-    #      context = {
-      
-    #         'objectives':objectives_pending_approval,
-    #         'focus_areas':focus_areas_pending_approval,
-    #         'measures':measures_pending_approval,
-    #         'prechecked_data':json.dumps({
-    #         'prechecked_objectives': prechecked_objectives,
-    #         'prechecked_measures': prechecked_measures,
-    #         'prechecked_focus_areas': prechecked_focus_areas,
-    #         })
-
-    #     }
-    #      return JsonResponse(context)
-    # else:
-    
-    #     objectives_pending_approval = Objective.objects.filter(approved=False)
-    #     focus_areas_pending_approval = FocusArea.objects.filter(approved=False)
-    #     measures_pending_approval = Measure.objects.filter(approved=False)
-
-    #     context = {
-    #         'form1': ApprovalsFilterForm(),
-    #         'objectives':objectives_pending_approval,
-    #         'focus_areas':focus_areas_pending_approval,
-    #         'measures':measures_pending_approval,
-            
-    #         'prechecked_objectives': prechecked_objectives,
-    #         'prechecked_measures': prechecked_measures,
-    #         'prechecked_focus_areas': prechecked_focus_areas,
-            
-   
-    #     }
-       
-    #     return render(request,'webapp/approvals.html', context = context)
-    
     
     
 @login_required
@@ -1933,28 +1712,27 @@ def update_session(request):
         return JsonResponse({'message': 'Session updated successfully'})
 
 
-    
-
-
-
-
-
-
 
 
 # Create initiative detail
 
 @login_required(login_url='my-login')
 def create_initiative_detail(request,pk):
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = Department.objects.get(id=request.user.department_id)
+
 
     initial_data = {
-        'department':request.user.department_id,
+        'department':department,
         'strategic_initiative':StrategicInitiative.objects.get(id=pk),
       
     
     }
 
-    department = Department.objects.get(id=request.user.department_id)
+
     strategic_initiative = StrategicInitiative.objects.get(id=pk)
     
 
@@ -2019,9 +1797,10 @@ def view_measure_info(request,pk):
         
     #  department = Department.objects.get(id=request.user.department_id)
      measure = Measure.objects.get(id=pk)
+     target_rate_number = measure.target_number if measure.is_number else measure.target_rate
      
      context = {
-        # 'department':department,
+        'target_rate_number':target_rate_number,
         'measure':measure,
         
     } 
@@ -2069,9 +1848,13 @@ def view_measure_info_regular(request,pk):
      measure = Measure.objects.get(id=pk)
      objective = Objective.objects.get(pk=measure.objective.id)
 
+     target_rate_number = measure.target_number if measure.is_number else measure.target_rate
+
+
      context = {
    
         'measure':measure,
+        'target_rate_number':target_rate_number,
         'objective':objective,
     } 
     
@@ -2176,6 +1959,45 @@ def grant_extension(request):
 
 
     # return render(request,'webapp/grant-extension.html')
+
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_citymanager_office or u.is_authenticated and u.is_superuser)
+def admin_forms(request):
+    models = [Mission, Overview, FocusArea, Objective, Measure, QuarterlyPerformanceData, StrategicInitiative, StrategicInitiativeDetail]
+    model_names_path = [model.__name__ for model in models]
+
+    d_names = {}
+    for i in models:
+        d_names.update({i.__name__: capfirst(i._meta.verbose_name.replace('_', ' '))})
+
+    form = None  # Initialize form with a default value
+
+    if request.method == 'POST':
+        selected_model_name = request.POST.get('selected_model')
+        selected_model = next((model for model in models if model.__name__ == selected_model_name), None)
+        if selected_model:
+            model_admin = admin.site._registry[selected_model]
+            form = model_admin.get_form(request)(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "The model instance was successfully created!")
+                return redirect('dashboard')
+        
+    else:
+        selected_model_name = request.GET.get('model')
+        selected_model = next((model for model in models if model.__name__ == selected_model_name), None)
+        if selected_model:
+            model_admin = admin.site._registry[selected_model]
+            form = model_admin.get_form(request)()
+
+    context = {
+        'model_names_path': model_names_path,
+        'd_names': d_names,
+        'selected_model_name': selected_model_name,
+        'form': form,
+    }
+    return render(request, 'webapp/admin_forms.html', context)
+
 
 
 # - User logout

@@ -30,7 +30,7 @@ User = get_user_model()
 
 def get_current_fiscal_year():                
     current_month = date.today().month        
-    if current_month > 7:
+    if current_month >= 7:
         fiscal_year = f'FY{date.today().year + 1}'
     else:
         fiscal_year = f'FY{date.today().year}'     
@@ -132,9 +132,9 @@ class CustomUserChangeForm(UserChangeForm):
 
 class CreateMeasureForm(forms.ModelForm):
     title = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 500 characters'}),
         label="Metric name",
-        max_length=255,
+        max_length=500,
         required=True,
     )
     department = forms.ModelChoiceField(
@@ -150,12 +150,20 @@ class CreateMeasureForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        department_id = kwargs.pop('department_id', None)
         super().__init__(*args, **kwargs)
         if user:
-            department_id = user.department_id
+            if department_id:
+                # Department ID passed from dropdown (chief performance officer)
+                self.fields['department'].initial = department_id
+            else:
+                # Regular user, set department based on user's department
+                self.fields['department'].initial = user.department_id
+
             current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+            print(current_fiscal_year)
             self.fields['objective'].queryset = Objective.objects.filter(
-                department_id=department_id,
+                department_id=self.fields['department'].initial,
                 fiscal_year=current_fiscal_year,
                 approved=True
             )
@@ -173,9 +181,9 @@ class CreateMeasureForm(forms.ModelForm):
 
 class CreateInitiativeForm(forms.ModelForm):
     title = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 255 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 500 characters'}),
         label="Please input Initative here",
-        max_length=255,
+        max_length=500,
         required=True,
     )
 
@@ -211,15 +219,14 @@ class CreateMissionForm(forms.ModelForm):
 
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
 
     class Meta:
-        model = Mission    
-        # fields = "__all__"
-        fields = ['name']  
-        exclude = ['department']  
+        model = Mission
+        fields = ['name', 'fiscal_year']
+      
 
 class CreateOverviewForm(forms.ModelForm):
     name = forms.CharField(
@@ -231,7 +238,7 @@ class CreateOverviewForm(forms.ModelForm):
 
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
 
@@ -243,9 +250,9 @@ class CreateOverviewForm(forms.ModelForm):
 
 class CreateObjectiveForm(forms.ModelForm):
     name = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 300 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 500 characters'}),
         label='Objective title',
-        max_length=300,
+        max_length=500,
         required=True,
 
     )
@@ -278,9 +285,9 @@ class CreateObjectiveForm(forms.ModelForm):
  
 class CreateFocusAreaForm(forms.ModelForm):
     name = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Focus Area text here, max 300 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Focus Area text here, max 500 characters'}),
         label='Focus Areas',
-        max_length=300,
+        max_length=500,
         required=False,
     )
 
@@ -378,9 +385,9 @@ class StrategicInitiativeDetailForm(forms.ModelForm):
 #  - Update Measures
 class UpdateMeasureForm(forms.ModelForm):
     title = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 200 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Measure Metrics here, max 500 characters'}),
         label="Metric name",
-        max_length=255,
+        max_length=500,
         required=True,
     )
     department = forms.ModelChoiceField(
@@ -414,9 +421,9 @@ class UpdateMeasureForm(forms.ModelForm):
 # -Update Objectives
 class UpdateObjectiveForm(forms.ModelForm):
     name = forms.CharField(
-        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 300 characters'}),
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Objectives text here, max 500 characters'}),
         label='Objective title',
-        max_length=300,
+        max_length=500,
         required=True,
 
     )

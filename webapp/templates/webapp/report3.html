@@ -1,0 +1,211 @@
+{% block title %}PDF{% endblock title %}
+{% load static %}
+
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_name }}</title>
+    <link rel="stylesheet" href="{% static 'css/pdf.css' %}">
+    <style>   {{ css_content|safe }}   </style>    
+
+</head>
+<body class="pdf-body">
+    <header>
+        <div class="header-container">
+            <img src="{{ city_logo }}" alt="City logo" width="120">
+            <h1 class="pdf_title">{{department_name}} - {{ report_name }} - {{fiscal_year}}</h1>
+        </div>
+    </header>
+
+    <p><b>Name:</b> {{ username }} <b>Email:</b> {{user_email}}</p>
+
+    <p><b>Department:</b> {{ department_name }} <b>Dept Head Name:</b>{{dept_head_name}} <b>Dept Head Email:</b>{{dept_head_email}}</p>
+    
+    <!--Mission & Overview start -->
+    <section class="section"> 
+        <div class="missionstatement">
+          <div class="row">    
+           
+            {% if missions %}  
+            <div class="col">
+              <div class="card text-black  mb-1" style="max-width: 100%;">
+                  <div class="card-header bg-info-subtle"><b>Mission Statement: </b>  </div>
+                  <div class="card-body">
+                    <p class="card-text data">
+                      {{missions}}   
+                    </p>
+                  </div>
+                </div>
+            </div>      
+    
+    
+            {% endif%}  
+    
+            {% if overviews %}  
+            <div class="col">
+              <div class="card text-black  mb-1" style="max-width: 100%;">
+                  <div class="card-header bg-info-subtle"><b>Overview: </b>  </div>
+                  <div class="card-body">    
+                    <p class="card-text data">
+                      {{overviews}}   
+                    </p>
+                  </div>
+                </div>
+            </div>            
+            {% endif%}
+    
+          </div>
+        </div>
+      </section>
+
+      <!--Mission & Overview end -->
+
+      <section>
+        <!--Strategic Objectives & Focus area start-->
+        <div class="row">
+            <div class="col">
+                <div class="list-group mb-2">
+                    <li class="list-group-item bg-info-subtle">
+                        <b>STRATEGIC OBJECTIVES: </b>
+                    </li>
+                    {% for objective in objectives %}
+                    <ul style="list-style-type:square">
+                        <li class="data">{{objective}}</li>
+                    </ul>
+                    {% endfor %}
+                </div>
+                <br>
+                <div class="list-group">
+                    <li class="list-group-item bg-info-subtle">
+                        <b>FOCUS AREAS IMPACTED:</b>
+                    </li>
+                    {% for focus_area in focus_areas%}
+                    <ul style="list-style-type:square">
+                        <li class="data">{{focus_area}}</li>
+                    </ul>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+      <!--Strategic Objectives & Focus area end -->
+
+
+      
+      <!--Measure start -->
+
+      <section class="Metrc-table">
+        <div class="wrapper">          
+        
+            {% if grouped_measures %}
+            {% for objective_id, measures in grouped_measures.items %}
+            <h5 class="objective-header">Objective: {{ d_objective_names|get_item:objective_id }}</h5>
+            <table class="table table-hover table-bordered full-width">
+              <thead>
+                  <tr>
+                      <th class="title_column">Measure</th>
+                      <th class="centered-header">Direction</th>
+                      <th class="centered-header">Frequency</th>
+                      <th class="centered-header">{{prev_fiscal_year}} Actual</th>
+                      <th class="centered-header">{{current_fiscal_year}} Target</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for measure in measures %}
+                  <tr>
+                      <td class="data_col">{{ measure.title }}</td>
+                      <td class="data_col centered-header">{{ measure.direction }}</td>
+                      <td class="data_col centered-header">{{ measure.frequency }}</td>
+                      <td class="data_col centered-header">{{ measure.current_year_rate }}</td>
+                      <td class="data_col centered-header">{{ measure.target_rate }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+              
+              {% endfor %}
+            {% else %}
+            <p class="text-bg-danger">You haven't created any measures or the objectives associated to those masures have not been approved.</p>
+            {% endif %}
+        
+        </div>
+      </section >
+
+      <!--Measure end -->
+
+
+     <!-- Initiatives start --> 
+    <h3> Strategic Iniatives</h3>
+
+     <section class="Iniatives-table">
+        <div>
+          
+          <table class="table table-hover table-bordered">
+              <thead class="table-light">
+                  <tr>
+                    <th class="th_col font-small" scope="col" id="centered-header" > Strategic Initiatives </th>
+                    <th class="th_col font-small"scope="col" id="centered-header" > Description </th>
+                    <th class="th_col font-small"scope="col" id="centered-header" > Proposed Completion Date </th>
+                    <th class="th_col font-small"scope="col" id="centered-header" > Status </th>
+                    <th class="th_col font-small"scope="col" id="centered-header" > Project Status Desc</th>
+                    <th class="th_col font-small"scope="col" id="centered-header" > Expected Impacts </th>
+                    {% comment %} <th scope="col" id="centered-header" width="10%"> Notes </th>       {% endcomment %}
+                  </tr>
+              </thead>
+          
+              <tbody>
+          
+                    <!-- Initiatives -->
+                  
+                  {% for initiative in initiatives %}
+                  <tr>
+          
+                      <td class="data data_col" width="35%"> {{initiative.title}} </td>
+                      <td class="data data_col" width="32%"> {{initiative.description}} </td>
+                      <td class="data data_col" align="center" width="12%"> {{initiative.proposed_completion_date |date:"m/d/Y"}} </td>
+          
+          
+                      {% if initiative.id in initiative_status %}
+                      <td class="data data_col" align="center" width=6% >{{ initiative_status|get_item:initiative.id }}</td>
+                      {% else %}
+                      <td class="data data_col" align="center"> - </td>
+                      {% endif %}
+    
+    
+                      {% if initiative.id in initiative_desc_of_s %}
+                      <td class="data data_col" align="center" width=10%> {{ initiative_desc_of_s|get_item:initiative.id }}</td>
+                      {% else %}
+                      <td class="data data_col" align="center"> - </td>
+                      {% endif %}
+    
+    
+                      {% if initiative.id in initiative_expected_impact %}
+                      <td class="data data_col" align="center" width=8%>{{ initiative_expected_impact|get_item:initiative.id }}</td>
+                      {% else %}
+                      <td class="data data_col" align="center"> - </td>
+                      {% endif %}
+    
+
+                      
+                      
+                  </tr>
+    
+                  {% endfor %} 
+    
+    
+              </tbody>
+    
+          </table>
+    
+    
+    
+        </div>
+      </section >
+
+     <!-- Initiatives end --> 
+
+</body>
+
+{% endblock content%}

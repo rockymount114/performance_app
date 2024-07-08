@@ -5,7 +5,7 @@
 {% block title %}Dashboard - City Manager Supervisor{% endblock %}
 
 {% block content %}
-<div id="dashboard-content">
+
   <div class="header1">
     <h6>Welcome, {{ user.first_name }} {{ user.last_name }} 👋 {{ user.email }}
       <b>City Manager Office</b>
@@ -17,74 +17,119 @@
       </form>
     </h6>
   </div>
-  <div class="card shadow">
-  <h3>{{ department.name }}</h3>
-  </div>
-
-
-
-  <section class="mission_statement">
-    <div class="missionstatement ">
-      <div class="row row-cols-1 row-cols-md-2 ">
-        <!-- Create mission start -->
-        <div class="col mb-4 ">
-          <div class="card text-black mb-1 h-100 card shadow">
-            <div class="card-header"><b>Mission Statement</b></div>
-            <div class="card-body">
-              <p class="card-text">{{ mission }}</p>
-            </div>
-          </div>
-        </div>
-        <!-- Create mission end -->
-
-        <!-- Create overview start -->
-        <div class="col mb-4">
-          <div class="card text-black mb-1 h-100 card shadow">
-            <div class="card-header"><b>Overview</b></div>
-            <div class="card-body">
-              <p class="card-text">{{ overview }}</p>
-            </div>
-          </div>
-        </div>
-        <!-- Create overview end -->
-      </div>
+<div id="dashboard-content">
+    <div class="card shadow">
+    <h3>{{ department.name }}</h3>
     </div>
-  </section>
 
-  {% include 'webapp/base_dashboard.html' %}
+
+
+    <section class="mission_statement">
+      <div class="missionstatement ">
+        <div class="row row-cols-1 row-cols-md-2 ">
+          <!-- Create mission start -->
+          {% if mission %}
+          <div class="col mb-4 ">
+            <div class="card text-black mb-1 h-100 card shadow">
+              <div class="card-header"><b>Mission Statement</b></div>
+              <div class="card-body">
+                <p class="card-text">{{ mission }}</p>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col mb-4">
+            <div class="card text-black mb-1 h-100 card shadow">
+              <div class="card-header "><b>Mission Statement</b></div>
+              <div class="card-body">
+                <p class="card-text">
+                  <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}?department_id={{ selected_department_id }}">
+                    <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <!-- Create mission end -->
+
+          <!-- Create overview start -->
+          {% if overview %}
+          <div class="col mb-4">
+            <div class="card text-black mb-1 h-100 card shadow">
+              <div class="card-header"><b>Overview</b></div>
+              <div class="card-body">
+                <p class="card-text">{{ overview }}</p>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="col mb-4">
+            <div class="card text-black mb-1 h-100 card shadow">
+              <div class="card-header ">
+                <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
+              </div>
+              <div class="card-body">
+                <p class="card-text">
+                  <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}?department_id={{ selected_department_id }}">
+                    <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <!-- Create overview end -->
+        </div>
+      </div>
+    </section>
+
+    {% include 'webapp/base_dashboard.html' %}
 </div>
 
 <script>
   $(document).ready(function() {
-    
+      function updateDashboard(fiscalYearId, departmentId) {
+          $.ajax({
+              url: '{% url "dashboard" %}',
+              data: {
+                  'fiscal_year': fiscalYearId,
+                  'departments': departmentId
+              },
+              success: function(response) {
+                  $('#dashboard-content').html(response.dashboard_content);
+                  $('[data-bs-toggle="tooltip"]').tooltip();
+  
+                  // Update navbar PDF links
+                  updateNavbarLinks(response.selected_department_id, response.selected_fiscal_year_id);
+              },
+              error: function(xhr, status, error) {
+                  console.log("AJAX request failed:", status, error);
+              }
+          });
+      }
+  
+      function updateNavbarLinks(departmentId, fiscalYearId) {
+          var performanceReportLink = $('a:contains("Performance Report")');
+          var approvedPlanLink = $('a:contains("Approved Plan")');
 
-    // Listen for changes in the dropdowns
-    $('#id_departments, #id_fiscal_year').change(function() {
-      var departmentId = $('#id_departments').val();
-      var fiscalYearId = $('#id_fiscal_year').val();
+          // For performance officers, both department and fiscal year are needed for performance report
+          var perfReportUrl = "{% url 'pdf2' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
+          performanceReportLink.attr('href', perfReportUrl).attr('target', '_blank');
 
-      // Send an AJAX request to update the dashboard content
-      $.ajax({
-        url: '{% url "dashboard" %}',
-        data: {
-          'departments': departmentId,
-          'fiscal_year': fiscalYearId
-        },
-        success: function(response) {
-          // Update the dashboard content with the response
-          
-          $('body').html(response.content);
-     
-        },
-        error: function(xhr, status, error) {
-          console.log("AJAX request failed");
-          console.log("Status: " + status);
-          console.log("Error: " + error);
-        }
+          // For approved plan, both department and fiscal year are needed
+          var approvedPlanUrl = "{% url 'pdf3' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
+          approvedPlanLink.attr('href', approvedPlanUrl).attr('target', '_blank');  // Fixed: changed approvedPlanLink to approvedPlanUrl
+      }
+  
+      // Listen for changes in both department and fiscal year dropdowns
+      $('#id_departments, #id_fiscal_year').change(function() {
+          var departmentId = $('#id_departments').val();
+          var fiscalYearId = $('#id_fiscal_year').val();
+          updateDashboard(fiscalYearId, departmentId);
       });
-    });
   });
-</script>
+  </script>
 
 
 {% endblock %}
