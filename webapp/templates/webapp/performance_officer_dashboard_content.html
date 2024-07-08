@@ -1,0 +1,73 @@
+{% block content %}
+
+    <div id="dashboard-content">
+        <div class="card shadow">
+        <h3>{{ department.name }}</h3>
+        </div>
+
+
+
+        <section class="mission_statement">
+        <div class="missionstatement ">
+            <div class="row row-cols-1 row-cols-md-2 ">
+            <!-- Create mission start -->
+            {% if mission %}
+            <div class="col mb-4 ">
+                <div class="card text-black mb-1 h-100 card shadow">
+                <div class="card-header"><b>Mission Statement</b></div>
+                <div class="card-body">
+                    <p class="card-text">{{ mission }}</p>
+                </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col mb-4">
+                <div class="card text-black mb-1 h-100 card shadow">
+                <div class="card-header "><b>Mission Statement</b></div>
+                <div class="card-body">
+                    <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="{% url 'create-mission' %}?department_id={{ selected_department_id }}">
+                        <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step1: Create Mission
+                    </a>
+                    </p>
+                </div>
+                </div>
+            </div>
+            {% endif %}
+            <!-- Create mission end -->
+
+            <!-- Create overview start -->
+            {% if overview %}
+            <div class="col mb-4">
+                <div class="card text-black mb-1 h-100 card shadow">
+                <div class="card-header"><b>Overview</b></div>
+                <div class="card-body">
+                    <p class="card-text">{{ overview }}</p>
+                </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col mb-4">
+                <div class="card text-black mb-1 h-100 card shadow">
+                <div class="card-header ">
+                    <b>Overview{% if dept_cmo %}{% else %} - {{ user.department }}{% endif %}</b>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                    <a class="list-group-item text-bg-danger" href="{% url 'create-overview' %}?department_id={{ selected_department_id }}">
+                        <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>&nbsp;Step2: Create Overview
+                    </a>
+                    </p>
+                </div>
+                </div>
+            </div>
+            {% endif %}
+            <!-- Create overview end -->
+            </div>
+        </div>
+        </section>
+
+        {% include 'webapp/base_dashboard.html' %}
+    </div>
+
+{% endblock %} 

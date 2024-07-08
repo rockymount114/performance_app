@@ -139,7 +139,7 @@ class Overview(TimeStampMixin):
          
               
 class Objective(TimeStampMixin):
-    name = models.TextField(max_length=255)
+    name = models.TextField(max_length=500)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)   
     approved = models.BooleanField('Approved',default = False)
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)  
@@ -268,7 +268,7 @@ class QuarterlyPerformanceData(TimeStampMixin):
     
 class StrategicInitiative(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)
-    title = models.TextField(max_length=255)
+    title = models.TextField(max_length=500)
     description = models.TextField(max_length=1000, null=True, blank=True)
     proposed_completion_date = models.DateField()
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)

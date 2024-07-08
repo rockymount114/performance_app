@@ -9,7 +9,7 @@
 <h3 class="text-center">Department: {{ user.department }}</h3>
 
 
-<div id="dashboard-content">
+
   <div class="header1">
     <h6>{{ user.first_name }} {{ user.last_name }} 👋 {{ user.email }}
       {% if dept_head %}
@@ -91,36 +91,51 @@
     </div>
   </section>
 
+
+  <div id="dashboard-content">
+
   {% include 'webapp/base_dashboard.html' %}
 
-</div>
+  </div>
 
-
-<script>
-  $(document).ready(function() {
-
-    // Listen for changes in the fiscal year dropdown
-    $('#id_fiscal_year').change(function() {
-      var fiscalYearId = $(this).val();
-
-      // Send an AJAX request to update the dashboard content
-      $.ajax({
-        url: '{% url "dashboard" %}',
-        data: {
-          'fiscal_year': fiscalYearId
-        },
-        success: function(response) {
-          // Update the dashboard content with the response
-
-          $('body').html(response.content);
-        },
-        error: function(xhr, status, error) {
-          console.log("AJAX request failed");
-          console.log("Status: " + status);
-          console.log("Error: " + error);
+  <script>
+    $(document).ready(function() {
+        function updateDashboard(fiscalYearId) {
+            $.ajax({
+                url: '{% url "dashboard" %}',
+                data: {
+                    'fiscal_year': fiscalYearId
+                },
+                success: function(response) {
+                    $('#dashboard-content').html(response.dashboard_content);
+                    $('[data-bs-toggle="tooltip"]').tooltip();
+    
+                    // Update navbar PDF links
+                    updateNavbarLinks(response.selected_department_id, response.selected_fiscal_year_id);
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX request failed:", status, error);
+                }
+            });
         }
-      });
+    
+        function updateNavbarLinks(departmentId, fiscalYearId) {
+            var performanceReportLink = $('a:contains("Performance Report")');
+            var approvedPlanLink = $('a:contains("Approved Plan")');
+    
+            // For regular users, only fiscal year is needed for performance report
+            var perfReportUrl = "{% url 'pdf' %}?fiscal_year=" + fiscalYearId;
+            performanceReportLink.attr('href', perfReportUrl).attr('target', '_blank');
+    
+            // For approved plan, both department and fiscal year are needed
+            var approvedPlanUrl = "{% url 'pdf3' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
+            approvedPlanLink.attr('href', approvedPlanUrl).attr('target', '_blank');
+        }
+    
+        $('#id_fiscal_year').change(function() {
+            var fiscalYearId = $(this).val();
+            updateDashboard(fiscalYearId);
+        });
     });
-  });
-</script>
+    </script>
 {% endblock %}
