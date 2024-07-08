@@ -576,7 +576,7 @@ def get_regular_user_context(request, current_fiscal_year):
 
         
 
-    my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=current_fiscal_year.id)
+    my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
     d_objective_names = {i.id: i.name for i in my_objectives}
 
