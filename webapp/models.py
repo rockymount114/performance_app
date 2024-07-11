@@ -70,6 +70,8 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     is_manager = models.BooleanField(default=False) # can input data
     is_dept_head = models.BooleanField(default=False)
     is_citymanager_office = models.BooleanField(default=False)
+    accessible_departments = models.ManyToManyField(Department, related_name='accessible_to_users', blank=True)
+    is_global_performance_officer = models.BooleanField(default=False)
     
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(blank=True, null=True)

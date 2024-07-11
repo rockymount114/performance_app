@@ -68,7 +68,7 @@ def is_within_10_minutes(timestamp):
 
 def get_prev_fiscal_year():                
     current_month = date.today().month        
-    if current_month > 7:
+    if current_month >= 7:
         fiscal_year = f'FY{date.today().year}'
     else:
         fiscal_year = f'FY{date.today().year - 1}'     
@@ -408,6 +408,9 @@ def my_login(request):
        
     
 #         return render(request, template, context=context)
+def is_performance_officer(user):
+    return user.is_citymanager_office or user.groups.filter(name='Performance Officers').exists() 
+
 @login_required(login_url='my-login')
 def dashboard(request):
     
@@ -415,7 +418,7 @@ def dashboard(request):
     TARGET_YEAR = date.today().year + 1
     current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
 
-    if request.user.is_citymanager_office:
+    if is_performance_officer(request.user):
         template = 'webapp/dashboard_performance_officer.html'
         context = get_performance_officer_context(request, current_fiscal_year)
     else:
@@ -459,11 +462,13 @@ def get_performance_officer_context(request, current_fiscal_year):
     except ValueError:
         fiscal_year_id = None
 
-     # show add button only is current fiscal year
-    if fiscal_year_id == current_fiscal_year.id:
-        show_add_button = True
-    else:
-        show_add_button = False
+
+    # # The following code is to obtain fiscal year selected value and prev year according to the selection:
+    fiscal_year_selected_name = FiscalYear.objects.get(id=fiscal_year_id).name
+    prev_fiscal_year_name = f'{fiscal_year_selected_name[0:2]}{str(int(fiscal_year_selected_name[2:])-1)}'
+    # print(fiscal_year_selected_name)
+    # print(prev_fiscal_year_name)
+    # -----------------------------------------------------------------------------------------------------------
         
 
     department = Department.objects.filter(id=department_id).first()
@@ -489,7 +494,7 @@ def get_performance_officer_context(request, current_fiscal_year):
     initiative_data = get_initiative_data(department_id)
 
     context = {
-        'form': DepartmentFilterForm(initial={'departments': department_id, 'fiscal_year': fiscal_year_id}),
+        'form': DepartmentFilterForm(initial={'departments': department_id, 'fiscal_year': fiscal_year_id}, user=request.user),
         'fiscal_year_id': fiscal_year_id,
         'current_quarter': current_quarter,
         'mission': my_mission,
@@ -514,7 +519,10 @@ def get_performance_officer_context(request, current_fiscal_year):
         'selected_fiscal_year_id': fiscal_year_id,
         'show_pencil_icon': True,
         "grant_extension_to_department":True,
-        'show_add_button':show_add_button,
+        'show_add_button':True,
+
+        'fiscal_year_selected_name':fiscal_year_selected_name,
+        'prev_fiscal_year_name':prev_fiscal_year_name,
 
         **initiative_data
     }
@@ -549,6 +557,14 @@ def get_regular_user_context(request, current_fiscal_year):
 
         
     prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())
+
+    # # The following code is to obtain fiscal year selected value and prev year according to the selection:
+    fiscal_year_selected_name = FiscalYear.objects.get(id=fiscal_year_id).name
+    prev_fiscal_year_name = f'{fiscal_year_selected_name[0:2]}{str(int(fiscal_year_selected_name[2:])-1)}'
+    # print(fiscal_year_selected_name)
+    # print(prev_fiscal_year_name)
+    # -----------------------------------------------------------------------------------------------------------
+
 
     department_id = request.user.department_id
     extension_granted_at = Department.objects.get(pk=department_id).extension_granted_at
@@ -613,6 +629,9 @@ def get_regular_user_context(request, current_fiscal_year):
         "current_fiscal_year":str(current_fiscal_year)[:2] + str(current_fiscal_year)[-2:],
         "prev_fiscal_year":str(prev_fiscal_year)[:2] + str(prev_fiscal_year)[-2:],
         "grant_extension_to_department":grant_extension_to_department,
+
+        'fiscal_year_selected_name':fiscal_year_selected_name,
+        'prev_fiscal_year_name':prev_fiscal_year_name,
 
         **initiative_data
     }
@@ -726,17 +745,20 @@ def create_focus_area(request):
 @login_required(login_url='my-login')
 def create_measure(request):
     department_id = request.GET.get('department_id')
+    fiscal_year_id = request.GET.get('fiscal_year_id')
 
     if department_id:
         department = Department.objects.get(id=department_id)
     else:
         department = Department.objects.get(id=request.user.department_id)
 
-
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
+    if fiscal_year_id:
+        fiscal_year = FiscalYear.objects.get(id=fiscal_year_id)
+    else:
+        fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
 
     if request.method == "POST":
-        form = CreateMeasureForm(request.POST, user=request.user, department_id=department_id)
+        form = CreateMeasureForm(request.POST, user=request.user, department_id=department_id, fiscal_year_id=fiscal_year_id)
         if form.is_valid():
             measure = form.save(commit=False)
             measure.department = department
@@ -746,10 +768,13 @@ def create_measure(request):
             messages.success(request, "Your measure was created!")
             return redirect("dashboard")
     else:
-        form = CreateMeasureForm(initial={'department': department, 'fiscal_year': fiscal_year}, user=request.user, department_id=department_id)
+        form = CreateMeasureForm(user=request.user, department_id=department_id, fiscal_year_id=fiscal_year_id)
 
-    context = {'form': form,
-               'department':department,}
+    context = {
+        'form': form,
+        'department': department,
+        'fiscal_year': fiscal_year,
+    }
     return render(request, 'webapp/create-measure.html', context=context)
 
 
@@ -985,6 +1010,12 @@ class GeneratePdf(View):
             
             current_quarter = get_current_quarter()
 
+            # # The following code is to obtain fiscal year selected value and prev year according to the selection:
+            fiscal_year_selected_name = FiscalYear.objects.get(id=fiscal_year_id).name
+            prev_fiscal_year_name = f'{fiscal_year_selected_name[0:2]}{str(int(fiscal_year_selected_name[2:])-1)}'
+
+           
+
 
             if not fiscal_year_id:
                 fiscal_year_id = FiscalYear.objects.get(name=current_fiscal_year).id
@@ -1029,6 +1060,12 @@ class GeneratePdf(View):
 
 
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True) 
+
+            target_rate_number = {
+                m.id: m.target_number if m.is_number else m.target_rate
+                for m in my_measures
+            }
+
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year_id)
 
             d_objective_names = {}
@@ -1117,6 +1154,7 @@ class GeneratePdf(View):
                 "focus_areas": my_focus_area,
                 "measures": my_measures,
                 "initiatives": my_initiatives,
+                'target_rate_number':target_rate_number,
                 
                 'grouped_measures': grouped_measures,
                 'quarterly_data_q1':quarterly_data_q1,
@@ -1134,6 +1172,9 @@ class GeneratePdf(View):
                 'initiative_desc_of_s': initiative_desc_of_s,
                 'initiative_expected_impact': initiative_expected_impact,
                 'initiative_notes':initiative_notes,
+
+                'fiscal_year_selected_name': fiscal_year_selected_name,
+                'prev_fiscal_year_name':prev_fiscal_year_name,
         
             }
             
@@ -1171,6 +1212,12 @@ class GeneratePdf2(View):
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
+
+
+            # # The following code is to obtain fiscal year selected value and prev year according to the selection:
+            fiscal_year_selected_name = FiscalYear.objects.get(id=fiscal_year_id).name
+            prev_fiscal_year_name = f'{fiscal_year_selected_name[0:2]}{str(int(fiscal_year_selected_name[2:])-1)}'
+          
             
             try:
                 # need to fix if has multiple members in one department, such as 3 or 4 peopele, add is_data_inputor???
@@ -1221,6 +1268,12 @@ class GeneratePdf2(View):
 
 
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
+
+            target_rate_number = {
+                m.id: m.target_number if m.is_number else m.target_rate
+                for m in my_measures
+            }
+
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
             
             d_objective_names = {}
@@ -1312,6 +1365,8 @@ class GeneratePdf2(View):
                 "focus_areas": my_focus_area,
                 "measures": my_measures,
                 "initiatives": my_initiatives,
+
+                'target_rate_number':target_rate_number,
                 
                 'grouped_measures': grouped_measures,
                 'quarterly_data_q1':quarterly_data_q1,
@@ -1330,6 +1385,9 @@ class GeneratePdf2(View):
                 'initiative_desc_of_s': initiative_desc_of_s,
                 'initiative_expected_impact': initiative_expected_impact,
                 'initiative_notes':initiative_notes,
+
+                'fiscal_year_selected_name': fiscal_year_selected_name,
+                'prev_fiscal_year_name':prev_fiscal_year_name,
         
             }
             
@@ -1367,6 +1425,13 @@ class GeneratePdf3(View):
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
+
+            # # The following code is to obtain fiscal year selected value and prev year according to the selection:
+            fiscal_year_selected_name = FiscalYear.objects.get(id=fiscal_year_id).name
+            prev_fiscal_year_name = f'{fiscal_year_selected_name[0:2]}{str(int(fiscal_year_selected_name[2:])-1)}'
+
+            print(fiscal_year_selected_name)
+            print(prev_fiscal_year_name)
             
             try:
                 # need to fix if has multiple members in one department, such as 3 or 4 peopele, add is_data_inputor???
@@ -1417,6 +1482,13 @@ class GeneratePdf3(View):
 
 
             my_measures = Measure.objects.filter(objective_id__in= my_objectives, approved=True, fiscal_year=fiscal_year) 
+
+
+            target_rate_number = {
+                m.id: m.target_number if m.is_number else m.target_rate
+                for m in my_measures
+            }
+
             my_initiatives = StrategicInitiative.objects.filter(department_id=department_id, fiscal_year=fiscal_year)
             print(my_measures)
             
@@ -1488,7 +1560,7 @@ class GeneratePdf3(View):
                 
             data = {
                 "page_orientation": "landscape",
-                "report_name":"Performance Report",
+                "report_name":"Approved Plan",
                 "name": "City of Rocky Mount", 
                 "department_name": department_name,
                 "username": username,
@@ -1509,6 +1581,7 @@ class GeneratePdf3(View):
                 "focus_areas": my_focus_area,
                 "measures": my_measures,
                 "initiatives": my_initiatives,
+                'target_rate_number':target_rate_number,
                 
                 'grouped_measures': grouped_measures,
                 # 'quarterly_data_q1':quarterly_data_q1,
@@ -1527,6 +1600,9 @@ class GeneratePdf3(View):
                 'initiative_desc_of_s': initiative_desc_of_s,
                 'initiative_expected_impact': initiative_expected_impact,
                 'initiative_notes':initiative_notes,
+
+                'fiscal_year_selected_name': fiscal_year_selected_name,
+                'prev_fiscal_year_name':prev_fiscal_year_name,
         
             }
             
@@ -1891,22 +1967,48 @@ def update_objective(request, pk):
 
 # - Update a measure
 @login_required(login_url='my-login')
-def update_measure(request,pk):
+def update_measure(request, pk):
     measure = Measure.objects.get(id=pk)
+    department_id = request.GET.get('department_id')
+    fiscal_year_id = request.GET.get('fiscal_year_id')
 
-    form = UpdateMeasureForm(instance=measure)
+    if department_id:
+        department = Department.objects.get(id=department_id)
+    else:
+        department = measure.department
+
+    if fiscal_year_id:
+        fiscal_year = FiscalYear.objects.get(id=fiscal_year_id)
+    else:
+        fiscal_year = measure.fiscal_year
 
     if request.method == "POST":
-        form = UpdateMeasureForm(request.POST, instance=measure,user=request.user)
+        form = UpdateMeasureForm(request.POST, instance=measure, user=request.user, 
+                                 department_id=department_id, fiscal_year_id=fiscal_year_id)
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.department = department
+            instance.fiscal_year = fiscal_year
             instance.approved = False
             instance.modified_by = request.user.get_full_name()
-            instance.save()
-            messages.success(request, "Your measure was updated and is now pending approval!")
-            return redirect("dashboard")
+            
+            # Check if the user has permission to update this measure
+            if request.user.is_global_performance_officer or request.user.is_citymanager_office or \
+               request.user.is_dept_head or request.user.department == instance.department:
+                instance.save()
+                messages.success(request, "Your measure was updated and is now pending approval!")
+                return redirect("dashboard")
+            else:
+                messages.error(request, "You don't have permission to update this measure.")
+    else:
+        form = UpdateMeasureForm(instance=measure, user=request.user, 
+                                 department_id=department_id, fiscal_year_id=fiscal_year_id)
 
-    context = {'form': form}
+    context = {
+        'form': form,
+        'department': department,
+        'fiscal_year': fiscal_year,
+    }
     return render(request, 'webapp/update-measure.html', context=context)
 
 
