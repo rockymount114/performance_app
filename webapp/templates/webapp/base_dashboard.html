@@ -47,7 +47,9 @@
                   <div class="list-group-item d-flex justify-content-between align-items-center{% if not objective.approved %} pending-approval{% endif %}">
                     <div class="objective-text">
                       {% if not objective.approved %}<span class="badge bg-warning">P</span>{% endif %}
-                      <a href="{% url 'view-objective-info-regular' objective.id %}" class="hover-link">{{ objective.name }}</a>
+                      <a href="{% if show_add_button %}{% url 'view-objective-info-regular' objective.id %}{% else %}javascript:void(0);{% endif %}"
+                      class="hover-link{% if not show_add_button %} disabled{% endif %}"
+                      {% if not show_add_button %}style="pointer-events: none;"{% endif %}>{{ objective.name }}</a>
                       {% for focus_area in objective.focus_area.all %}
                         <a href="#" class="focus-area-tag" data-toggle="tooltip" title="{{ focus_area.description }}">{{ focus_area.name }}</a>
                       {% endfor %}
@@ -57,7 +59,7 @@
               {% else %}
                 <div class="card-body">
                   <p class="card-text">
-                    <p class="text-bg-danger">No measures have been created.</p>
+                    <p class="text-bg-danger">No objectives have been created.</p>
                   </p>
                 </div>
               {% endif %}
@@ -78,7 +80,7 @@
     <section class="Metrc-table">
       <div>
         {% if show_add_button %}
-          <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}?department_id={{ selected_department_id }}">
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'create-measure' %}?department_id={{ selected_department_id }}&fiscal_year_id={{ selected_fiscal_year_id }}">
             <i class="fa fa-plus-circle" aria-hidden="true"></i> &nbsp; Create a new measure  
           </a>
         {% endif %}
@@ -100,8 +102,8 @@
                       <th class="title_column" width="50%">Metric</th>
                       <th id="centered-header" width="5%">Direction</th>
                       <th id="centered-header" width="5%">Frequency</th>
-                      <th id="centered-header" width="6%">{{prev_fiscal_year}} Actual</th>
-                      <th id="centered-header" width="6%">{{current_fiscal_year}} Target</th>
+                      <th id="centered-header" width="6%">{{prev_fiscal_year_name}} Actual</th>
+                      <th id="centered-header" width="6%">{{fiscal_year_selected_name}} Target</th>
                       <th id="centered-header" width="5%">Q1</th>
                       <th id="centered-header" width="5%">Q2</th>
                       <th id="centered-header" width="5%">Q3</th>
@@ -115,11 +117,19 @@
                           
                               {% if measure.approved %}
                               <tr>
-                                <td class="title_column" width="15%" data-toggle="tooltip" title="{{ measure.title }}">  <a href="{% url 'view-measure-info-regular' measure.id %}" class="hover-link">{{ measure.title }}</a></td>
+                                <td class="title_column" width="15%" data-toggle="tooltip" title="{{ measure.title }}">
+                                    <a href="{% if show_add_button %}{% url 'view-measure-info-regular' measure.id %}?department_id={{ selected_department_id }}&fiscal_year_id={{ selected_fiscal_year_id }}{% else %}javascript:void(0);{% endif %}"
+                                      class="hover-link{% if not show_add_button %} disabled{% endif %}"
+                                      {% if not show_add_button %}style="pointer-events: none;"{% endif %}
+                                      data-department-id="{{ selected_department_id }}"
+                                      data-fiscal-year-id="{{ selected_fiscal_year_id }}">
+                                        {{ measure.title }}
+                                    </a>
+                                </td>
                                 <td align="center">{{ measure.direction }}</td>
                                 <td align="center">{{ measure.frequency }}</td>
-                                <td align="center">{{ measure.current_year_rate }}</td>
-                                <td align="center">{{ target_rate_number|get_item:measure.id }} {% if not measure.is_number %} % {% endif %}</td>         
+                                <td align="center">{{ measure.current_year_rate }} {% if not measure.is_number %} % {% endif %} </td>
+                                <td align="center">{{ target_rate_number|get_item:measure.id }} {% if not measure.is_number %} % {% endif %} </td>         
                                 {% with measure_id=measure.id %}
       
 

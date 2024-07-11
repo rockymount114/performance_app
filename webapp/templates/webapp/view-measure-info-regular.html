@@ -13,9 +13,9 @@
                     <ul class="list-unstyled">
                         <li><strong>Department:</strong> {{ measure.department }}</li>
                         {% if objective.approved %}
-                            <li><strong>Objective:</strong> {{ measure.title }}</li>
+                            <li><strong>Measure:</strong> {{ measure.title }}</li>
                         {% else %}
-                            <li><strong>Objective:</strong> <span style="color: red;">{{ measure.title }}</span></li>
+                            <li><strong>Measure:</strong> <span style="color: red;">{{ measure.title }}</span></li>
                         {% endif %}
                         <li><strong>Fiscal Year:</strong> {{ measure.fiscal_year }}</li>
                         <li><strong>Direction:</strong> {{ measure.direction }}</li>
@@ -49,7 +49,7 @@
                     <i class="fa fa-arrow-left mr-2"></i> Return
                 </a>
                 {% if objective.approved %}
-                <a href="{% url 'update-measure' measure.id %}" class="btn btn-info">
+                <a href="{% url 'update-measure' measure.id %}?department_id={{ request.GET.department_id }}&fiscal_year_id={{ request.GET.fiscal_year_id }}" class="btn btn-info">
                     <i class="fa fa-edit mr-2"></i> Update
                 </a>
                 {% else %}
@@ -61,7 +61,6 @@
         </div>
     </div>
 </div>
-
 
 <style>
     .disabled-link {

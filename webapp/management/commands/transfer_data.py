@@ -75,6 +75,7 @@ class Command(BaseCommand):
                         target_rate=prev_measure.target_rate,
                         fiscal_year=current_fiscal_year,
                         is_number=prev_measure.is_number,
+                        created_by='Year-end Transfer',
                     )
                 else:
                     self.stdout.write(self.style.WARNING(f'No new objective found for measure: {prev_measure.title}'))
