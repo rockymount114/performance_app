@@ -151,20 +151,27 @@ class CreateMeasureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         department_id = kwargs.pop('department_id', None)
+        fiscal_year_id = kwargs.pop('fiscal_year_id', None)
         super().__init__(*args, **kwargs)
+        
         if user:
-            if department_id:
-                # Department ID passed from dropdown (chief performance officer)
-                self.fields['department'].initial = department_id
+            if user.is_global_performance_officer or user.is_citymanager_office or user.is_dept_head:
+                # For users with elevated access, use the department from the dropdown
+                self.fields['department'].initial = department_id if department_id else user.department_id
             else:
-                # Regular user, set department based on user's department
+                # For regular users, use their assigned department
                 self.fields['department'].initial = user.department_id
 
-            current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-            print(current_fiscal_year)
+            # Use the fiscal year from the dropdown if provided, otherwise use the current fiscal year
+            if fiscal_year_id:
+                self.fields['fiscal_year'].initial = fiscal_year_id
+            else:
+                current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+                self.fields['fiscal_year'].initial = current_fiscal_year.id
+
             self.fields['objective'].queryset = Objective.objects.filter(
                 department_id=self.fields['department'].initial,
-                fiscal_year=current_fiscal_year,
+                fiscal_year_id=self.fields['fiscal_year'].initial,
                 approved=True
             )
 
@@ -341,6 +348,16 @@ class DepartmentFilterForm(forms.Form):
         disabled=False,
         required=True,
     )
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            if user.is_global_performance_officer:
+                self.fields['departments'].queryset = Department.objects.all()
+            elif user.accessible_departments.exists():
+                self.fields['departments'].queryset = user.accessible_departments.all()
+     
 
 # This is a test form to filter pending approvals dynamically based on Departmnet and fiscal year
     
@@ -403,20 +420,39 @@ class UpdateMeasureForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        department_id = kwargs.pop('department_id', None)
+        fiscal_year_id = kwargs.pop('fiscal_year_id', None)
         super().__init__(*args, **kwargs)
+        
         if user:
-            department_id = user.department_id
-            current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+            if user.is_global_performance_officer or user.is_citymanager_office or user.is_dept_head:
+                # For users with elevated access, use the department and fiscal year from the dropdown
+                if department_id:
+                    self.fields['department'].initial = department_id
+                else:
+                    # If no department_id is provided, use the measure's original department
+                    self.fields['department'].initial = self.instance.department_id
+
+                if fiscal_year_id:
+                    self.fields['fiscal_year'].initial = fiscal_year_id
+                else:
+                    # If no fiscal_year_id is provided, use the measure's original fiscal year
+                    self.fields['fiscal_year'].initial = self.instance.fiscal_year_id
+            else:
+                # For regular users, use their assigned department and the measure's original fiscal year
+                self.fields['department'].initial = user.department_id
+                self.fields['fiscal_year'].initial = self.instance.fiscal_year_id
+
             self.fields['objective'].queryset = Objective.objects.filter(
-                department_id=department_id,
-                fiscal_year=current_fiscal_year,
+                department_id=self.fields['department'].initial,
+                fiscal_year_id=self.fields['fiscal_year'].initial,
                 approved=True
             )
 
     class Meta:
         model = Measure
-        fields = ['department','objective', 'title', 'fiscal_year', 'direction', 'frequency', 'is_number', 'target_rate', 'target_number']
-        exclude = [ 'created_by', 'current_year_rate']
+        fields = ['department', 'objective', 'title', 'fiscal_year', 'direction', 'frequency', 'is_number', 'target_rate', 'target_number']
+        exclude = ['created_by', 'current_year_rate']
 
 # -Update Objectives
 class UpdateObjectiveForm(forms.ModelForm):

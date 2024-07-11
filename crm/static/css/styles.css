@@ -369,4 +369,8 @@ table tbody tr td:last-child {
     margin-top: auto;
   }
 
-
+  .hover-link.disabled {
+   
+    text-decoration: none;
+    cursor: default;
+}

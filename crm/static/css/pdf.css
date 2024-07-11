@@ -1,85 +1,181 @@
-
-/*
 @page {
-    size: landscape;
-} 
-*/
-
-body{
-    background-image: url("{{ city_logo }}");
-    background-repeat: repeat;
-    background-position: center;
-    background-size: 200px; 
-    
+    margin-top: 0.5cm;
+    margin-bottom: 1cm;
+    margin-left: 1cm;
+    margin-right: 1cm;
 }
 
-.table {     
-    position:absolute;       
-    width: 100%;
-    border:1px solid #6F6F6F;
-    background-color: #f1f1f1;
-}
-.table .table-light th .col1{
-    width:550px;
-
-}
-
-th{
-    height:30px;
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    font-size: 12px; /* Increased to 12px */
 }
 
-tr{
-    white-space: nowrap;
+.pdf-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.data{
-    background-color: #f1f1f1;
-    margin-left: 5px;
-    
-
-}
-
-.data_col{
-    margin-left: 5px;
-    padding-top: 5px;
-    white-space: nowrap;
-
-}
-
-th .th_col{
-    margin-left: 5px;
-    padding-top: 5px;
-    white-space: nowrap;
-
-}
-
-/* Logo */
 .header-container {
-    margin-bottom: 20px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #2c3e50;
+    padding-bottom: 5px;
 }
 
-.pdf_title{
-    display: inline-block; 
-    vertical-align: middle; 
-    text-decoration: underline; 
-    text-underline-position: under; 
-    text-underline-offset: 5px;
+.logo-container {
+    text-align: center;
+    margin-bottom: 5px;
 }
 
+.city-logo {
+    width: 200px;
+    height: auto;
+    max-width: 100%;
+}
 
+.pdf-title {
+    font-size: 24px; /* Increased for better proportion */
+    color: #2c3e50;
+    margin: 0;
+    text-align: center;
+}
 
-.full-width {
+.info-container {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 12px; /* Increased to 12px */
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 0px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #2c3e50;
+    color: #fff;
+    /* padding: 6px 12px; */
+    /* margin: 0; */
+    font-size: 14px; /* Increased for better proportion */
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 0px;
+    margin-bottom: 0; /* Remove any bottom margin */
+}
+
+.card-body {
+    /* padding-bottom: 12px; */
+    margin-top: 0px;
+    
+    font-size: 12px; /* Increased to 12px */
+}
+
+.mission-overview, .objectives-focus-areas {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.mission-overview .card, .objectives-focus-areas .card {
+    flex: 1;
+}
+
+.objectives-focus-areas .card.full-width {
     width: 100%;
-    table-layout: fixed;
-  }
-  
-.full-width th, .full-width td {
-word-wrap: break-word;
-overflow-wrap: break-word;
 }
 
-.data_col {
-padding: 5px;
+.strategic-objectives-list, .focus-areas-list {
+    padding-left: 15px;
+    margin: 0;
+    
+
+}
+
+.strategic-objectives-list li, .focus-areas-list li {
+    /* margin-bottom: 8px; */
+    padding-left: 8px;
+    padding-bottom: 0; /* Remove any bottom padding */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 12px; /* Increased to 12px */
+}
+
+th, td {
+    border: 1px solid #e0e0e0;
+    padding: 6px; /* Slightly increased for better readability */
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+}
+
+th:first-child,
+td:first-child {
+    text-align: left;
+}
+
+.measure-table, .initiative-table {
+    font-size: 12px; /* Increased to 12px */
+    margin-top: 0px;
+    
+}
+
+.measure-column, .initiative-column {
+    width: 23%;
+}
+
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px; /* Increased to 12px */
+}
+
+h2 {
+    color: #2c3e50;
+    border-bottom: 2px solid #2c3e50;
+    padding-bottom: 4px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    font-size: 14px; /* Increased for better proportion */
+}
+
+ul {
+    padding-left: 15px;
+}
+
+li {
+    margin-bottom: 0px;
 }
 
 
+p {
+    margin-top: 0px;
+}
