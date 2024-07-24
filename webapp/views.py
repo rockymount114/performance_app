@@ -36,6 +36,14 @@ from django.db.models import Prefetch
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import admin
 from django.utils.text import capfirst
+from django.conf import settings
+
+from .email_utils import *
+from .decorators import send_approval_email
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -684,23 +692,19 @@ def get_initiative_data(department_id):
 # - Create a object record 
 
 @login_required(login_url='my-login')
+@send_approval_email('objective', 'create')
 def create_objective(request):   
     department_id = request.GET.get('department_id')
 
     if department_id:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
     else:
-        department = Department.objects.get(id=request.user.department_id)
+        department = get_object_or_404(Department, id=request.user.department_id)
 
+    fiscal_year = get_object_or_404(FiscalYear, name=get_current_fiscal_year())       
 
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())       
-    print(get_current_fiscal_year())
     if request.method == "POST":
-
-        form = CreateObjectiveForm(request.POST, initial={
-                             
-                                        'fiscal_year': fiscal_year,
-                                    })
+        form = CreateObjectiveForm(request.POST, initial={'fiscal_year': fiscal_year})
         
         if form.is_valid():   
             objective = form.save(commit=False)
@@ -708,17 +712,23 @@ def create_objective(request):
             objective.fiscal_year = fiscal_year
             objective.created_by = request.user.get_full_name()
             objective.save() 
-            form.save_m2m() # Save many to many field
-            messages.success(request, "Your objective was created and pending to review!")
-            return redirect("dashboard")
-    else:
-        form = CreateObjectiveForm(initial={
-                                 
-                                        'fiscal_year': fiscal_year,
-                                    })  
+            form.save_m2m()
 
-    context = {'form': form,
-               'department':department,}
+            request.objective = objective
+
+            logger.info(f"Objective created: {objective.id} by user: {request.user.id}")
+            messages.success(request, "Your objective was created and is pending review!")
+            return redirect("dashboard")
+        else:
+            logger.warning(f"Invalid form submission for create_objective by user: {request.user.id}")
+            messages.error(request, "There was an error in your form. Please check and try again.")
+    else:
+        form = CreateObjectiveForm(initial={'fiscal_year': fiscal_year})  
+
+    context = {
+        'form': form,
+        'department': department,
+    }
     return render(request, 'webapp/create-objective.html', context=context)
 
 # Create focus area
@@ -743,32 +753,42 @@ def create_focus_area(request):
 
 
 @login_required(login_url='my-login')
+@send_approval_email('measure', 'create')
 def create_measure(request):
     department_id = request.GET.get('department_id')
     fiscal_year_id = request.GET.get('fiscal_year_id')
 
     if department_id:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
     else:
-        department = Department.objects.get(id=request.user.department_id)
+        department = get_object_or_404(Department, id=request.user.department_id)
 
     if fiscal_year_id:
-        fiscal_year = FiscalYear.objects.get(id=fiscal_year_id)
+        fiscal_year = get_object_or_404(FiscalYear, id=fiscal_year_id)
     else:
-        fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+        fiscal_year = get_object_or_404(FiscalYear, name=get_current_fiscal_year())
+
+    logger.info(f"Creating measure for department: {department}, fiscal year: {fiscal_year}")
 
     if request.method == "POST":
-        form = CreateMeasureForm(request.POST, user=request.user, department_id=department_id, fiscal_year_id=fiscal_year_id)
+        form = CreateMeasureForm(request.POST, user=request.user, department_id=department.id, fiscal_year_id=fiscal_year.id)
         if form.is_valid():
             measure = form.save(commit=False)
             measure.department = department
             measure.fiscal_year = fiscal_year
             measure.created_by = request.user.get_full_name()
             measure.save()
-            messages.success(request, "Your measure was created!")
+
+            request.measure = measure  # Set this for the decorator
+
+            logger.info(f"Measure created: {measure.id} by user: {request.user.id}")
+            messages.success(request, "Your measure was created and is pending review!")
             return redirect("dashboard")
+        else:
+            logger.warning(f"Invalid form submission for create_measure by user: {request.user.id}")
+            messages.error(request, "There was an error in your form. Please check and try again.")
     else:
-        form = CreateMeasureForm(user=request.user, department_id=department_id, fiscal_year_id=fiscal_year_id)
+        form = CreateMeasureForm(user=request.user, department_id=department.id, fiscal_year_id=fiscal_year.id)
 
     context = {
         'form': form,
@@ -822,26 +842,19 @@ def create_initiative(request):
 def create_mission(request):
     department_id = request.GET.get('department_id')
     if department_id:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
     else:
-        department = Department.objects.get(id=request.user.department_id)
+        department = get_object_or_404(Department, id=request.user.department_id)
 
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-
+    form = CreateMissionForm()
     if request.method == "POST":
-
-        form = CreateMissionForm(request.POST, initial={
-                                        'fiscal_year': fiscal_year,
-                                    })
+        form = CreateMissionForm(request.POST)
         if form.is_valid():
             mission = form.save(commit=False)
-            mission.fiscal_year = fiscal_year
             mission.department = department
             mission.save()
             messages.success(request, "Your mission was created successfully")
             return redirect("dashboard")
-    else:
-        form = CreateMissionForm(initial={'fiscal_year': fiscal_year})
 
     context = {
         'form': form,
@@ -854,26 +867,24 @@ def create_mission(request):
 def create_overview(request):    
     department_id = request.GET.get('department_id')
     if department_id:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
     else:
-        department = Department.objects.get(id=request.user.department_id)
+        department = get_object_or_404(Department, id=request.user.department_id)
 
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-    if request.method=="POST":
-        form=CreateOverviewForm(request.POST, initial={
-                                        'fiscal_year': fiscal_year,
-                                    })
+    form = CreateOverviewForm()
+    if request.method == "POST":
+        form = CreateOverviewForm(request.POST)
         if form.is_valid():
             overview = form.save(commit=False)
             overview.department = department
             overview.save()
-            messages.success(request, "Your overview was created sucessfully")
+            messages.success(request, "Your overview was created successfully")
             return redirect("dashboard")
-    else:
-        form = CreateOverviewForm(initial={'fiscal_year': fiscal_year})
-        
-    context = {'form': form,
-               'department': department,}    
+    
+    context = {
+        'form': form,
+        'department': department,
+    }    
     return render(request, 'webapp/create-overview.html', context=context)
 
 # Create quaterly data for depterment and objectives
@@ -1944,68 +1955,79 @@ def view_measure_info_regular(request,pk):
 # - Update an objective
 
 @login_required(login_url='my-login')
+@send_approval_email('objective', 'update')
 def update_objective(request, pk):     
-    objective = Objective.objects.get(id=pk)
-
-    form = UpdateObjectiveForm(instance=objective)
-
+    objective = get_object_or_404(Objective, id=pk)
+    
     if request.method == "POST":
         form = UpdateObjectiveForm(request.POST, instance=objective)
-
         if form.is_valid():
             instance = form.save(commit=False)
             instance.modified_by = request.user.get_full_name()
             instance.approved = False
             instance.save()
-            form.save_m2m() # Save many to many field
+            form.save_m2m()
+            
+            request.objective = instance  # Set this for the decorator
+            
+            logger.info(f"Objective updated: {instance.id} by user: {request.user.id}")
             messages.success(request, "Your objective was updated and is now pending approval!")
             return redirect("dashboard")
+        else:
+            logger.warning(f"Invalid form submission for update_objective by user: {request.user.id}")
+            messages.error(request, "There was an error in your form. Please check and try again.")
+    else:
+        form = UpdateObjectiveForm(instance=objective)
 
-    context = {'form': form}
+    context = {'form': form, 'objective': objective}
     return render(request, 'webapp/update-objective.html', context=context)
 
 
 # - Update a measure
 @login_required(login_url='my-login')
+@send_approval_email('measure', 'update')
 def update_measure(request, pk):
-    measure = Measure.objects.get(id=pk)
+    measure = get_object_or_404(Measure, id=pk)
+    logger.debug(f"Updating measure: {measure.id}, is_number: {measure.is_number}, target_number: {measure.target_number}, target_rate: {measure.target_rate}")
     department_id = request.GET.get('department_id')
     fiscal_year_id = request.GET.get('fiscal_year_id')
 
-    if department_id:
-        department = Department.objects.get(id=department_id)
-    else:
-        department = measure.department
-
-    if fiscal_year_id:
-        fiscal_year = FiscalYear.objects.get(id=fiscal_year_id)
-    else:
-        fiscal_year = measure.fiscal_year
+    department = get_object_or_404(Department, id=department_id) if department_id else measure.department
+    fiscal_year = get_object_or_404(FiscalYear, id=fiscal_year_id) if fiscal_year_id else measure.fiscal_year
 
     if request.method == "POST":
         form = UpdateMeasureForm(request.POST, instance=measure, user=request.user, 
-                                 department_id=department_id, fiscal_year_id=fiscal_year_id)
+                                 department_id=department.id, fiscal_year_id=fiscal_year.id)
         if form.is_valid():
             instance = form.save(commit=False)
+            logger.debug(f"Form is valid. Updated values: is_number: {instance.is_number}, target_number: {instance.target_number}, target_rate: {instance.target_rate}")
             instance.department = department
             instance.fiscal_year = fiscal_year
             instance.approved = False
             instance.modified_by = request.user.get_full_name()
             
-            # Check if the user has permission to update this measure
             if request.user.is_global_performance_officer or request.user.is_citymanager_office or \
                request.user.is_dept_head or request.user.department == instance.department:
                 instance.save()
+                
+                request.measure = instance  # Set this for the decorator
+                
+                logger.info(f"Measure updated: {instance.id} by user: {request.user.id}")
                 messages.success(request, "Your measure was updated and is now pending approval!")
                 return redirect("dashboard")
             else:
+                logger.warning(f"Unauthorized measure update attempt by user: {request.user.id}")
                 messages.error(request, "You don't have permission to update this measure.")
+        else:
+            logger.warning(f"Invalid form submission for update_measure by user: {request.user.id}")
+            messages.error(request, "There was an error in your form. Please check and try again.")
     else:
         form = UpdateMeasureForm(instance=measure, user=request.user, 
-                                 department_id=department_id, fiscal_year_id=fiscal_year_id)
+                                 department_id=department.id, fiscal_year_id=fiscal_year.id)
 
     context = {
         'form': form,
+        'measure': measure,
         'department': department,
         'fiscal_year': fiscal_year,
     }

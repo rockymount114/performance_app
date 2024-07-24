@@ -24,10 +24,10 @@
                 
             
                 {{ form.is_number|as_crispy_field }}
-                <div id="target_number_field" style="display: none;">
+                <div id="target_number_field">
                   {{ form.target_number|as_crispy_field }}
                 </div>
-                <div id="target_rate_field" >
+                <div id="target_rate_field">
                   {{ form.target_rate|as_crispy_field }}
                 </div>
                 
@@ -52,24 +52,23 @@
     </body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-
-
     $(document).ready(function() {
-   
-      $('#id_is_number').change(function() {
-        if ($(this).val() === 'True') {
-          
+      function toggleFields() {
+        if ($('#id_is_number').val() === 'True') {
           $('#target_number_field').show();
           $('#target_rate_field').hide();
-        } else  {
-         
+        } else {
           $('#target_rate_field').show();
           $('#target_number_field').hide();
-        } 
-      });
+        }
+      }
+
+      $('#id_is_number').change(toggleFields);
+      
+      // Call the function on page load to set the initial state
+      toggleFields();
     });
     </script>
-
 
 
 

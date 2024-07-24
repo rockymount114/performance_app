@@ -224,15 +224,10 @@ class CreateMissionForm(forms.ModelForm):
         required=False,
     )
 
-    fiscal_year = forms.ModelChoiceField(
-        queryset=FiscalYear.objects.all(),
-        disabled=True,
-        required=True,
-    )
 
     class Meta:
         model = Mission
-        fields = ['name', 'fiscal_year']
+        fields = ['name', ]
       
 
 class CreateOverviewForm(forms.ModelForm):
@@ -243,11 +238,6 @@ class CreateOverviewForm(forms.ModelForm):
         required=False,
     )
 
-    fiscal_year = forms.ModelChoiceField(
-        queryset=FiscalYear.objects.all(),
-        disabled=True,
-        required=True,
-    )
 
     class Meta:
         model = Overview    
@@ -398,7 +388,6 @@ class StrategicInitiativeDetailForm(forms.ModelForm):
 
 
 # UPDATE FORMS
-
 #  - Update Measures
 class UpdateMeasureForm(forms.ModelForm):
     title = forms.CharField(
@@ -417,6 +406,14 @@ class UpdateMeasureForm(forms.ModelForm):
         disabled=True,
         required=False,
     )
+    is_number = forms.ChoiceField(
+        choices=((True, 'Yes'), (False, 'No')),
+        label="Is this measure a number?",
+        widget=forms.Select(),
+        required=True
+    )
+    target_number = forms.IntegerField(required=False)
+    target_rate = forms.DecimalField(max_digits=3, decimal_places=0, required=False)
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -424,6 +421,13 @@ class UpdateMeasureForm(forms.ModelForm):
         fiscal_year_id = kwargs.pop('fiscal_year_id', None)
         super().__init__(*args, **kwargs)
         
+        if self.instance:
+            self.fields['is_number'].initial = 'True' if self.instance.is_number else 'False'
+            if self.instance.is_number:
+                self.fields['target_number'].initial = self.instance.target_number
+            else:
+                self.fields['target_rate'].initial = self.instance.target_rate
+
         if user:
             if user.is_global_performance_officer or user.is_citymanager_office or user.is_dept_head:
                 # For users with elevated access, use the department and fiscal year from the dropdown
@@ -448,6 +452,23 @@ class UpdateMeasureForm(forms.ModelForm):
                 fiscal_year_id=self.fields['fiscal_year'].initial,
                 approved=True
             )
+
+    def clean_is_number(self):
+        # Convert string back to boolean
+        return self.cleaned_data['is_number'] == 'True'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_number = cleaned_data.get('is_number')
+        target_number = cleaned_data.get('target_number')
+        target_rate = cleaned_data.get('target_rate')
+
+        if is_number and target_number is None:
+            self.add_error('target_number', 'This field is required when the measure is a number.')
+        elif not is_number and target_rate is None:
+            self.add_error('target_rate', 'This field is required when the measure is a rate.')
+
+        return cleaned_data
 
     class Meta:
         model = Measure

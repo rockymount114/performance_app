@@ -70,16 +70,17 @@
       </li>
       {% endif %}
     </ul>
-    <ul class="navbar-nav ml-auto mr-3">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'profile' %}"><i class="fa fa-user" aria-hidden="true"></i> &nbsp;Profile </a>
-      </li>
+    {% if user.is_authenticated %}
+      <ul class="navbar-nav ml-auto mr-3">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'profile' %}"><i class="fa fa-user" aria-hidden="true"></i> &nbsp;Profile </a>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'user-logout' %}"> <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Sign out </a>
-      </li>
-      
-    </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'user-logout' %}"> <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Sign out </a>
+        </li>
+      </ul>
+    {% endif %}
   </div>
 </nav>
 

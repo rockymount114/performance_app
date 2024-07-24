@@ -170,11 +170,10 @@ class FocusArea(TimeStampMixin):
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]  
  
 class Measure(TimeStampMixin):
-    
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)   
     title = models.TextField(max_length=500)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)  
-    approved = models.BooleanField('Approved',default=False) 
+    approved = models.BooleanField('Approved', default=False) 
     created_by = models.CharField(max_length=50, null=True)
     modified_by = models.CharField(max_length=50, null=True)
     
@@ -182,30 +181,42 @@ class Measure(TimeStampMixin):
         ("Upwards", "Upwards"),
         ("Downwards", "Downwards"),
     )  
-    
-    direction = models.CharField(max_length=255, choices= DIRECTIONS, default="Upwards") 
+    direction = models.CharField(max_length=255, choices=DIRECTIONS, default="Upwards") 
     
     FREQUENCY_CHOICES = (
         ("Quarterly", "Quarterly"),
         ("Annually", "Annually"),
     )    
-    frequency = models.CharField(max_length=255, choices= FREQUENCY_CHOICES, default="Quarterly")    
+    frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES, default="Quarterly")    
     
-    current_year_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
+    current_year_rate = models.DecimalField(
+        max_digits=3, 
+        decimal_places=0, 
+        default=Decimal(0), 
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
     
-    NUMBER_CHOICES = (
-        (True, "Number"),
-        (False, "Rate"),
-    ) 
-    
-    is_number = models.BooleanField(default=False, choices= NUMBER_CHOICES)
+    IS_NUMBER_CHOICES = (
+        (True, "Yes"),
+        (False, "No"),
+    )
+    is_number = models.BooleanField(
+        'Is this measure a number?',
+        choices=IS_NUMBER_CHOICES,
+        default=False
+    )
     
     target_number = models.IntegerField(null=True, blank=True, default=0)
-    target_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR, null=True, blank=True)
+    target_rate = models.DecimalField(
+        max_digits=3, 
+        decimal_places=0, 
+        default=Decimal(0), 
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        null=True, 
+        blank=True
+    )
     
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
-    
-    
     
     def __str__(self) -> str:
         return self.title
