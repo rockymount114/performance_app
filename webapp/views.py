@@ -1188,11 +1188,8 @@ class GeneratePdf(View):
                 'prev_fiscal_year_name':prev_fiscal_year_name,
         
             }
+            pdf = render_to_pdf('webapp/report.html', data) 
             
-            if current_quarter == "Q4":
-                pdf = render_to_pdf('webapp/report.html', data)                
-            else:
-                pdf = render_to_pdf('webapp/report1.html',data)
         
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
@@ -1203,7 +1200,8 @@ class GeneratePdf(View):
         return HttpResponse("Page Not Found")
 
 
-# for CMO
+# for CMO because it has two parameters such as dept & fiscal year
+
 class GeneratePdf2(View):
     def get(self, request, *args, **kwargs):
         
@@ -1416,7 +1414,8 @@ class GeneratePdf2(View):
     
 
 
-# Approved Plan
+# Approved Plan for everyone
+
 class GeneratePdf3(View):
     def get(self, request, *args, **kwargs):
         
