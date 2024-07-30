@@ -32,14 +32,14 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'grant-extension' %}"> <i class="fa fa-angle-double-right" aria-hidden="true"></i> &nbsp; Extensions </a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="{% url 'extension-log' %}"> <i class="fa fa-clipboard-list" aria-hidden="true"></i> &nbsp; Extension log </a>
           </li>
           <li class="nav-item">
             <a class="nav-link"href="{% url 'admin-forms' %}"> <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp; Create Model Instances</a>
-          </li>
+          </li> -->
         {% endif %}
-
+        {% if request.resolver_match.url_name == 'dashboard' %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="shareDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-share-alt" aria-hidden="true"></i> &nbsp; Share
@@ -59,6 +59,7 @@
             </a>
           </div>
         </li>
+        {% endif %}
 
         <!-- {% if user.is_superuser %}
         <li class="nav-item">
