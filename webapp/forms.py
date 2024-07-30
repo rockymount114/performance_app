@@ -361,7 +361,7 @@ class ApprovalsFilterForm(forms.Form):
         queryset=FiscalYear.objects.all(),
         disabled=False,
         required=True,
-        initial=get_current_fiscal_year(),  # Your function to get the current fiscal year
+        initial=FiscalYear.objects.get(name=get_current_fiscal_year()),  # Your function to get the current fiscal year
         widget=forms.Select(attrs={'onchange': 'filterResults(this.value)'}),
     )
         

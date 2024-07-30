@@ -1684,7 +1684,7 @@ def approvals(request):
     approve_objective = request.GET.get('approve_objective')
     approve_measure = request.GET.get('approve_measure')
 
-    print(approve_objective)
+
     prechecked_objectives = request.session.get('prechecked_objectives', [])
 
 
