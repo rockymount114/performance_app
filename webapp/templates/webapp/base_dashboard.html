@@ -12,8 +12,8 @@
               {% for focus_area in focus_areas %}
                 {% if focus_area.objective_count > 0 %}
                   <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="objective-text">{{ focus_area.name }}: <strong>{{ focus_area.objective_count }}</strong></div>
-      
+                    <div class="objective-text">{{ focus_area.name }}</strong></div>
+                    <!-- <div class="objective-text">{{ focus_area.name }}: <strong>{{ focus_area.objective_count }}</strong></div> -->
                   </div>
                 {% endif %}
               {% endfor %}

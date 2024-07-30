@@ -38,16 +38,18 @@ body {
 }
 
 .city-logo {
-    width: 200px;
+    width: 300px;
     height: auto;
     max-width: 100%;
 }
 
 .pdf-title {
-    font-size: 24px; /* Increased for better proportion */
+    font-size: 21px; /* Increased for better proportion */
     color: #2c3e50;
     margin: 0;
     text-align: center;
+    padding-top: 0px;
+    margin-top: 0;
 }
 
 .info-container {

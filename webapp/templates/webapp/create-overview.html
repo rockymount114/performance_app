@@ -14,7 +14,6 @@
         <form method="POST" id="overviewForm"  autocomplete="off" action="{% url 'create-overview' %}?department_id={{ department.id }}">
 
             {% csrf_token %}
-            {{ form.fiscal_year | as_crispy_field }}   
             {{ form.name | as_crispy_field }}
                 
 

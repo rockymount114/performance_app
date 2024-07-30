@@ -16,6 +16,12 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'dashboard' %}"><i class="fa fa-home" aria-hidden="true"></i> &nbsp; Dashboard </a>
       </li>
+      {% if not user.is_global_performance_officer %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'request-extension' %}"><i class="fa fa-calendar-plus" aria-hidden="true"></i> &nbsp; Request Extension </a>
+        </li>
+      {% endif %}
+      
       
 
 
@@ -25,6 +31,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'grant-extension' %}"> <i class="fa fa-angle-double-right" aria-hidden="true"></i> &nbsp; Extensions </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'extension-log' %}"> <i class="fa fa-clipboard-list" aria-hidden="true"></i> &nbsp; Extension log </a>
           </li>
           <li class="nav-item">
             <a class="nav-link"href="{% url 'admin-forms' %}"> <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp; Create Model Instances</a>
@@ -46,7 +55,7 @@
             </a>
             {% endif %}
             <a class="dropdown-item" href="{% url 'pdf3' %}?departments={{ selected_department_id }}&fiscal_year={{ selected_fiscal_year_id }}" target="_blank">
-              <i class="fa-regular fa-file-pdf"></i> &nbsp; Approved Plan
+              <i class="fa-regular fa-file-pdf"></i> &nbsp; Performance Plan
             </a>
           </div>
         </li>
@@ -70,16 +79,17 @@
       </li>
       {% endif %}
     </ul>
-    <ul class="navbar-nav ml-auto mr-3">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'profile' %}"><i class="fa fa-user" aria-hidden="true"></i> &nbsp;Profile </a>
-      </li>
+    {% if user.is_authenticated %}
+      <ul class="navbar-nav ml-auto mr-3">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'profile' %}"><i class="fa fa-user" aria-hidden="true"></i> &nbsp;Profile </a>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'user-logout' %}"> <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Sign out </a>
-      </li>
-      
-    </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'user-logout' %}"> <i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp; Sign out </a>
+        </li>
+      </ul>
+    {% endif %}
   </div>
 </nav>
 
