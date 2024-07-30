@@ -1,0 +1,108 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Extension Log{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    .table th {
+        background-color: #f1f3f5;
+    }
+    .reason-text {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .btn-custom {
+        transition: all 0.3s ease;
+    }
+    .btn-custom:hover {
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="mb-4 text-primary"><i class="fas fa-history mr-2"></i> Extension Log</h1>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0"><i class="fas fa-list mr-2"></i> Extension Records</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 13%;"><i class="fas fa-building mr-2"></i> Department</th>
+                            <th style="width: 10%;"><i class="fas fa-user mr-2"></i> Requested By</th>
+                            <th style="width: 13%;"><i class="fas fa-calendar-plus mr-2"></i> Requested At</th>
+                            <th style="width: 10%;"><i class="fas fa-user-check mr-2"></i> Granted By</th>
+                            <th style="width: 13%;"><i class="fas fa-calendar-check mr-2"></i> Granted At</th>
+                            <th style="width: 8%;"><i class="fas fa-hourglass-half mr-2"></i> Duration</th>
+                            <th style="width: 23%;"><i class="fas fa-comment mr-2"></i> Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.department.name }}</td>
+                            <td>{{ log.requested_by.get_full_name }}</td>
+                            <td>{{ log.requested_at|date:"F j, Y, g:i a" }}</td>
+                            <td>{{ log.granted_by.get_full_name }}</td>
+                            <td>{{ log.granted_at|date:"F j, Y, g:i a" }}</td>
+                            <td>{{ log.duration }} day{% if log.duration > 1 %}s{% endif %}</td>
+                            <td>
+                                <div class="reason-text" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ log.reason }}">
+                                    {{ log.reason }}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No extension logs found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'grant-extension' %}" class="btn btn-primary btn-lg btn-custom">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Grant Extensions
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    document.querySelectorAll('.reason-text').forEach(function(reasonDiv) {
+        reasonDiv.addEventListener('mouseenter', function() {
+            bootstrap.Tooltip.getInstance(this).show();
+        });
+
+        reasonDiv.addEventListener('mouseleave', function() {
+            bootstrap.Tooltip.getInstance(this).hide();
+        });
+    });
+});
+</script>
+{% endblock %}

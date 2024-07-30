@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import datetime
 # from .validators import PhoneNumberField  
 from django.core.validators import RegexValidator
+from datetime import timedelta
 
 
 
@@ -43,16 +44,84 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-
-class Department(TimeStampMixin): 
-    
-    name = models.CharField(max_length=100)   
-    description = models.CharField(max_length=100, null=True, blank=True)    
+class Department(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, null=True, blank=True)
     extension_granted_at = models.DateTimeField(null=True, blank=True)
+    extension_duration = models.IntegerField(default=0)  # Changed default to 0
+
     class Meta:
-        ordering = ["name"]        
-    def __str__(self) -> str:
-        return self.name  
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    def grant_extension(self, duration_days):
+        self.extension_granted_at = timezone.now()
+        self.extension_duration = duration_days
+        self.save()
+
+    def revoke_extension(self):
+        self.extension_granted_at = None
+        self.extension_duration = 0  # Set to 0 instead of None
+        self.save()
+
+    @property
+    def extension_deadline(self):
+        if self.extension_granted_at and self.extension_duration > 0:
+            return self.extension_granted_at + timedelta(days=self.extension_duration)
+        return None
+
+    @property
+    def has_active_extension(self):
+        deadline = self.extension_deadline
+        return deadline is not None and deadline > timezone.now()
+
+class ExtensionRequest(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='extension_requests')
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='requested_extensions')
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='approved_extensions')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    requested_duration = models.IntegerField()  # Duration in days
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('denied', 'Denied'),
+    ], default='pending')
+
+    def approve(self, approved_by):
+        self.status = 'approved'
+        self.approved_by = approved_by
+        self.save()
+        self.department.grant_extension(self.requested_duration)
+        ExtensionLog.objects.create(
+            department=self.department,
+            requested_by=self.requested_by,
+            requested_at=self.requested_at,
+            granted_by=approved_by,
+            granted_at=timezone.now(),
+            duration=self.requested_duration,
+            reason=self.reason
+        )
+
+    def deny(self, denied_by):
+        self.status = 'denied'
+        self.approved_by = denied_by
+        self.save()
+
+class ExtensionLog(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='extension_logs')
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='logged_requested_extensions')
+    requested_at = models.DateTimeField(default=timezone.now)  # Add default here
+    granted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='logged_granted_extensions')
+    granted_at = models.DateTimeField()
+    duration = models.IntegerField()  # Duration in days
+    reason = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Extension for {self.department} requested by {self.requested_by} on {self.requested_at}"
+
     
 class CustomerUser(AbstractBaseUser, PermissionsMixin):
     
@@ -170,11 +239,10 @@ class FocusArea(TimeStampMixin):
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]  
  
 class Measure(TimeStampMixin):
-    
     objective = models.ForeignKey("Objective", on_delete=models.CASCADE)   
     title = models.TextField(max_length=500)
     department = models.ForeignKey("Department", on_delete=models.CASCADE)  
-    approved = models.BooleanField('Approved',default=False) 
+    approved = models.BooleanField('Approved', default=False) 
     created_by = models.CharField(max_length=50, null=True)
     modified_by = models.CharField(max_length=50, null=True)
     
@@ -182,30 +250,65 @@ class Measure(TimeStampMixin):
         ("Upwards", "Upwards"),
         ("Downwards", "Downwards"),
     )  
-    
-    direction = models.CharField(max_length=255, choices= DIRECTIONS, default="Upwards") 
+    direction = models.CharField(max_length=255, choices=DIRECTIONS, default="Upwards") 
     
     FREQUENCY_CHOICES = (
         ("Quarterly", "Quarterly"),
         ("Annually", "Annually"),
     )    
-    frequency = models.CharField(max_length=255, choices= FREQUENCY_CHOICES, default="Quarterly")    
+    frequency = models.CharField(max_length=255, choices=FREQUENCY_CHOICES, default="Quarterly")    
     
-    current_year_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR)
+    current_year_rate = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        default=Decimal('0')
+    )
     
-    NUMBER_CHOICES = (
-        (True, "Number"),
-        (False, "Rate"),
-    ) 
+    IS_NUMBER_CHOICES = (
+        (True, "Yes"),
+        (False, "No"),
+    )
+    is_number = models.BooleanField(
+        'Is this measure a number?',
+        choices=IS_NUMBER_CHOICES,
+        default=False
+    )
     
-    is_number = models.BooleanField(default=False, choices= NUMBER_CHOICES)
-    
-    target_number = models.IntegerField(null=True, blank=True, default=0)
-    target_rate = models.DecimalField(max_digits=3, decimal_places=0, default=Decimal(0), validators=PERCENTAGE_VALIDATOR, null=True, blank=True)
+    target_number = models.DecimalField(
+        max_digits=15,
+        decimal_places=0,
+        null=True, 
+        blank=True
+    )
+    target_rate = models.DecimalField(
+        max_digits=5, 
+        decimal_places=0, 
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        null=True, 
+        blank=True
+    )
     
     fiscal_year = models.ForeignKey("FiscalYear", on_delete=models.CASCADE)
     
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        if self.is_number:
+            if self.current_year_rate < 0:
+                raise ValidationError('For numbers, the value must be non-negative')
+        else:
+            if self.current_year_rate < 0 or self.current_year_rate > 100:
+                raise ValidationError('For rates, the value must be between 0 and 100')
     
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+    
+    def formatted_current_year_rate(self):
+        if self.is_number:
+            return f"{self.current_year_rate:,.2f}"
+        else:
+            return f"{self.current_year_rate:.2f}%"
     
     def __str__(self) -> str:
         return self.title
