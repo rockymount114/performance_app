@@ -506,8 +506,35 @@ class UpdateObjectiveForm(forms.ModelForm):
         fields = ['name', 'fiscal_year', "focus_area"]  
         exclude = ['department', 'approved', 'created_by']
 
+class ExtensionRequestForm(forms.ModelForm):
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,  # Changed to False since we're setting it in the view
+    )
 
+    class Meta:
+        model = ExtensionRequest
+        fields = ['department', 'requested_duration', 'reason']
+        widgets = {
+            'requested_duration': forms.Select(choices=[
+                (1, '1 day'),
+                (2, '2 days'),
+                (3, '3 days'),
+                (4, '4 days'),
+                (5, '5 days'),
+                (6, '6 days'),
+                (7, '7 days'),
+            ]),
+            'reason': forms.Textarea(attrs={'rows': 4}),
+        }
+        labels = {
+            'requested_duration': 'Please select how many extension days you need',
+        }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['department'].widget.attrs['readonly'] = True
 
 # RegexValidator for phone number
 

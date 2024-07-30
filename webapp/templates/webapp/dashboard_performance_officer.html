@@ -108,18 +108,19 @@
               }
           });
       }
+
   
       function updateNavbarLinks(departmentId, fiscalYearId) {
           var performanceReportLink = $('a:contains("Performance Report")');
-          var approvedPlanLink = $('a:contains("Approved Plan")');
+          var performancePlanLink = $('a:contains("Performance Plan")');
 
           // For performance officers, both department and fiscal year are needed for performance report
           var perfReportUrl = "{% url 'pdf2' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
           performanceReportLink.attr('href', perfReportUrl).attr('target', '_blank');
 
           // For approved plan, both department and fiscal year are needed
-          var approvedPlanUrl = "{% url 'pdf3' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
-          approvedPlanLink.attr('href', approvedPlanUrl).attr('target', '_blank');  // Fixed: changed approvedPlanLink to approvedPlanUrl
+          var perfPlanUrl = "{% url 'pdf3' %}?departments=" + departmentId + "&fiscal_year=" + fiscalYearId;
+          performancePlanLink.attr('href', perfPlanUrl).attr('target', '_blank');  // Fixed: changed approvedPlanLink to approvedPlanUrl
       }
   
       // Listen for changes in both department and fiscal year dropdowns

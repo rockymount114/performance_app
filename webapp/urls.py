@@ -48,7 +48,9 @@ urlpatterns = [
 
 
     # Grant extension:
+    path('request-extension/', views.request_extension, name='request-extension'),
     path('grant-extension/', views.grant_extension, name='grant-extension'),
+    path('extension-log/', views.extension_log, name='extension-log'),
 
 
 

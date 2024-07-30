@@ -1570,7 +1570,7 @@ class GeneratePdf3(View):
                 
             data = {
                 "page_orientation": "landscape",
-                "report_name":"Approved Plan",
+                "report_name":"Performance Plan",
                 "name": "City of Rocky Mount", 
                 "department_name": department_name,
                 "username": username,
@@ -1620,7 +1620,7 @@ class GeneratePdf3(View):
 
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
-                filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                filename = "%s - Performance Plan %s.pdf" % (data['department_name'], data['current_fiscal_year'])
                 content = "inline; filename= %s" %(filename)
                 response['Content-Disposition']=content
                 return response
@@ -2031,59 +2031,86 @@ def update_measure(request, pk):
         'fiscal_year': fiscal_year,
     }
     return render(request, 'webapp/update-measure.html', context=context)
+                   
 
-
-                    
-# Create grant extension page
 @login_required(login_url='my-login')
-def grant_extension(request):
-    department_list = Department.objects.all().order_by('name')
-    if request.user.is_citymanager_office or request.user.is_superuser:
-        if request.method=="POST":
-            id_list = request.POST.getlist('boxes')
-
-            # Update the db
-            for x in id_list:
-                department = Department.objects.filter(pk=int(x)).first()
-                if department:
-                    department.extension_granted_at = timezone.now()
-                    department.save()
-           
-            messages.success(request, ("The extension was successfully granted, and will expire in 48 hours."))
-            return redirect("dashboard")
-
-        else:
-            d_ext= {}
-            for i in department_list:
-                d_ext.update({i.id:is_within_10_minutes(i.extension_granted_at)})
-
-            d_deadline={}
-            for i in department_list:
-                if is_within_10_minutes(i.extension_granted_at):
-                    d_deadline.update({i.id:i.extension_granted_at + timedelta(minutes=10)})
-
-
-            for i in department_list:
-                if is_within_10_minutes(i.extension_granted_at) == False:
-                    i.extension_granted_at = None
-                    i.save()
-
-            context = {
-                'department_list': department_list,
-                'd_ext':d_ext,
-                'd_deadline':d_deadline
-                       }
-            return render(request,'webapp/grant-extension.html',context)
-  
+def request_extension(request):
+    # Get the department, either from the URL or the user's profile
+    department_id = request.GET.get('department_id')
+    if department_id:
+        department = get_object_or_404(Department, id=department_id)
+    elif request.user.department_id:
+        department = request.user.department
     else:
-        messages.success(request,("You are not authorized to visit this page!"))
+        messages.error(request, "No department specified and user is not associated with a department.")
         return redirect("dashboard")
 
+    if request.method == "POST":
+        form = ExtensionRequestForm(request.POST, initial={'department': department})
+        if form.is_valid():
+            extension_request = form.save(commit=False)
+            extension_request.requested_by = request.user
+            extension_request.department = department
+            extension_request.save()
+            messages.success(request, "Extension request submitted successfully.")
+            return redirect("dashboard")
+    else:
+        form = ExtensionRequestForm(initial={'department': department})
+    
+    context = {
+        'form': form,
+        'department': department
+    }
+    return render(request, 'webapp/request_extension.html', context)
 
+# Grant extension view
+@login_required(login_url='my-login')
+def grant_extension(request):
+    if not (request.user.is_citymanager_office or request.user.is_superuser):
+        messages.error(request, "You are not authorized to visit this page!")
+        return redirect("dashboard")
 
-    # return render(request,'webapp/grant-extension.html')
+    pending_requests = ExtensionRequest.objects.filter(status='pending')
 
+    if request.method == "POST":
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
 
+        extension_request = get_object_or_404(ExtensionRequest, id=request_id)
+        if action == 'approve':
+            extension_request.approve(request.user)
+            messages.success(request, f"Extension of {extension_request.requested_duration} day(s) granted to {extension_request.department.name}.")
+        elif action == 'deny':
+            extension_request.deny(request.user)
+            messages.success(request, f"Extension request for {extension_request.department.name} has been denied.")
+
+        return redirect("grant-extension")
+
+    departments = Department.objects.all().order_by('name')
+    for dept in departments:
+        if not dept.has_active_extension:
+            dept.revoke_extension()
+
+    context = {
+        'pending_requests': pending_requests,
+        'departments': departments,
+    }
+    return render(request, 'webapp/grant_extension.html', context)
+
+# Extension log view
+@login_required(login_url='my-login')
+def extension_log(request):
+    if not (request.user.is_citymanager_office or request.user.is_superuser):
+        messages.error(request, "You are not authorized to view this page!")
+        return redirect("dashboard")
+
+    logs = ExtensionLog.objects.all().order_by('-granted_at')
+    context = {
+        'logs': logs,
+    }
+    return render(request, 'webapp/extension_log.html', context)
+
+# For ACM logic
 @user_passes_test(lambda u: u.is_authenticated and u.is_citymanager_office or u.is_authenticated and u.is_superuser)
 def admin_forms(request):
     models = [Mission, Overview, FocusArea, Objective, Measure, QuarterlyPerformanceData, StrategicInitiative, StrategicInitiativeDetail]

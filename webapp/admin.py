@@ -12,16 +12,22 @@ admin.site.site_header = SITE_TITLE
 admin.site.site_title = SITE_TITLE
 
 
+@admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description', 'created_at','extension_granted_at' )
-    fields = (
-        # 'id',
-        'name',
-        'description',
+    list_display = ('name', 'description', 'has_active_extension', 'extension_deadline')
+    search_fields = ('name', 'description')
 
-        'extension_granted_at',
-    )    
-admin.site.register(Department, DepartmentAdmin)
+@admin.register(ExtensionRequest)
+class ExtensionRequestAdmin(admin.ModelAdmin):
+    list_display = ('department', 'requested_by', 'requested_at', 'requested_duration', 'status')
+    list_filter = ('status', 'requested_at')
+    search_fields = ('department__name', 'requested_by__username', 'reason')
+
+@admin.register(ExtensionLog)
+class ExtensionLogAdmin(admin.ModelAdmin):
+    list_display = ('department', 'granted_by', 'granted_at', 'duration')
+    list_filter = ('granted_at',)
+    search_fields = ('department__name', 'granted_by__username', 'reason')
 
 class FiscalYearAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'created_at',)

@@ -48,6 +48,8 @@ body {
     color: #2c3e50;
     margin: 0;
     text-align: center;
+    padding-top: 0px;
+    margin-top: 0;
 }
 
 .info-container {

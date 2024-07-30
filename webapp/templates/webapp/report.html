@@ -21,13 +21,14 @@
           <div class="logo-container">
               <img src="{{ city_logo }}" alt="City logo" class="city-logo">
           </div>
-          <h1 class="pdf-title">{{department_name}} - {{ report_name }} - {{fiscal_year}}</h1>
+          <h1 class="pdf-title"> Department of {{department_name}}</h1>
+          <h1 class="pdf-title"> {{fiscal_year}} - {{ report_name }} </h1>
       </div>
     </header>
 
     <div class="info-container">
       <p><strong>Name:</strong> {{ username }} <strong>Email:</strong> {{user_email}}</p>
-      <p><strong>Department:</strong> {{ department_name }} <strong>Dept Head Name:</strong> {{dept_head_name}} <strong>Dept Head Email:</strong> {{dept_head_email}}</p>
+      <p> <strong>Dept Head Name:</strong> {{dept_head_name}} <strong>Dept Head Email:</strong> {{dept_head_email}}</p>
   </div>
 
   <section class="mission-overview">

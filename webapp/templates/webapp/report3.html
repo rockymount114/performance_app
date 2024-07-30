@@ -21,7 +21,8 @@
           <div class="logo-container">
               <img src="{{ city_logo }}" alt="City logo" class="city-logo">
           </div>
-          <h1 class="pdf-title">Department of {{department_name}} - {{ report_name }} - {{fiscal_year}}</h1>
+          <h1 class="pdf-title"> Department of {{department_name}}</h1>
+          <h1 class="pdf-title"> {{fiscal_year}} - {{ report_name }} </h1>
       </div>
     </header>
 
@@ -95,7 +96,7 @@
                             <td class="measure-column">{{ measure.title }}</td>
                             <td>{{ measure.direction }}</td>
                             <td>{{ measure.frequency }}</td>
-                            <td>{{ measure.current_year_rate }} {% if not measure.is_number %} % {% endif %}</td>
+                            <td>{% if measure.current_year_rate == 0 %} N/A {% else %}{{ measure.current_year_rate }} {% if not measure.is_number %} % {% endif %} {% endif %}</td>
                             <td>{{ target_rate_number|get_item:measure.id }} {% if not measure.is_number %} % {% endif %}</td>
                         </tr>
                         {% endfor %}
@@ -115,22 +116,21 @@
             <thead>
                 <tr>
                     <th class="initiative-column">Strategic Initiatives</th>
-                    <!-- <th>Description</th> -->
+                    <th>Description</th>
                     <th>Proposed Completion Date</th>
-                    <th>Status</th>
+                    <!-- <th>Status</th>
                     <th>Project Status Desc</th>
-                    <th>Expected Impacts</th>
-                </tr>
+                    <th>Expected Impacts</th> -->
             </thead>
             <tbody>
                 {% for initiative in initiatives %}
                 <tr>
                     <td class="initiative-column">{{initiative.title}}</td>
-                    <!-- <td>{{initiative.description}}</td> -->
-                    <td>{{initiative.proposed_completion_date|date:"m/d/Y"}}</td>
-                    <td>{{ initiative_status|get_item:initiative.id|default:"-" }}</td>
+                    <td align="left"">{{initiative.description}}</td>
+                    <td width="15%">{{initiative.proposed_completion_date|date:"m/d/Y"}}</td>
+                    <!-- <td>{{ initiative_status|get_item:initiative.id|default:"-" }}</td>
                     <td>{{ initiative_desc_of_s|get_item:initiative.id|default:"-" }}</td>
-                    <td>{{ initiative_expected_impact|get_item:initiative.id|default:"-" }}</td>
+                    <td>{{ initiative_expected_impact|get_item:initiative.id|default:"-" }}</td> -->
                 </tr>
                 {% endfor %}
             </tbody>
