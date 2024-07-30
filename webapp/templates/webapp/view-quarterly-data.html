@@ -91,6 +91,29 @@
             </div>
         </div>
     </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Quarterly Impact Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for quarter in quarterly_data %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-info">
+                                <h6 class="mb-0">{{ quarter.quarter }} Descriptive Impact</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ quarter.descriptive_impact }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
     <div class=" mt-4">
         <a href="javascript:history.go(-1)" class="btn btn-outline-secondary"> <i class="fa fa-arrow-left me-2" aria-hidden="true"></i> Return </a>
     </div>
