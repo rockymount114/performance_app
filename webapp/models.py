@@ -244,7 +244,7 @@ class Measure(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)  
     approved = models.BooleanField('Approved', default=False) 
     created_by = models.CharField(max_length=50, null=True)
-    modified_by = models.CharField(max_length=50, null=True)
+    modified_by = models.CharField(max_length=50, null=True, blank=True)
     
     DIRECTIONS = (
         ("Upwards", "Upwards"),
