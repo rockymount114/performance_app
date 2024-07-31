@@ -115,7 +115,7 @@ WSGI_APPLICATION = 'crm.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "mssql",
-        "NAME": "db_performance_test",
+        "NAME": "db_performance",
         "USER": "SSRS",
         "PASSWORD": "Ts4test@",
         "HOST": "172.20.21.115",
