@@ -15,8 +15,37 @@ jobs:
 
       - name: Sync main to deploy branch
         run: |
+          set -e
+          echo "Configuring git..."
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git checkout deploy
-          git merge origin/main
-          git push origin deploy
+          
+          echo "Fetching latest changes..."
+          git fetch origin
+          
+          echo "Checking out deploy branch..."
+          if git show-ref --quiet refs/remotes/origin/deploy; then
+            git checkout deploy
+          else
+            echo "Deploy branch doesn't exist. Creating it..."
+            git checkout -b deploy
+          fi
+          
+          echo "Merging main into deploy..."
+          if git merge origin/main; then
+            echo "Merge successful"
+          else
+            echo "Merge failed. There might be conflicts."
+            git merge --abort
+            exit 1
+          fi
+          
+          echo "Pushing changes..."
+          if git push origin deploy; then
+            echo "Push successful"
+          else
+            echo "Push failed. Check repository permissions."
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
