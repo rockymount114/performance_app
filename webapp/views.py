@@ -458,7 +458,7 @@ def get_performance_officer_context(request, current_fiscal_year):
 
     if not department_id:
         # Set default department to City Manager Office
-        department = Department.objects.filter(name='City Manager Office').first()
+        department = Department.objects.filter(name='City Manager').first()
         department_id = department.id if department else None
 
     if not fiscal_year_id:
@@ -575,6 +575,7 @@ def get_regular_user_context(request, current_fiscal_year):
 
 
     department_id = request.user.department_id
+    
     extension_granted_at = Department.objects.get(pk=department_id).extension_granted_at
     if is_within_10_minutes(extension_granted_at) == False:
         grant_extension_to_department = False
@@ -640,6 +641,7 @@ def get_regular_user_context(request, current_fiscal_year):
 
         'fiscal_year_selected_name':fiscal_year_selected_name,
         'prev_fiscal_year_name':prev_fiscal_year_name,
+        'department': Department.objects.get(pk=department_id),
 
         **initiative_data
     }
@@ -1015,7 +1017,7 @@ class GeneratePdf(View):
             fiscal_year_id = request.GET.get('fiscal_year') # for selection returns FY id
             
             department_id = request.user.department_id   
-            department_name = Department.objects.filter(id=department_id).last()
+            department = Department.objects.filter(id=department_id).last()
             
             current_fiscal_year = get_current_fiscal_year()
             
@@ -1147,7 +1149,7 @@ class GeneratePdf(View):
                 "page_orientation": "landscape",
                 "report_name":"Performance Report",
                 "name": "City of Rocky Mount", 
-                "department_name": department_name,
+                "department": department,
                 "username": request.user.first_name + " " + request.user.last_name,
                 "user_email": user_email,
                 "dept_head_name":dept_head_name,
@@ -1193,7 +1195,7 @@ class GeneratePdf(View):
         
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
-                filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                filename = "%s - Performance Report %s.pdf" % (data['department'], data['current_fiscal_year'])
                 content = "inline; filename= %s" %(filename)
                 response['Content-Disposition']=content
                 return response
@@ -1217,7 +1219,7 @@ class GeneratePdf2(View):
             if not department_id or not fiscal_year:
                 return redirect('dashboard')
         
-            department_name = Department.objects.filter(id=department_id).last()
+            department = Department.objects.filter(id=department_id).last()
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
@@ -1355,7 +1357,7 @@ class GeneratePdf2(View):
                 "page_orientation": "landscape",
                 "report_name":"Performance Report",
                 "name": "City of Rocky Mount", 
-                "department_name": department_name,
+                "department": department,
                 "username": username,
                 "user_email": user_email,
                 "dept_head_name":dept_head_name,
@@ -1404,7 +1406,7 @@ class GeneratePdf2(View):
 
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
-                filename = "%s - Performance Report %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                filename = "%s - Performance Report %s.pdf" % (data['department'], data['current_fiscal_year'])
                 content = "inline; filename= %s" %(filename)
                 response['Content-Disposition']=content
                 return response
@@ -1431,7 +1433,7 @@ class GeneratePdf3(View):
             if not department_id:
                 department_id = request.user.department_id   
         
-            department_name = Department.objects.filter(id=department_id).last()
+            department = Department.objects.filter(id=department_id).last()
             
             current_fiscal_year = FiscalYear.objects.get(name= get_current_fiscal_year())        
             prev_fiscal_year = FiscalYear.objects.get(name= get_prev_fiscal_year())  
@@ -1572,7 +1574,7 @@ class GeneratePdf3(View):
                 "page_orientation": "landscape",
                 "report_name":"Performance Plan",
                 "name": "City of Rocky Mount", 
-                "department_name": department_name,
+                "department": department,
                 "username": username,
                 "user_email": user_email,
                 "dept_head_name":dept_head_name,
@@ -1620,7 +1622,7 @@ class GeneratePdf3(View):
 
             if pdf:
                 response=HttpResponse(pdf,content_type='application/pdf')
-                filename = "%s - Performance Plan %s.pdf" % (data['department_name'], data['current_fiscal_year'])
+                filename = "%s - Performance Plan %s.pdf" % (data['department'], data['current_fiscal_year'])
                 content = "inline; filename= %s" %(filename)
                 response['Content-Disposition']=content
                 return response

@@ -19,7 +19,21 @@
   </div>
 <div id="dashboard-content">
     <div class="card shadow">
-    <h3>Department of {{ department.name }}</h3>
+      
+        {% if department.name == "City Manager" %}
+            <h3 class="text-center">Office of the City Manager</h3>
+        {% elif department.name == "Business & Collections" %}
+            <h3 class="text-center">Department of Business & Collections Services</h3>
+        {% elif department.name == "City Clerk" %}
+            <h3 class="text-center">Office of the City Clerk</h3>
+        {% elif department.name == "Fire" %}
+            <h3 class="text-center">Fire Department</h3>
+        {% elif department.name == "Police" %}
+            <h3 class="text-center">Police Department</h3>
+        {% else %}
+            <h3 class="text-center">Department of {{ department.name }}</h3>
+        {% endif %}
+      
     </div>
 
 
