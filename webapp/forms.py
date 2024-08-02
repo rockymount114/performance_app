@@ -19,7 +19,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field
+from crispy_forms.layout import Layout, Field, Submit
 
 from django.core.validators import RegexValidator
 # from .views import get_current_fiscal_year
@@ -203,7 +203,7 @@ class CreateInitiativeForm(forms.ModelForm):
     
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
     proposed_completion_date = forms.DateField(
@@ -506,6 +506,40 @@ class UpdateObjectiveForm(forms.ModelForm):
         fields = ['name', 'fiscal_year', "focus_area"]  
         exclude = ['department', 'approved', 'created_by']
 
+
+# -Update Initiatives 
+
+class UpdateInitiativeForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 500 characters'}),
+        label="Please input Initiative here",
+        max_length=500,
+        required=True,
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative description here, max 1000 characters'}),
+        label="Description",
+        max_length=1000,
+        required=False,
+    )
+    
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=True,
+    )
+    proposed_completion_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=True,
+    )
+
+    class Meta:
+        model = StrategicInitiative    
+        fields = ['fiscal_year', 'title', 'description', 'proposed_completion_date']  
+        exclude = ['department', 'created_by', 'modified_by']
+
+
 class ExtensionRequestForm(forms.ModelForm):
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
@@ -535,6 +569,9 @@ class ExtensionRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['department'].widget.attrs['readonly'] = True
+
+
+
 
 # RegexValidator for phone number
 

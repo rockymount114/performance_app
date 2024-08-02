@@ -42,9 +42,11 @@ urlpatterns = [
     # View and update records --> regular  
     path('update-objective/<int:pk>/', views.update_objective, name="update-objective"),
     path('view-objective-info-regular/<int:pk>/', views.view_objective_info_regular, name="view-objective-info-regular"),
-
+ 
     path('update-measure/<int:pk>/', views.update_measure, name="update-measure"),
     path('view-measure-info-regular/<int:pk>/', views.view_measure_info_regular, name="view-measure-info-regular"),
+
+    path('update-initiative/<int:pk>/', views.update_initiative, name="update-initiative"),
 
 
     # Grant extension:

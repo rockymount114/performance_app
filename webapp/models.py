@@ -368,8 +368,6 @@ class QuarterlyPerformanceData(TimeStampMixin):
             percentage = f"{int((self.numerator / self.denominator) * 100)} % "
         return percentage
     
-
-    
     
 class StrategicInitiative(TimeStampMixin):
     department = models.ForeignKey("Department", on_delete=models.CASCADE)

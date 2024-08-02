@@ -263,7 +263,12 @@
                 {% for initiative in initiatives %}
                 <tr>
         
-                    <td data-toggle="tooltip" title="{{initiative.title}}"> {{initiative.title}} </td>
+                    <td data-toggle="tooltip" title="{{initiative.title}}"> 
+                      <a href="{% url 'update-initiative' initiative.id %}"
+                      class="hover-link{% if not show_add_button %} disabled{% endif %}"
+                      {% if not show_add_button %}style="pointer-events: none;"{% endif %}>{{initiative.title}}</a>
+                    </td>
+                    
                     <td data-toggle="tooltip" title="{{initiative.description}}"> {{initiative.description}} </td>
                     <td align="center"> {{initiative.proposed_completion_date |date:"m/d/Y"}} </td>
         

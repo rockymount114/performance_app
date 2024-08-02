@@ -2033,6 +2033,30 @@ def update_measure(request, pk):
         'fiscal_year': fiscal_year,
     }
     return render(request, 'webapp/update-measure.html', context=context)
+
+
+#  - Update an initiative
+
+@login_required(login_url='my-login')
+def update_initiative(request, pk):     
+    initiative = get_object_or_404(StrategicInitiative, id=pk)
+    
+    if request.method == "POST":
+        form = UpdateInitiativeForm(request.POST, instance=initiative)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.modified_by = request.user.get_full_name()
+            instance.save()
+    
+            messages.success(request, "Your initiative was successfully updated!")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "There was an error in your form. Please check and try again.")
+    else:
+        form = UpdateInitiativeForm(instance=initiative)
+
+    context = {'form': form, 'initiative': initiative}
+    return render(request, 'webapp/update-initiative.html', context=context)
                    
 
 @login_required(login_url='my-login')
