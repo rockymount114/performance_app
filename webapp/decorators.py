@@ -28,12 +28,14 @@ def send_approval_email(object_type, action):
 
                     if obj is None:
                         raise ValueError(f"No {object_type} found on request")
+                    
+                    changes = getattr(request, 'changes', None)  # Get changes from request
 
                     supervisor_email = settings.PERFORMANCE_OFFICER_EMAIL
                     if object_type == 'objective':
-                        send_approval_request_cobj(obj, supervisor_email, action)
+                        send_approval_request_cobj(obj, supervisor_email, action,changes)
                     else:
-                        send_approval_request_measure(obj, supervisor_email, action)
+                        send_approval_request_measure(obj, supervisor_email, action,changes)
                     logger.info(f"Approval email sent for {object_type} {obj.id}")
                 except Exception as e:
                     logger.error(f"Failed to send approval email for {action} {object_type}: {str(e)}")

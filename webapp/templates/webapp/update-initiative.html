@@ -1,0 +1,49 @@
+{% extends 'webapp/base.html' %}
+{% block title %}Create Measure{% endblock title %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+    <body>
+
+        <div class="container bg-light shadow-md p-5 form-layout">
+
+            <h3> Update Objective </h3>
+            <h6> Review, and modify initiative as needed.</h6>
+            <hr>
+
+            <form method="POST" autocomplete="off" >
+
+                {% csrf_token %}  
+
+                {{ form.fiscal_year|as_crispy_field }}
+                {{ form.title|as_crispy_field }}
+                {{ form.description|as_crispy_field }}
+                {{ form.proposed_completion_date|as_crispy_field }}
+
+
+
+
+                <br>
+                <button type="submit" class="btn btn-primary">                     
+                    Update Initiative &nbsp; <i class="fa fa-check" aria-hidden="true"></i>
+                </button>
+                &nbsp;
+                <a href="javascript:history.go(-1)" class="btn btn-secondary"> 
+                    Return &nbsp; <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </form>
+        </div>
+        <br>
+
+
+
+    </body>
+
+
+
+
+{% endblock %}
+
+
+
+

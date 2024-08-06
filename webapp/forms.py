@@ -19,11 +19,13 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field
+from crispy_forms.layout import Layout, Field, Submit
 
 from django.core.validators import RegexValidator
 # from .views import get_current_fiscal_year
 import re
+
+from .changes_utils import *
 
 User = get_user_model()
 
@@ -203,7 +205,7 @@ class CreateInitiativeForm(forms.ModelForm):
     
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
-        disabled=False,
+        disabled=True,
         required=True,
     )
     proposed_completion_date = forms.DateField(
@@ -469,6 +471,18 @@ class UpdateMeasureForm(forms.ModelForm):
             self.add_error('target_rate', 'This field is required when the measure is a rate.')
 
         return cleaned_data
+    
+
+    def save(self, commit=True):
+        old_instance = Measure.objects.get(pk=self.instance.pk)
+        instance = super().save(commit=False)
+        
+        if commit:
+            instance.save()
+        
+        changes = get_changes(old_instance, instance)
+        instance.changes = changes
+        return instance
 
     class Meta:
         model = Measure
@@ -498,6 +512,28 @@ class UpdateObjectiveForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
     
     )
+
+    def save(self, commit=True):
+        old_instance = Objective.objects.get(pk=self.instance.pk)
+        instance = super().save(commit=False)
+        
+        if commit:
+            instance.save()
+            self.save_m2m()
+        
+        changes = get_changes(old_instance, instance)
+        
+        # Handle ManyToMany fields separately
+        old_focus_areas = set(old_instance.focus_area.all())
+        new_focus_areas = set(self.cleaned_data['focus_area'])
+        if old_focus_areas != new_focus_areas:
+            changes['focus_area'] = {
+                'old': ', '.join(str(fa) for fa in old_focus_areas),
+                'new': ', '.join(str(fa) for fa in new_focus_areas)
+            }
+        
+        instance.changes = changes
+        return instance
     
     class Meta:
         model = Objective    
@@ -505,6 +541,40 @@ class UpdateObjectiveForm(forms.ModelForm):
 
         fields = ['name', 'fiscal_year', "focus_area"]  
         exclude = ['department', 'approved', 'created_by']
+
+
+# -Update Initiatives 
+
+class UpdateInitiativeForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 500 characters'}),
+        label="Please input Initiative here",
+        max_length=500,
+        required=True,
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative description here, max 1000 characters'}),
+        label="Description",
+        max_length=1000,
+        required=False,
+    )
+    
+    fiscal_year = forms.ModelChoiceField(
+        queryset=FiscalYear.objects.all(),
+        disabled=True,
+        required=True,
+    )
+    proposed_completion_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=True,
+    )
+
+    class Meta:
+        model = StrategicInitiative    
+        fields = ['fiscal_year', 'title', 'description', 'proposed_completion_date']  
+        exclude = ['department', 'created_by', 'modified_by']
+
 
 class ExtensionRequestForm(forms.ModelForm):
     department = forms.ModelChoiceField(
@@ -535,6 +605,9 @@ class ExtensionRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['department'].widget.attrs['readonly'] = True
+
+
+
 
 # RegexValidator for phone number
 

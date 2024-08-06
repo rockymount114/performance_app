@@ -1,27 +1,21 @@
 {% extends 'webapp/base.html' %}
-{%load static%}
+{% load static %}
 {% block title %}Performance Application{% endblock title %}
 {% block content %}   
 
+<div class="container">
+    <div class="logo-container">
+        <img class="beating-logo" src="{% static 'img/logo.svg' %}" alt="Logo Image">
+    </div>
 
-
-    <body>
-        <br>
-        <br>
-        <img class="falling-leaf" src="{% static 'img/leaf.svg' %}" style="display: block; margin-left: auto; margin-right: auto; width: 150px; height: 150px;" alt="Leaf Image">
-
-        <div class="text-center">
-            <h3> City of Rocky Mount's Performance Tracker </h3>
-            <br>
-            <h5> Keep track of your performance effectively! </h5>
-            <hr>
-            <br>
-            <a class="btn btn-primary" type="button" href="{% url 'register' %}"> Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i> </a>
-        </div>
-
-        
-
-
-    </body>      
+    <div class="text-center">
+        <h3>Performance Management Tracker (PMT)</h3>
+        <h5>Keep track of your performance effectively!</h5>
+        <hr>
+        <a class="btn btn-primary" type="button" href="{% url 'register' %}">
+            Create your account &nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i>
+        </a>
+    </div>
+</div>
 
 {% endblock %}

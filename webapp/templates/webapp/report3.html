@@ -24,7 +24,22 @@
           <div class="logo-container">
               <img src="{{ city_logo }}" alt="City logo" class="city-logo">
           </div>
-          <h1 class="pdf-title"> Department of {{department_name}}</h1>
+          <h1 class="pdf-title"> 
+            {% if department.name == "City Manager" %}
+                Office of the City Manager
+            {% elif department.name == "Business & Collections" %}
+                Department of Business & Collections Services
+            {% elif department.name == "City Clerk" %}
+                Office of the City Clerk
+            {% elif department.name == "Fire" %}
+                Fire Department
+            {% elif department.name == "Police" %}
+                Police Department
+            {% else %}
+                Department of {{ department.name }}
+            {% endif %}
+          </h1>
+
           <h1 class="pdf-title"> {{fiscal_year}} - {{ report_name }} </h1>
       </div>
     </header>
@@ -54,11 +69,14 @@
         <div class="card full-width">
             <h2 class="card-header">Strategic Objectives</h2>
             <div class="card-body">
-                <ol class="strategic-objectives-list">
+                <table class="strategic-objectives-list">
                     {% for objective in objectives %}
-                    <li>{{objective}}</li>
+                    <tr>
+                        <td class="objective-number">{{ forloop.counter }}.</td>
+                        <td class="objective-text">{{objective}}</td>
+                    </tr>
                     {% endfor %}
-                </ol>
+                </table>
             </div>
         </div>
     </section>

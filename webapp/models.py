@@ -281,9 +281,9 @@ class Measure(TimeStampMixin):
         blank=True
     )
     target_rate = models.DecimalField(
-        max_digits=5, 
+        max_digits=15, 
         decimal_places=0, 
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        validators=[MinValueValidator(0), MaxValueValidator(1000)],
         null=True, 
         blank=True
     )
@@ -367,8 +367,6 @@ class QuarterlyPerformanceData(TimeStampMixin):
         if self.quarter == quarter:
             percentage = f"{int((self.numerator / self.denominator) * 100)} % "
         return percentage
-    
-
     
     
 class StrategicInitiative(TimeStampMixin):
