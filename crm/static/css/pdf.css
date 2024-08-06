@@ -101,17 +101,42 @@ body {
     width: 100%;
 }
 
-.strategic-objectives-list, .focus-areas-list {
+.focus-areas-list {
     padding-left: 15px;
     margin: 0;
     
 
 }
 
-.strategic-objectives-list li, .focus-areas-list li {
+.focus-areas-list li {
     /* margin-bottom: 8px; */
     padding-left: 8px;
     padding-bottom: 0; /* Remove any bottom padding */
+}
+
+.strategic-objectives-list {
+    margin: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0px; /* Adds vertical space between rows */
+}
+
+.objective-number {
+    width: 30px;
+    text-align: right;
+    padding-left: 10px;
+    vertical-align: top;
+}
+
+.objective-text {
+    padding-left: 5px;
+    padding-bottom: 5px;
+    text-align: left;
+}
+
+/* Remove any borders that might be causing issues */
+.strategic-objectives-list td {
+    border: none;
 }
 
 table {

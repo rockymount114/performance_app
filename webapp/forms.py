@@ -25,6 +25,8 @@ from django.core.validators import RegexValidator
 # from .views import get_current_fiscal_year
 import re
 
+from .changes_utils import *
+
 User = get_user_model()
 
 
@@ -469,6 +471,18 @@ class UpdateMeasureForm(forms.ModelForm):
             self.add_error('target_rate', 'This field is required when the measure is a rate.')
 
         return cleaned_data
+    
+
+    def save(self, commit=True):
+        old_instance = Measure.objects.get(pk=self.instance.pk)
+        instance = super().save(commit=False)
+        
+        if commit:
+            instance.save()
+        
+        changes = get_changes(old_instance, instance)
+        instance.changes = changes
+        return instance
 
     class Meta:
         model = Measure
@@ -498,6 +512,28 @@ class UpdateObjectiveForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
     
     )
+
+    def save(self, commit=True):
+        old_instance = Objective.objects.get(pk=self.instance.pk)
+        instance = super().save(commit=False)
+        
+        if commit:
+            instance.save()
+            self.save_m2m()
+        
+        changes = get_changes(old_instance, instance)
+        
+        # Handle ManyToMany fields separately
+        old_focus_areas = set(old_instance.focus_area.all())
+        new_focus_areas = set(self.cleaned_data['focus_area'])
+        if old_focus_areas != new_focus_areas:
+            changes['focus_area'] = {
+                'old': ', '.join(str(fa) for fa in old_focus_areas),
+                'new': ', '.join(str(fa) for fa in new_focus_areas)
+            }
+        
+        instance.changes = changes
+        return instance
     
     class Meta:
         model = Objective    

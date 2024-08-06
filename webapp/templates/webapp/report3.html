@@ -69,11 +69,14 @@
         <div class="card full-width">
             <h2 class="card-header">Strategic Objectives</h2>
             <div class="card-body">
-                <ol class="strategic-objectives-list">
+                <table class="strategic-objectives-list">
                     {% for objective in objectives %}
-                    <li>{{objective}}</li>
+                    <tr>
+                        <td class="objective-number">{{ forloop.counter }}.</td>
+                        <td class="objective-text">{{objective}}</td>
+                    </tr>
                     {% endfor %}
-                </ol>
+                </table>
             </div>
         </div>
     </section>

@@ -1970,7 +1970,8 @@ def update_objective(request, pk):
             form.save_m2m()
             
             request.objective = instance  # Set this for the decorator
-            
+            request.changes = instance.changes
+
             logger.info(f"Objective updated: {instance.id} by user: {request.user.id}")
             messages.success(request, "Your objective was updated and is now pending approval!")
             return redirect("dashboard")
@@ -2012,6 +2013,7 @@ def update_measure(request, pk):
                 instance.save()
                 
                 request.measure = instance  # Set this for the decorator
+                request.changes = instance.changes
                 
                 logger.info(f"Measure updated: {instance.id} by user: {request.user.id}")
                 messages.success(request, "Your measure was updated and is now pending approval!")
