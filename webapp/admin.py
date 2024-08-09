@@ -88,7 +88,7 @@ class FocusAreaAdmin(admin.ModelAdmin):
 admin.site.register(FocusArea, FocusAreaAdmin)
 
 class MeasureAdmin(admin.ModelAdmin):
-    list_display = ('id', 'department', 'objective', 'title', 'direction', 'frequency', 'current_year_rate','target_rate','created_at',)
+    list_display = ('id', 'department', 'title','objective', 'title', 'direction', 'frequency', 'current_year_rate','target_rate','created_at',)
     fields = (
         
         'fiscal_year',
