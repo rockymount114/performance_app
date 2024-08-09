@@ -188,35 +188,61 @@ class CreateMeasureForm(forms.ModelForm):
 #         model = QuarterlyPerformanceData    
 #         fields = '__all__' 
 
+
+
 class CreateInitiativeForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative here, max 500 characters'}),
-        label="Please input Initative here",
+        label="Initiative name",
         max_length=500,
         required=True,
     )
-
     description = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': 'Please input Your Department Initiative description here, max 1000 characters'}),
         label="Description",
         max_length=1000,
         required=True,
     )
-    
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        disabled=True,
+        required=False,
+    )
     fiscal_year = forms.ModelChoiceField(
         queryset=FiscalYear.objects.all(),
         disabled=True,
-        required=True,
+        required=False,
     )
     proposed_completion_date = forms.DateField(
         widget=DateInput(attrs={'type': 'date'}),
         required=False,
     )
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        department_id = kwargs.pop('department_id', None)
+        fiscal_year_id = kwargs.pop('fiscal_year_id', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            if user.is_global_performance_officer or user.is_citymanager_office or user.is_dept_head:
+                # For users with elevated access, use the department from the dropdown
+                self.fields['department'].initial = department_id if department_id else user.department_id
+            else:
+                # For regular users, use their assigned department
+                self.fields['department'].initial = user.department_id
+
+            # Use the fiscal year from the dropdown if provided, otherwise use the current fiscal year
+            if fiscal_year_id:
+                self.fields['fiscal_year'].initial = fiscal_year_id
+            else:
+                current_fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
+                self.fields['fiscal_year'].initial = current_fiscal_year.id
+
     class Meta:
-        model = StrategicInitiative    
-        fields = ['title','description','proposed_completion_date']  
-        exclude = ['department']
+        model = StrategicInitiative
+        fields = ['title', 'description', 'fiscal_year', 'proposed_completion_date']
+        exclude = ['department', 'created_by']
 
 
 class CreateMissionForm(forms.ModelForm):

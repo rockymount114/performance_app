@@ -800,39 +800,46 @@ def create_measure(request):
     return render(request, 'webapp/create-measure.html', context=context)
 
 
-
-# Create a strategic Initiative
 @login_required(login_url='my-login')
 def create_initiative(request):
-    
     department_id = request.GET.get('department_id')
+    fiscal_year_id = request.GET.get('fiscal_year_id')
+
     if department_id:
-        department = Department.objects.get(id=department_id)
+        department = get_object_or_404(Department, id=department_id)
     else:
-        department = Department.objects.get(id=request.user.department_id)
+        department = get_object_or_404(Department, id=request.user.department_id)
 
-    fiscal_year = FiscalYear.objects.get(name=get_current_fiscal_year())
-    
+    if fiscal_year_id:
+        fiscal_year = get_object_or_404(FiscalYear, id=fiscal_year_id)
+    else:
+        fiscal_year = get_object_or_404(FiscalYear, name=get_current_fiscal_year())
 
-    form = CreateInitiativeForm(initial={
-                                    'department': department,
-                                    'fiscal_year': fiscal_year,
-                                        })  
-    
+    logger.info(f"Creating initiative for department: {department}, fiscal year: {fiscal_year}")
 
     if request.method == "POST":
-        form = CreateInitiativeForm(request.POST)
-        if form.is_valid():            
-            instance = form.save(commit=False)
-            instance.department = department
-            instance.fiscal_year = fiscal_year
-            instance.created_by = request.user.get_full_name()
-            instance.save() 
-            messages.success(request, "Your Strategic Initiative was created!")
+        form = CreateInitiativeForm(request.POST, user=request.user, department_id=department.id, fiscal_year_id=fiscal_year.id)
+        if form.is_valid():
+            initiative = form.save(commit=False)
+            initiative.department = department
+            initiative.fiscal_year = fiscal_year
+            initiative.created_by = request.user.get_full_name()
+            initiative.save()
+
+            logger.info(f"Initiative created: {initiative.id} by user: {request.user.id}")
+            messages.success(request, "Your initiative was created successfully!")
             return redirect("dashboard")
-        
-    context = {'form': form}
-        
+        else:
+            logger.warning(f"Invalid form submission for create_initiative by user: {request.user.id}")
+            messages.error(request, "There was an error in your form. Please check and try again.")
+    else:
+        form = CreateInitiativeForm(user=request.user, department_id=department.id, fiscal_year_id=fiscal_year.id)
+
+    context = {
+        'form': form,
+        'department': department,
+        'fiscal_year': fiscal_year,
+    }
     return render(request, 'webapp/create-initiative.html', context=context)
 
 
