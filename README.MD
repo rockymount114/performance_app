@@ -3,6 +3,15 @@
 ### Performance Management Tracker(PMT)
 This application is designed to help city departments track and manage their performance metrics and initiatives.
 
+## Root .env file format
+```
+EMAIL_HOST=YOUR_EMAIL_SMTP
+EMAIL_PORT=SMPT_PORT
+EMAIL_HOST_USER=YOUR_EMAIL_ADDRESS
+EMAIL_HOST_PASSWORD=YOUR_EMAIL_PASSWORD
+PERFORMANCE_OFFICER_EMAIL=OFFICER_EMAIL
+```
+
 ## Deploy on IIS Server
 
 - ```python -m venv venv```
