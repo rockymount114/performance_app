@@ -20,3 +20,52 @@ DJANGO_SETTINGS_MODULE: crm.settings
 
 PYTHONPATH: D:\www\performance_app
 ```
+
+## Static files
+```
+python manage.py collectstatic --no-input
+```
+
+## Root web.config file
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+    </system.webServer>
+    <location path="" overrideMode="Deny">
+        <system.webServer>
+        </system.webServer>
+    </location>
+
+<appSettings>
+    <!-- Required settings -->
+    <add key="WSGI_HANDLER" value="django.core.wsgi.get_wsgi_application()" />
+    <!-- Your djangoname.settings -->
+    <add key="DJANGO_SETTINGS_MODULE" value="crm.settings" />
+    <!-- Your django path -->
+    <add key="PYTHONPATH" value="D:\www\performance_app" /> 
+    
+  </appSettings>
+
+    <location path="" overrideMode="Allow">
+        <system.webServer>
+        <handlers>
+                <remove name="Performance_app_FastCGI" />
+                <add name="Performance_app_FastCGI" path="*" verb="*" modules="FastCgiModule" scriptProcessor="D:\www\performance_app\venv\Scripts\python.exe|D:\www\performance_app\venv\Lib\site-packages\wfastcgi.py" resourceType="Unspecified" requireAccess="Script" />
+        </handlers>
+        </system.webServer>
+    </location>
+</configuration>
+```
+## Static folder web.config file
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <system.webServer>
+    <handlers>
+      <clear />      
+      <add name="StaticFile" path="*" verb="*" modules="StaticFileModule" resourceType="File" requireAccess="Read" />
+    </handlers>
+  </system.webServer>
+</configuration>
+```
