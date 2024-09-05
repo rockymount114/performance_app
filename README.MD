@@ -11,3 +11,12 @@ This application is designed to help city departments track and manage their per
 - ```pip install wfastcgi` & `wfastcgi-enable```
 - ```python manage.py runserver``` to test it locally
 
+## FASTCGI Setting
+
+```
+WSGI_HANDLER: django.core.wsgi.get_wsgi_application()
+
+DJANGO_SETTINGS_MODULE: crm.settings
+
+PYTHONPATH: D:\www\performance_app
+```
