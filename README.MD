@@ -5,9 +5,9 @@ This application is designed to help city departments track and manage their per
 
 ## Deploy on IIS Server
 
-- `python -m venv venv'
-- `venv/scripts/activate'
-- `pip install -r requirements.txt`
-- `pip install wfastcgi` & `wfastcgi-enable`
-- `python manage.py runserver` to test it locally
+- ```python -m venv venv```
+- ```venv/scripts/activate```
+- ```pip install -r requirements.txt```
+- ```pip install wfastcgi` & `wfastcgi-enable```
+- ```python manage.py runserver``` to test it locally
 
