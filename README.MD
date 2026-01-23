@@ -80,7 +80,7 @@ python manage.py collectstatic --no-input
 ```
 
 **Run fiscal year setting each year if not exist
-```bash
+```sql
   use db_performance
   go
 
