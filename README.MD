@@ -78,3 +78,21 @@ python manage.py collectstatic --no-input
   </system.webServer>
 </configuration>
 ```
+
+**Run fiscal year setting each year if not exist
+```bash
+  use db_performance
+  go
+
+  INSERT INTO [dbo].[webapp_fiscalyear] (
+  [created_at]
+      ,[updated_at]
+      ,[name]
+	  )
+
+	  VALUES (
+	  GETDATE()
+      ,GETDATE()
+	  ,'FY2026'
+	  )
+```
